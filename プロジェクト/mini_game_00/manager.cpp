@@ -1,0 +1,367 @@
+//=============================================================================
+//
+// マネージャー処理 [manager.h]
+// Author : 羽鳥太一
+//
+//=============================================================================
+//=============================================================================
+// インクルード
+//=============================================================================
+#include "renderer.h"
+#include "manager.h"
+#include "texture.h"
+#include "object.h"
+#include "keyinput.h"
+#include "mouseinput.h"
+#include "light.h"
+#include "camera.h"
+#include "fade.h"
+#include "title.h"
+#include "game.h"
+
+//=============================================================================
+// マクロ定義
+//=============================================================================
+#define LIGHT_POS_00 (D3DXVECTOR3(-1000.0f, 1000.0f, 1000.0f))	// ライトの位置
+#define LIGHT_POS_01 (D3DXVECTOR3(0.0f, 1000.0f, 0.0f))	// ライトの位置
+#define LIGHT_POS_02 (D3DXVECTOR3(1000.0f, -1000.0f, -1000.0f))	// ライトの位置
+#define LIGHT_DIR_00 (D3DXVECTOR3(0.2f, -0.8f, 0.4f))	// ライトの向き
+#define LIGHT_DIR_01 (D3DXVECTOR3(0.0f, -1.0f, 0.0f))	// ライトの向き
+#define LIGHT_DIR_02 (D3DXVECTOR3(-0.2f, 0.8f, -0.4f))	// ライトの向き
+#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 25.0f, -50.0f))	// カメラの位置
+#define CAMERA_POS_R (D3DXVECTOR3(0.0f, 0.0f, 500.0f))	// カメラの注視点
+#define CAMERA_ROT (D3DXVECTOR3(0.0f, 0.0f, 0.0f))	// カメラの向き
+
+//=============================================================================
+// 静的メンバ変数宣言
+//=============================================================================
+CManager *CManager::m_single_manager;
+CMouse *CManager::m_mouse;
+CKey *CManager::m_key;
+CRenderer *CManager::m_renderer;
+CCamera *CManager::m_camera;
+CLight *CManager::m_light[MAX_LIGHT];
+CFade *CManager::m_fade;
+CTitle *CManager::m_title;
+CGame *CManager::m_game;
+CTexture *CManager::m_texture;
+CManager::MODE CManager::m_mode;
+HWND CManager::m_hwnd;
+
+//=============================================================================
+// デフォルトコンストラクタ
+//=============================================================================
+CManager::CManager()
+{
+	m_single_manager = nullptr;
+	m_mouse = nullptr;
+	m_key = nullptr;
+	m_renderer = nullptr;
+	m_camera = nullptr;
+	m_fade = nullptr;
+	m_title = nullptr;
+	m_game = nullptr;
+	m_texture = nullptr;
+	m_mode = MODE::TITLE;
+	m_hwnd = NULL;
+	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
+	{
+		m_light[count_liht] = NULL;
+	}
+}
+
+//=============================================================================
+// デストラクタ
+//=============================================================================
+CManager::~CManager()
+{
+
+}
+
+//=============================================================================
+// 期化処理
+//=============================================================================
+HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
+{
+	m_hwnd = hWnd;
+
+	// レンダリングクラスの生成
+	m_renderer = new CRenderer;
+	if (m_renderer != nullptr)
+	{
+		m_renderer->Init(hWnd, bWindow);
+	}
+
+	// キーボードクラスの生成
+	m_key = new CKey;
+	if (m_key != nullptr)
+	{
+		m_key->Init(hInstance, hWnd);
+	}
+
+	// マウスクラスの生成
+	m_mouse = new CMouse;
+	if (m_mouse != nullptr)
+	{
+		m_mouse->Init(hInstance, hWnd);
+	}
+
+	// テクスチャクラスの生成
+	m_texture = new CTexture;
+	if (m_texture != nullptr)
+	{
+		m_texture->Init();
+	}
+
+	//フェードクラスの生成
+	m_fade = new CFade;
+	if (m_fade != nullptr)
+	{
+		m_fade->Init();
+	}
+
+	// ライトとカメラの生成
+	m_camera = CCamera::Create(CAMERA_POS_V, CAMERA_POS_R, CAMERA_ROT);
+	m_light[0] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_00, LIGHT_DIR_00);
+	m_light[1] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_01, LIGHT_DIR_01);
+	m_light[2] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_02, LIGHT_DIR_02);
+
+	// キーバインド
+	m_key->BindKey(CKey::KEYBIND::W, DIK_W);
+
+	// モードの設定
+	SetMode(m_mode);
+
+	return S_OK;
+}
+
+//================================================
+//終了処理
+//================================================
+void CManager::Uninit(void)
+{
+	// 全てのオブジェクトの破棄
+	CObject::ReleaseAll();
+
+	// テクスチャの破棄
+	if (m_texture != nullptr)
+	{
+		// 終了処理
+		m_texture->Uninit();
+
+		// メモリの開放
+		delete m_texture;
+		m_texture = nullptr;
+	}
+
+	// マウスクラスの破棄
+	if (m_mouse != nullptr)
+	{
+		// 終了処理
+		m_mouse->Uninit();
+
+		// メモリの開放
+		delete m_mouse;
+		m_mouse = nullptr;
+	}
+
+	// キーボードクラスの破棄
+	if (m_key != nullptr)
+	{
+		// 終了処理
+		m_key->Uninit();
+
+		// メモリの開放
+		delete m_key;
+		m_key = nullptr;
+	}
+
+	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
+	{
+		// ライトクラスの破棄
+		if (m_light[count_liht] != nullptr)
+		{
+			// 終了処理
+			m_light[count_liht]->Uninit();
+
+			// メモリの開放
+			delete m_light[count_liht];
+			m_light[count_liht] = nullptr;
+		}
+	}
+
+	// カメラクラスの破棄
+	if (m_camera != nullptr)
+	{
+		// 終了処理
+		m_camera->Uninit();
+
+		// メモリの開放
+		delete m_camera;
+		m_camera = nullptr;
+	}
+
+	// フェードクラスの破棄
+	if (m_fade != nullptr)
+	{
+		// 終了処理
+		m_fade->Uninit();
+
+		// メモリの開放
+		delete m_fade;
+		m_fade = nullptr;
+	}
+
+	// レンダラークラスの破棄
+	if (m_renderer != nullptr)
+	{
+		// 終了処理
+		m_renderer->Uninit();
+
+		// メモリの開放
+		delete m_renderer;
+		m_renderer = nullptr;
+	}
+
+	// メモリの開放
+	delete m_single_manager;
+	m_single_manager = nullptr;
+}
+
+//================================================
+//更新処理
+//================================================
+void CManager::Update(void)
+{
+	// キーボードクラス
+	if (m_key != nullptr)
+	{
+		m_key->Update();
+	}
+
+	// マウスクラス
+	if (m_mouse != nullptr)
+	{
+		m_mouse->Update();
+	}
+
+	// ライトクラス
+	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
+	{
+		if (m_light[count_liht] != nullptr)
+		{
+			m_light[count_liht]->Update();
+		}
+	}
+
+	// カメラクラス
+	if (m_camera != nullptr)
+	{
+		m_camera->Update();
+	}
+
+	// フェードクラス
+	if (m_fade != nullptr)
+	{
+		m_fade->Update();
+	}
+
+	// レンダラークラス
+	if (m_renderer != nullptr)
+	{
+		m_renderer->Update();
+	}
+}
+
+//================================================
+//描画処理
+//================================================
+void CManager::Draw(void)
+{
+	// レンダラークラス
+	if (m_renderer != nullptr)
+	{
+		m_renderer->Draw();
+	}
+}
+
+//================================================
+//インスタンス取得処理
+//================================================
+CManager *CManager::GetInstance(void)
+{
+	if (m_single_manager == nullptr)
+	{
+		m_single_manager = new CManager;
+	}
+	return m_single_manager;
+}
+
+//=======================================================================
+//モード設定処理
+//=======================================================================
+void CManager::SetMode(MODE mode)
+{
+	switch (m_mode)
+	{
+	case MODE::TITLE:
+		// nullチェック
+		if (m_title != nullptr)
+		{
+			// 終了処理
+			m_title->Uninit();
+			m_title = nullptr;
+		}
+		break;
+	case MODE::GAME:
+		// nullチェック
+		if (m_game != nullptr)
+		{
+			// 終了処理
+			m_game->Uninit();
+			m_game = nullptr;
+		}
+		break;
+	case MODE::RESULT:
+		break;
+	default:
+		break;
+	}
+
+	//全てのオブジェクトの破棄
+	CObject::ReleaseAll();
+
+	m_mode = mode;
+
+	switch (mode)
+	{
+	case MODE::TITLE:
+		// nullチェック
+		if (m_title == nullptr)
+		{
+			m_title = new CTitle;
+			// nullチェック
+			if (m_title != nullptr)
+			{
+				// 初期化
+				m_title->Init();
+			}
+		}
+		break;
+	case MODE::GAME:
+		// nullチェック
+		if (m_game == nullptr)
+		{
+			m_game = new CGame;
+			// nullチェック
+			if (m_game != nullptr)
+			{
+				// 初期化
+				m_game->Init();
+			}
+		}
+		break;
+	case MODE::RESULT:
+		break;
+	}
+}
