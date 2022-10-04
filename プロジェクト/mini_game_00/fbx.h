@@ -20,31 +20,64 @@
 class CFbx
 {
 public:
-	//メッシュの情報
-	struct MeshInfo 
+	struct MeshData
 	{
-		int polygonCount;	//ポリゴンの数
-		int vertexCount;	//頂点の数
-		int indexCount;	//頂点インデックスの数
-		VERTEX_3D *vertex;	//頂点
-		int *indexBuffer;	//頂点インデックスの順番
-		int uvSetCount;	//UVSetの数
-		string *uvSetName;//UVSetの名前
-		LPDIRECT3DVERTEXBUFFER9  pVB;	//頂点バッファ
-		LPDIRECT3DINDEXBUFFER9 pIB;	//インデックスバッファ
-		LPDIRECT3DTEXTURE9 *texture;	//テクスチャ
-		vector<string> texturePath;	//テクスチャパス
+		LPDIRECT3DVERTEXBUFFER9* m_VertexBuffer;
+		LPDIRECT3DINDEXBUFFER9* m_IndexBuffer;
+		vector<VERTEX_3D> m_Vertices;
+		vector<UINT> m_Indices;
+		string m_MaterialName;
+		string m_UVSetName;
+	};
+	struct CustomVertex
+	{
+		D3DXVECTOR3 Position;		// 座標(x, y, z)
+		D3DXVECTOR3 Normal;			// 法線
+		D3DXCOLOR Color;			// 頂点カラー
+		D3DXVECTOR3 TexturePos;		// テクスチャ座標(u, v)
 	};
 
-	// FBXの情報
-	struct FbxInfo 
+
+	struct ObjMaterial
 	{
-		vector<FbxMesh*> meshes;	//メッシュ
-		int meshCount;	//メッシュの数
-		vector<FbxSurfaceMaterial*> material;	//マテリアル
-		int materialCount;	//マテリアルの数
-		int uvSetCount;	//UVSetの数
-		string *uvSetName;	//UVSetの名前
+		ObjMaterial()
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				Ambient[i] = 1.0f;
+				Diffuse[i] = 1.0f;
+				Specular[i] = 1.0f;
+			}
+		}
+
+		void SetAmbient(float r, float g, float b, float factor)
+		{
+			Ambient[0] = r;
+			Ambient[1] = g;
+			Ambient[2] = b;
+			Ambient[3] = factor;
+		}
+
+		void SetDiffuse(float r, float g, float b, float factor)
+		{
+			Diffuse[0] = r;
+			Diffuse[1] = g;
+			Diffuse[2] = b;
+			Diffuse[3] = factor;
+		}
+
+		void SetSpecular(float r, float g, float b, float factor)
+		{
+			Specular[0] = r;
+			Specular[1] = g;
+			Specular[2] = b;
+			Specular[3] = factor;
+		}
+
+		float Ambient[4];
+		float Diffuse[4];
+		float Specular[4];
+		float Alpha;
 	};
 
 	CFbx();	//コンストラクタ
@@ -54,21 +87,25 @@ public:
 	void Update(void);
 	void Draw(void);
 	static CFbx *Create(string pas);
-	vector<FbxMesh*> GetMesh(void);
-	void GetVertex(int meshIndex, VERTEX_3D* vertex);
-	void GetNormal(int meshIndex, VERTEX_3D* vertex);
-	void GetUVSetName(int meshIndex);
-	void TextureMemoryAllocate(int meshIndex);
-	void GetUV(int meshIndex);
-	void GetMaterial(void);
-	void GetTextureInfo(int meshIndex);
 
 private:
-	FbxManager *m_fbx_manager;
-	FbxImporter *m_fbx_importer;
-	FbxScene *m_fbx_scene;
-	FbxInfo m_fbx_info;
-	vector<MeshInfo> m_mesh_info;
+	bool LoadFbxFile(const char* file_name);
+	bool CreateVertexBuffer();
+	bool CreateIndexBuffer();
+	bool CreateMesh(const char* node_name, FbxMesh* mesh);
+	void CollectMeshNode(FbxNode* node, map<string, FbxNode*>& list);
+	void CreateMesh(FbxMesh* mesh);
+	void LoadIndices(MeshData& mesh_data, FbxMesh* mesh);
+	void LoadVertices(MeshData& mesh_data, FbxMesh* mesh);
+	void LoadNormals(MeshData& mesh_data, FbxMesh* mesh);
+	void LoadColors(MeshData& mesh_data, FbxMesh* mesh);
+	void LoadUV(MeshData& mesh_data, FbxMesh* mesh);
+	void LoadMaterial(FbxSurfaceMaterial* material);
+	bool LoadTexture(FbxFileTexture* material, std::string& keyword);
+	void SetMaterialName(MeshData& mesh_data, FbxMesh* mesh);
+	void SetMaterialColor(DirectGraphics* graphics, ObjMaterial& material);
+	vector<MeshData> m_MeshList;
+	map<string, ObjMaterial> m_Materials;
 	string m_pas;
 	D3DXMATRIX m_mtx_wold;
 	D3DXVECTOR3 m_pos;

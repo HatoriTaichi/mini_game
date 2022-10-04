@@ -24,57 +24,22 @@ CFbx::~CFbx()
 //=============================================================================
 HRESULT CFbx::Init(void)
 {
-	// FBXのマネージャー作成
-	m_fbx_manager = FbxManager::Create();
-
-	// nullチェック
-	if (m_fbx_manager != nullptr)
+	// XFile読み込み
+	if (LoadFbxFile(m_pas.c_str()) == false)
 	{
-		// インポーター作成
-		m_fbx_importer = FbxImporter::Create(m_fbx_manager, "Importer");
-
-		// nullチェック
-		if (m_fbx_importer != nullptr)
-		{
-			// シーン作成
-			m_fbx_scene = FbxScene::Create(m_fbx_manager, "Scene");
-
-			// nullチェック
-			if (m_fbx_scene != nullptr)
-			{
-				// filePathに指定したファイルを読み込む
-				bool result = m_fbx_importer->Initialize(m_pas.c_str());
-				if (result)
-				{
-					//シーンにインポートしたファイルを渡す
-					m_fbx_importer->Import(m_fbx_scene);
-				}
-			}
-		}
-		// インポーターの役目は終わりなので解放する
-		m_fbx_importer->Destroy();
+		return false;
 	}
 
-	// シーンのポリゴンを三角にする
-	FbxGeometryConverter geometryConverter(m_fbx_manager);
-	geometryConverter.Triangulate(m_fbx_scene, true);
-
-	m_fbx_info.meshes = GetMesh();
-
-	int size = m_fbx_info.meshes.size();
-	for (int mesh_count = 0; mesh_count < size; mesh_count++)
+	// VertexBuffer作成
+	if (CreateVertexBuffer() == false)
 	{
-		GetVertex(mesh_count, m_mesh_info[0].vertex);
+		return false;
+	}
 
-		GetNormal(mesh_count, m_mesh_info[0].vertex);
-
-		GetUVSetName(mesh_count);
-
-		GetUV(mesh_count);
-
-		GetMaterial();
-
-		GetTextureInfo(mesh_count);
+	// IndexBuffer作成
+	if (CreateIndexBuffer() == false)
+	{
+		return false;
 	}
 
 	return S_OK;
@@ -138,13 +103,18 @@ void CFbx::Draw(void)
 	pDevice->SetTransform(	D3DTS_WORLD,
 							&m_mtx_wold);
 
-	for (int i = 0; i < m_fbx_info.meshCount; i++)
+	for (auto index : m_Indices) 
 	{
+		// FVF設定(XYZ座標、法線)
 		pDevice->SetFVF(FVF_VERTEX_3D);
-		pDevice->SetTexture(0, *m_mesh_info[i].texture);
-		pDevice->SetStreamSource(0, m_mesh_info[i].pVB, 0, sizeof(VERTEX_3D));
-		pDevice->SetIndices(m_mesh_info[i].pIB);
-		pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, m_mesh_info[i].indexCount, 0, m_mesh_info[i].polygonCount);
+		// テクスチャの設定
+		pDevice->SetTexture(0, NULL); //テクスチャの設定
+		// 頂点バッファの登録
+		pDevice->SetStreamSource(0, m_VertexBuffers[index.first], 0, sizeof(VERTEX_3D));
+		// インデックスバッファの登録
+		pDevice->SetIndices(m_IndexBuffers[index.first]);
+		// 描画
+		pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, 0, 0, m_Vertices[index.first].size(), 0, index.second.size() / 3);
 	}
 }
 
@@ -164,189 +134,355 @@ CFbx *CFbx::Create(string pas)
 	return buf;
 }
 
-vector<FbxMesh*> CFbx::GetMesh(void)
+bool CFbx::LoadFbxFile(const char * file_name)
 {
-	//メッシュの数を取得
-	m_fbx_info.meshCount = m_fbx_scene->GetSrcObjectCount<FbxMesh>();
-	vector<FbxMesh*> meshes;
-	for (int mech_count = 0; mech_count < m_fbx_info.meshCount; ++mech_count)
+	// FbxManager作成
+	FbxManager* fbx_manager = fbxsdk::FbxManager::Create();
+	if (fbx_manager == nullptr)
 	{
-		//i番目のメッシュを取得
-		FbxMesh* mesh = m_fbx_scene->GetSrcObject<FbxMesh>(mech_count);
-		meshes.emplace_back(mesh);
+		return false;
 	}
-	return meshes;
+
+	// FbxImporter作成
+	FbxImporter* fbx_importer = FbxImporter::Create(fbx_manager, "");
+	if (fbx_importer == nullptr)
+	{
+		fbx_manager->Destroy();
+		return false;
+	}
+
+	// FbxScene作成
+	FbxScene* fbx_scene = FbxScene::Create(fbx_manager, "");
+	if (fbx_scene == nullptr)
+	{
+		fbx_importer->Destroy();
+		fbx_manager->Destroy();
+		return false;
+	}
+
+	// Fileを初期化
+	fbx_importer->Initialize(file_name);
+	// sceneにインポート
+	fbx_importer->Import(fbx_scene);
+
+	FbxGeometryConverter converter(fbx_manager);
+	// メッシュに使われているマテリアル単位でメッシュを分割する
+	converter.SplitMeshesPerMaterial(fbx_scene, true);
+	// ポリゴンを三角形にする
+	converter.Triangulate(fbx_scene, true);
+
+	int material_num = fbx_scene->GetSrcObjectCount<FbxSurfaceMaterial>();
+
+	for (int i = 0; i < material_num; i++)
+	{
+		LoadMaterial(fbx_scene->GetSrcObject<FbxSurfaceMaterial>(i));
+	}
+
+	// FbxMeshの数を取得
+	int mesh_num = fbx_scene->GetSrcObjectCount<FbxMesh>();
+
+	for (int i = 0; i < mesh_num; i++)
+	{
+		// Mesh作成
+		CreateMesh(fbx_scene->GetSrcObject<FbxMesh>(i));
+	}
+
+	int texture_num = fbx_scene->GetSrcObjectCount<FbxFileTexture>();
+	for (int i = 0; i < texture_num; i++)
+	{
+		FbxFileTexture* texture = fbx_scene->GetSrcObject<FbxFileTexture>(i);
+		if (texture)
+		{
+			const char* file_name01 = texture->GetFileName();
+			const char* file_name02 = texture->GetRelativeFileName();
+			int tex = texture->GetSrcObjectCount< FbxSurfaceMaterial>();
+		}
+	}
+
+	fbx_importer->Destroy();
+	fbx_scene->Destroy();
+	fbx_manager->Destroy();
+
+	return true;
 }
 
-void CFbx::GetVertex(int meshIndex, VERTEX_3D* vertex)
+bool CFbx::CreateVertexBuffer()
 {
-	//メッシュに含まれる頂点座標を取得
-	FbxVector4* vtx = m_fbx_info.meshes[meshIndex]->GetControlPoints();
-	for (int vIdx = 0; vIdx < m_mesh_info[meshIndex].vertexCount; vIdx++)
+	for (auto& mesh : m_MeshList)
 	{
-		vertex[vIdx].pos.x = (float)vtx[vIdx][0];
-		vertex[vIdx].pos.y = (float)vtx[vIdx][1];
-		vertex[vIdx].pos.z = (float)vtx[vIdx][2];
+		if (FAILED(CManager::GetInstance()->GetRenderer()->GetDevice()->CreateVertexBuffer(
+			// 作成するバッファのサイズ(頂点バッファの数 * 頂点構造体のサイズ)
+			sizeof(VERTEX_3D) * mesh.m_VertexBuffer.size(),
+			// 使用方法
+			0,
+			// FVF設定(SetFVF設定できるので0でも可)
+			FVF_VERTEX_3D,
+			// メモリの指定
+			D3DPOOL_MANAGED,
+			// 生成したVertexBufferの格納先の指定
+			&mesh.m_VertexBuffer,
+			// nullptr固定
+			nullptr)))
+		{
+			return false;
+		}
+
+		// 頂点バッファにデータをコピーする
+		VERTEX_3D* list;
+		if (SUCCEEDED(m_VertexBuffers[vertex_buffer.first]->Lock(
+			// Lockする領域のオフセット値
+			0,
+			// Lockする領域のサイズ(0なら全体)
+			0,
+			// ロックされたポインタ変数を受け取る変数
+			(void**)&list,
+			// ロックの種類
+			0
+		)))
+		{
+			// 頂点データをコピー
+			for (int i = 0; i < vertex_buffer.second.size(); i++)
+			{
+				list[i] = vertex_buffer.second[i];
+			}
+
+			m_VertexBuffers[vertex_buffer.first]->Unlock();
+		}
 	}
-	m_mesh_info[meshIndex].indexBuffer = m_fbx_info.meshes[meshIndex]->GetPolygonVertices();
+
+	return true;
 }
 
-void CFbx::GetNormal(int meshIndex, VERTEX_3D* vertex)
+bool CFbx::CreateIndexBuffer()
+{
+	for (auto index : m_Indices)
+	{
+		_D3DFORMAT format = _D3DFORMAT::D3DFMT_INDEX32;
+
+		if (FAILED(CManager::GetInstance()->GetRenderer()->GetDevice()->CreateIndexBuffer(
+			// インデックスバッファのサイズ
+			sizeof(UINT) * index.second.size(),
+			// 使用方法
+			D3DUSAGE_WRITEONLY,
+			// インデックスバッファのフォーマット
+			format,
+			// メモリの指定
+			D3DPOOL_MANAGED,
+			// 生成したIndexBufferの格納先の指定
+			&m_IndexBuffers[index.first],
+			// nullptr固定
+			nullptr)))
+		{
+			return false;
+		}
+
+		// インデックスバッファにコピーする
+		UINT* index_buffer;
+		if (SUCCEEDED(m_IndexBuffers[index.first]->Lock(
+			// Lockする領域のオフセット値
+			0,
+			// Lockする領域のサイズ(0なら全体)
+			0,
+			// ロックされたポインタ変数を受け取る変数
+			(void**)&index_buffer,
+			// ロックの種類
+			0
+		)))
+		{
+			// インデックスデータをコピー
+			for (int i = 0; i < index.second.size() / 3; i++)
+			{
+				for (int j = 0; j < 3; j++)
+				{
+					index_buffer[i * 3 + j] = index.second[i * 3 + j];
+				}
+			}
+
+			m_IndexBuffers[index.first]->Unlock();
+
+		}
+	}
+
+	return true;
+}
+
+bool CFbx::CreateMesh(const char * node_name, FbxMesh * mesh)
+{
+	// 頂点バッファの取得
+	FbxVector4* vertices = mesh->GetControlPoints();
+	// インデックスバッファの取得
+	int* indices = mesh->GetPolygonVertices();
+	// 頂点座標の数の取得
+	int polygon_vertex_count = mesh->GetPolygonVertexCount();
+
+	// GetPolygonVertexCount => 頂点数
+	for (int i = 0; i < polygon_vertex_count; i++)
+	{
+		VERTEX_3D vertex;
+		// インデックスバッファから頂点番号を取得
+		int index = indices[i];
+
+		// 頂点座標リストから座標を取得する
+		vertex.pos.x = (float)-vertices[index][0];
+		vertex.pos.y = (float)vertices[index][1];
+		vertex.pos.z = (float)vertices[index][2];
+
+		// 追加
+		m_Vertices[node_name].push_back(vertex);
+	}
+
+	FbxArray<FbxVector4> normals;
+	// 法線リストの取得
+	mesh->GetPolygonVertexNormals(normals);
+
+	// 法線設定
+	for (int i = 0; i < normals.Size(); i++)
+	{
+		m_Vertices[node_name][i].nor.x = (float)-normals[i][0];
+		m_Vertices[node_name][i].nor.y = (float)normals[i][1];
+		m_Vertices[node_name][i].nor.z = (float)normals[i][2];
+	}
+
+	// ポリゴン数の取得
+	int polygon_count = mesh->GetPolygonCount();
+
+	// ポリゴンの数だけ連番として保存する
+	for (int i = 0; i < polygon_count; i++)
+	{
+		m_Indices[node_name].push_back(i * 3 + 2);
+		m_Indices[node_name].push_back(i * 3 + 1);
+		m_Indices[node_name].push_back(i * 3 + 0);
+	}
+
+	return true;
+}
+
+void CFbx::CollectMeshNode(FbxNode * node, map<string, FbxNode*>& list)
+{
+	for (int i = 0; i < node->GetNodeAttributeCount(); i++)
+	{
+		FbxNodeAttribute* attribute = node->GetNodeAttributeByIndex(i);
+
+		// Attributeがメッシュなら追加
+		if (attribute->GetAttributeType() == FbxNodeAttribute::EType::eMesh)
+		{
+			list[node->GetName()] = node;
+			break;
+		}
+	}
+
+	for (int i = 0; i < node->GetChildCount(); i++)
+	{
+		CollectMeshNode(node->GetChild(i), list);
+	}
+}
+
+void CFbx::CreateMesh(FbxMesh * mesh)
+{
+}
+
+void CFbx::LoadIndices(MeshData & mesh_data, FbxMesh * mesh)
+{
+}
+
+void CFbx::LoadVertices(MeshData & mesh_data, FbxMesh * mesh)
+{
+	// 頂点バッファの取得
+	FbxVector4* vertices = mesh->GetControlPoints();
+	// インデックスバッファの取得
+	int* indices = mesh->GetPolygonVertices();
+	// 頂点座標の数の取得
+	int polygon_vertex_count = mesh->GetPolygonVertexCount();
+	// GetPolygonVertexCount => 頂点数
+	for (int i = 0; i < polygon_vertex_count; i++)
+	{
+		VERTEX_3D vertex;
+		// インデックスバッファから頂点番号を取得
+		int index = indices[i];
+
+		// 頂点座標リストから座標を取得する
+		vertex.pos.x = (float)-vertices[index][0];
+		vertex.pos.y = (float)vertices[index][1];
+		vertex.pos.z = (float)vertices[index][2];
+
+		// 追加
+		mesh_data.m_Vertices.push_back(vertex);
+	}
+}
+
+void CFbx::LoadNormals(MeshData & mesh_data, FbxMesh * mesh)
 {
 	FbxArray<FbxVector4> normals;
-	//法線を取得
-	m_fbx_info.meshes[meshIndex]->GetPolygonVertexNormals(normals);
-	//法線の数を取得
-	int normalCount = normals.Size();
-	for (int i = 0; i < normalCount; i++)
+	// 法線リストの取得
+	mesh->GetPolygonVertexNormals(normals);
+
+	// 法線設定
+	for (int i = 0; i < normals.Size(); i++)
 	{
-		//頂点インデックスに対応した頂点に値を代入
-		vertex[m_mesh_info[meshIndex].indexBuffer[i]].nor.x = static_cast<float>(normals[i][0]);
-		vertex[m_mesh_info[meshIndex].indexBuffer[i]].nor.y = static_cast<float>(normals[i][1]);
-		vertex[m_mesh_info[meshIndex].indexBuffer[i]].nor.z = static_cast<float>(normals[i][2]);
+		mesh_data.m_Vertices[i].nor.x = (float)-normals[i][0];
+		mesh_data.m_Vertices[i].nor.y = (float)normals[i][1];
+		mesh_data.m_Vertices[i].nor.z = (float)normals[i][2];
 	}
 }
 
-void CFbx::GetUVSetName(int meshIndex) 
-{
-	FbxStringList uvsetName;
-	//メッシュに含まれるUVSet名をすべて取得
-	m_fbx_info.meshes[meshIndex]->GetUVSetNames(uvsetName);
-	//UVSetの数を取得
-	m_mesh_info[meshIndex].uvSetCount = m_fbx_info.meshes[meshIndex]->GetUVLayerCount();
-	/*テクスチャ関係のメモリ確保*/
-	TextureMemoryAllocate(meshIndex);
-	for (int i = 0; i < m_mesh_info[meshIndex].uvSetCount; i++)
+void CFbx::LoadColors(MeshData & mesh_data, FbxMesh * mesh)
+{	
+	// 頂点カラーデータの数を確認
+	int color_count = mesh->GetElementVertexColorCount();
+	if (color_count == 0)
 	{
-		//UVSet名を取得
-		m_mesh_info[meshIndex].uvSetName[i] = uvsetName[i];
+		return;
 	}
-}
+	
+	// 頂点カラーデータの取得
+	FbxGeometryElementVertexColor* vertex_colors = mesh->GetElementVertexColor(0);
 
-void CFbx::TextureMemoryAllocate(int meshIndex) 
-{
-	m_mesh_info[meshIndex].uvSetName = new std::string[m_mesh_info[meshIndex].uvSetCount];
-	m_mesh_info[meshIndex].texturePath.reserve(m_mesh_info[meshIndex].uvSetCount);
-	m_mesh_info[meshIndex].texture = new LPDIRECT3DTEXTURE9[m_mesh_info[meshIndex].uvSetCount];
-}
-
-void CFbx::GetUV(int meshIndex) 
-{
-	FbxArray<FbxVector2> uvsets;
-	FbxStringList uvsetName;
-	m_fbx_info.meshes[meshIndex]->GetUVSetNames(uvsetName);
-	//UVを取得
-	m_fbx_info.meshes[meshIndex]->GetPolygonVertexUVs(uvsetName.GetStringAt(0), uvsets);
-	//UVの数を取得
-	int uvsetCount = uvsets.Size();
-	for (int i = 0; i < uvsetCount; i++)
+	if (vertex_colors == nullptr)
 	{
-		//頂点インデックスに対応した頂点に値を代入
-		m_mesh_info[meshIndex].vertex[m_mesh_info[meshIndex].indexBuffer[i]].tex.x = static_cast<float>(uvsets[i][0]);
-		m_mesh_info[meshIndex].vertex[m_mesh_info[meshIndex].indexBuffer[i]].tex.y = static_cast<float>(uvsets[i][1]);
+		return;
 	}
-}
 
-void CFbx::GetMaterial(void)
-{
-	//マテリアルの数を取得
-	m_fbx_info.materialCount = m_fbx_scene->GetMaterialCount();
-	m_fbx_info.material.reserve(m_fbx_info.materialCount);
-	for (int i = 0; i < m_fbx_info.materialCount; i++)
+	FbxLayerElement::EMappingMode mapping_mode = vertex_colors->GetMappingMode();
+	FbxLayerElement::EReferenceMode reference_mode = vertex_colors->GetReferenceMode();
+
+	if (mapping_mode == FbxLayerElement::eByPolygonVertex)
 	{
-		//マテリアルを取得
-		m_fbx_info.material.emplace_back(m_fbx_scene->GetMaterial(i));
-	}
-}
-
-void CFbx::GetTextureInfo(int meshIndex) 
-{
-	int uvIndex = 0;
-	for (int matIndex = 0; matIndex < m_fbx_info.materialCount; matIndex++)
-	{
-		//diffuseの情報を取得
-		FbxProperty prop = m_fbx_info.material[matIndex]->FindProperty(FbxSurfaceMaterial::sDiffuse);
-		//レイヤテクスチャの数を取得する
-		int layeredTextureCount = prop.GetSrcObjectCount<FbxLayeredTexture>();
-
-		//レイヤテクスチャを利用している場合
-		if (0 < layeredTextureCount)
+		if (reference_mode == FbxLayerElement::eIndexToDirect)
 		{
-			for (int j = 0; layeredTextureCount > j; j++) 
+			// 頂点カラーバッファ取得
+			FbxLayerElementArrayTemplate<FbxColor>& colors = vertex_colors->GetDirectArray();
+			// 頂点カラーインデックスバッファ取得
+			FbxLayerElementArrayTemplate<int>& indeces = vertex_colors->GetIndexArray();
+			for (int i = 0; i < indeces.GetCount(); i++)
 			{
-
-				//レイヤテクスチャを取得する
-				FbxLayeredTexture* layeredTexture = prop.GetSrcObject<FbxLayeredTexture>(j);
-				//テクスチャの数を取得する
-				int textureCount = layeredTexture->GetSrcObjectCount<FbxFileTexture>();
-
-				for (int k = 0; textureCount > k; k++)
-				{
-					//テクスチャを取得する
-					FbxFileTexture* texture = prop.GetSrcObject<FbxFileTexture>(k);
-
-					if (texture)
-					{
-						//テクスチャ名を取得する
-						string textureName = texture->GetRelativeFileName();
-
-						//UVSet名を取得する
-						string UVSetName = texture->UVSet.Get().Buffer();
-
-						//UVSet名を比較し対応しているテクスチャなら保持する
-						for (int i = 0; i < m_mesh_info[meshIndex].uvSetCount; i++)
-						{
-							if (m_mesh_info[meshIndex].uvSetName[i] == UVSetName) 
-							{
-								//ちゃんと設定していないのでファイルまでのパスを追加しています
-								string a = "Models/test/";
-								m_mesh_info[meshIndex].texturePath.emplace_back(textureName + a);
-								//テクスチャのUVSet名を取得する
-								m_fbx_info.uvSetName[uvIndex] = UVSetName;
-								uvIndex++;
-							}
-						}
-
-					}
-				}
-			}
-		}
-		//レイヤテクスチャを利用していない場合
-		else 
-		{
-			//テクスチャ数を取得する
-			int fileTextureCount = prop.GetSrcObjectCount<FbxFileTexture>();
-
-			if (0 < fileTextureCount)
-			{
-				for (int j = 0; fileTextureCount > j; j++)
-				{
-					//テクスチャを取得する
-					FbxFileTexture* texture = prop.GetSrcObject<FbxFileTexture>(j);
-					if (texture)
-					{
-						//テクスチャ名を取得する
-						string textureName = texture->GetRelativeFileName();
-
-						//UVSet名を取得する
-						string UVSetName = texture->UVSet.Get().Buffer();
-
-						//UVSet名を比較し対応しているテクスチャなら保持する
-						for (int i = 0; i < m_mesh_info[meshIndex].uvSetCount; i++)
-						{
-							if (m_mesh_info[meshIndex].uvSetName[i] == UVSetName)
-							{
-								string a = "Models/test/";
-								m_mesh_info[meshIndex].texturePath.emplace_back(textureName + a);
-								m_fbx_info.uvSetName[uvIndex] = UVSetName;
-								uvIndex++;
-							}
-						}
-					}
-				}
+				int id = indeces.GetAt(i);
+				FbxColor color = colors.GetAt(id);
+				mesh_data.m_Vertices[i].col.a = (float)color.mAlpha;
+				mesh_data.m_Vertices[i].col.r = (float)color.mRed;
+				mesh_data.m_Vertices[i].col.g = (float)color.mGreen;
+				mesh_data.m_Vertices[i].col.b = (float)color.mBlue;
 			}
 		}
 	}
-	//UVSetの数を取得する
-	m_fbx_info.uvSetCount = uvIndex;
+}
+
+void CFbx::LoadUV(MeshData & mesh_data, FbxMesh * mesh)
+{
+}
+
+void CFbx::LoadMaterial(FbxSurfaceMaterial * material)
+{
+}
+
+bool CFbx::LoadTexture(FbxFileTexture * material, std::string & keyword)
+{
+	return false;
+}
+
+void CFbx::SetMaterialName(MeshData & mesh_data, FbxMesh * mesh)
+{
+}
+
+void CFbx::SetMaterialColor(DirectGraphics * graphics, ObjMaterial & material)
+{
 }
