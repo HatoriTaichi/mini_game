@@ -181,6 +181,11 @@ void CRenderer::Draw(void)
 	// Direct3Dによる描画の開始
 	if (SUCCEEDED(m_pD3DDevice->BeginScene()))
 	{
+		// カメラクラス
+		if (camera != nullptr)
+		{
+			camera->SetCamera();
+		}
 		// オブジェクトの描画処理
 		CObject::DrawAll();
 		// フェードクラス
@@ -188,11 +193,7 @@ void CRenderer::Draw(void)
 		{
 			fade->Draw();
 		}
-		// カメラクラス
-		if (camera != nullptr)
-		{
-			camera->SetCamera();
-		}
+
 #ifdef _DEBUG
 		// FPS表示
 		DrawFPS();
