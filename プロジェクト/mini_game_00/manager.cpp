@@ -84,6 +84,7 @@ CManager::~CManager()
 //=============================================================================
 HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 {
+	// ハンドルの保存
 	m_hwnd = hWnd;
 
 	// レンダリングクラスの生成
