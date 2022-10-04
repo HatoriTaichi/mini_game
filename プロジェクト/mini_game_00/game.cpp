@@ -9,9 +9,9 @@
 //=============================================================================
 #include "game.h"
 #include "meshfloo.h"
-#include "object2D.h"
 #include "keyinput.h"
 #include "fade.h"
+#include "singlemodel.h"
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -35,7 +35,7 @@ CGame::~CGame()
 HRESULT CGame::Init(void)
 {
 	CMeshFloo::Create(D3DXVECTOR3(-100.0f, 10.0f, 0.0f), D3DXVECTOR3(0.0f, 10.0f, 0.0f), 32, 32, 64, 64, "Sky.jpg");
-	CObject2D::Create(D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), D3DXVECTOR3(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4, 0.0f), "Sky.jpg");;
+	CSingleModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "Player000.x");
 
 	return S_OK;
 }
