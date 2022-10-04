@@ -33,7 +33,7 @@ CCamera::CCamera()
 	D3DXMatrixIdentity(&m_mtx_projection);
 	D3DXMatrixIdentity(&m_mtx_view);
 	m_long = 0.0f;
-	m_zoom = 0.0f;
+	m_zoom = CAMERA_ZOOM_NORMAL;
 }
 
 //=============================================================================
