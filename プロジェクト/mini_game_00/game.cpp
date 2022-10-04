@@ -58,9 +58,7 @@ void CGame::Update(void)
 
 	if (key->GetTrigger(CKey::KEYBIND::W) == true)
 	{
-		CFade *fade = CManager::GetInstance()->GetFade();
-
-		fade->SetFade(CManager::MODE::TITLE);
+		CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::TITLE);
 	}
 }
 

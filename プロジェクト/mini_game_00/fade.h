@@ -11,7 +11,7 @@
 // インクルードファイル
 //*****************************************************************************
 #include "main.h"
-#include "manager.h"
+#include "scenemanager.h"
 
 //*****************************************************************************
 // クラス定義
@@ -25,12 +25,12 @@ public:
 	void Uninit(void);	//終了処理
 	void Update(void);	//更新処理
 	void Draw(void);	//描画処理
-	void SetFade(CManager::MODE mode);	//フェードの設定
+	void SetFade(CSceneManager::MODE mode);	//フェードの設定
 	bool GetFade(void);		//フェード中かどうかを取得
 
 private:
 	LPDIRECT3DVERTEXBUFFER9 m_vtx_buff;	//頂点バッファへのポインタ
-	CManager::MODE m_nextMode;	//次のモード
+	CSceneManager::MODE m_next_mode;	//次のモード
 	bool m_fade_in;	//暗くなっていく状態かどうか
 	float m_col_a;	//カラーのアルファ値
 };

@@ -169,7 +169,7 @@ void CRenderer::Update(void)
 //=============================================================================
 void CRenderer::Draw(void)
 {
-	CFade *fade = CManager::GetInstance()->GetFade();	// フェードクラス	
+	CFade *fade = CManager::GetInstance()->GetSceneManager()->GetFade();	// フェードクラス	
 	CCamera *camera = CManager::GetInstance()->GetCamera();	// カメラクラス
 
 	// デバックバッファ&Zバッファのクリア
