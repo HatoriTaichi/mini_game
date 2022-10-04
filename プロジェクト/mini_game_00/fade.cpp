@@ -16,7 +16,7 @@ CFade::CFade()
 	m_vtx_buff = NULL;
 	m_col_a = 0.0f;
 	m_fade_in = false;
-	m_nextMode = CManager::MODE::TITLE;
+	m_next_mode = CSceneManager::MODE::TITLE;
 }
 
 //=============================================================================
@@ -107,7 +107,7 @@ void CFade::Update(void)
 		{
 			m_col_a = 1.0f;
 			m_fade_in = false;
-			CManager::SetMode(m_nextMode);
+			CSceneManager::SetMode(m_next_mode);
 		}
 	}
 
@@ -153,12 +153,12 @@ void CFade::Draw(void)
 //=============================================================================
 // フェードの設定
 //=============================================================================
-void CFade::SetFade(CManager::MODE mode) 
+void CFade::SetFade(CSceneManager::MODE mode) 
 {
 	if (m_fade_in == false)
 	{
 		m_fade_in = true;
-		m_nextMode = mode;
+		m_next_mode = mode;
 	}
 }
 

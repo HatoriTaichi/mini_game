@@ -10,6 +10,8 @@
 #include "title.h"
 #include "meshsphere.h"
 #include "keyinput.h"
+#include "manager.h"
+#include "scenemanager.h"
 #include "fade.h"
 #include "singlemodel.h"
 
@@ -58,9 +60,7 @@ void CTitle::Update(void)
 
 	if (key->GetTrigger(CKey::KEYBIND::W) == true)
 	{
-		CFade *fade = CManager::GetInstance()->GetFade();
-
-		fade->SetFade(CManager::MODE::GAME);
+		CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::GAME);
 	}
 }
 

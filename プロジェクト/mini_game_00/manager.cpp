@@ -15,9 +15,7 @@
 #include "mouseinput.h"
 #include "light.h"
 #include "camera.h"
-#include "fade.h"
-#include "title.h"
-#include "game.h"
+#include "scenemanager.h"
 #include "model.h"
 
 //=============================================================================
@@ -41,12 +39,9 @@ CMouse *CManager::m_mouse;
 CKey *CManager::m_key;
 CRenderer *CManager::m_renderer;
 CCamera *CManager::m_camera;
+CSceneManager *CManager::m_scene_manager;
 CLight *CManager::m_light[MAX_LIGHT];
-CFade *CManager::m_fade;
-CTitle *CManager::m_title;
-CGame *CManager::m_game;
 CTexture *CManager::m_texture;
-CManager::MODE CManager::m_mode;
 HWND CManager::m_hwnd;
 
 //=============================================================================
@@ -59,11 +54,8 @@ CManager::CManager()
 	m_key = nullptr;
 	m_renderer = nullptr;
 	m_camera = nullptr;
-	m_fade = nullptr;
-	m_title = nullptr;
-	m_game = nullptr;
+	m_scene_manager = nullptr;
 	m_texture = nullptr;
-	m_mode = MODE::TITLE;
 	m_hwnd = NULL;
 	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
 	{
@@ -118,11 +110,11 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 		m_texture->Init();
 	}
 
-	//フェードクラスの生成
-	m_fade = new CFade;
-	if (m_fade != nullptr)
+	// シーンマネージャークラスの生成
+	m_scene_manager = new CSceneManager;
+	if (m_scene_manager != nullptr)
 	{
-		m_fade->Init();
+		m_scene_manager->Init();
 	}
 
 	// ライトとカメラの生成
@@ -134,8 +126,8 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	// キーバインド
 	m_key->BindKey(CKey::KEYBIND::W, DIK_W);
 
-	// モードの設定
-	SetMode(m_mode);
+	// 初期シーン
+	m_scene_manager->SetMode(CSceneManager::MODE::TITLE);
 
 	return S_OK;
 }
@@ -209,15 +201,15 @@ void CManager::Uninit(void)
 		m_camera = nullptr;
 	}
 
-	// フェードクラスの破棄
-	if (m_fade != nullptr)
+	// シーンマネージャークラスの破棄
+	if (m_scene_manager != nullptr)
 	{
 		// 終了処理
-		m_fade->Uninit();
+		m_scene_manager->Uninit();
 
 		// メモリの開放
-		delete m_fade;
-		m_fade = nullptr;
+		delete m_scene_manager;
+		m_scene_manager = nullptr;
 	}
 
 	// レンダラークラスの破棄
@@ -268,10 +260,10 @@ void CManager::Update(void)
 		m_camera->Update();
 	}
 
-	// フェードクラス
-	if (m_fade != nullptr)
+	// シーンマネージャークラス
+	if (m_scene_manager != nullptr)
 	{
-		m_fade->Update();
+		m_scene_manager->Update();
 	}
 
 	// レンダラークラス
@@ -303,73 +295,4 @@ CManager *CManager::GetInstance(void)
 		m_single_manager = new CManager;
 	}
 	return m_single_manager;
-}
-
-//=======================================================================
-//モード設定処理
-//=======================================================================
-void CManager::SetMode(MODE mode)
-{
-	switch (m_mode)
-	{
-	case MODE::TITLE:
-		// nullチェック
-		if (m_title != nullptr)
-		{
-			// 終了処理
-			m_title->Uninit();
-			m_title = nullptr;
-		}
-		break;
-	case MODE::GAME:
-		// nullチェック
-		if (m_game != nullptr)
-		{
-			// 終了処理
-			m_game->Uninit();
-			m_game = nullptr;
-		}
-		break;
-	case MODE::RESULT:
-		break;
-	default:
-		break;
-	}
-
-	//全てのオブジェクトの破棄
-	CObject::ReleaseAll();
-
-	m_mode = mode;
-
-	switch (mode)
-	{
-	case MODE::TITLE:
-		// nullチェック
-		if (m_title == nullptr)
-		{
-			m_title = new CTitle;
-			// nullチェック
-			if (m_title != nullptr)
-			{
-				// 初期化
-				m_title->Init();
-			}
-		}
-		break;
-	case MODE::GAME:
-		// nullチェック
-		if (m_game == nullptr)
-		{
-			m_game = new CGame;
-			// nullチェック
-			if (m_game != nullptr)
-			{
-				// 初期化
-				m_game->Init();
-			}
-		}
-		break;
-	case MODE::RESULT:
-		break;
-	}
 }

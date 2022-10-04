@@ -6,6 +6,7 @@
 //=============================================================================
 #include "main.h"
 #include "manager.h"
+#include "scenemanager.h"
 
 //===========================================================
 // マクロ定義
@@ -170,7 +171,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case VK_ESCAPE:				// [ESC]キーが押された
 
 			//ゲーム中でなかったら
-			if (CManager::GetInstance()->GetMode() != CManager::MODE::GAME)
+			if (CManager::GetInstance()->GetSceneManager()->GetMode() != CSceneManager::MODE::GAME)
 			{
 				DestroyWindow(hWnd);	// ウィンドウを破棄するよう指示する
 			}
