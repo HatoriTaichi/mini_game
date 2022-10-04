@@ -160,6 +160,7 @@
     <ClInclude Include="manager.h" />
     <ClInclude Include="meshfloo.h" />
     <ClInclude Include="meshsphere.h" />
+    <ClInclude Include="model.h" />
     <ClInclude Include="mouseinput.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="renderer.h" />
@@ -181,6 +182,7 @@
     <ClCompile Include="manager.cpp" />
     <ClCompile Include="meshfloo.cpp" />
     <ClCompile Include="meshsphere.cpp" />
+    <ClCompile Include="model.cpp" />
     <ClCompile Include="mouseinput.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="renderer.cpp" />
