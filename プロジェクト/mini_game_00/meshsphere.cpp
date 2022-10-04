@@ -53,30 +53,29 @@ HRESULT CMeshsphere::Init(void)
 									vtx_buff,
 									NULL);
 	}
-
 	// 頂点バッファの設定
 	if (*vtx_buff != NULL)
 	{
-		VERTEX_3D *pVtx;	// 頂点バッファのポインタ
+		VERTEX_3D *vtx;	//頂点バッファのポインタ
 
-		// 頂点バッファをロックし、頂点データへのポインタを取得
-		(*vtx_buff)->Lock(0, 0, (void**)&pVtx, 0);
+							//頂点バッファをロックし、頂点データへのポインタを取得
+		(*vtx_buff)->Lock(0, 0, (void**)&vtx, 0);
 
 		int vtx_num = 0;
-		for (int count_y = 0; count_y < m_x_num + 1; count_y++)
+		for (int y_count = 0; y_count < m_y_num + 1; y_count++)
 		{
-			for (int count_x = 0; count_x < m_y_num + 1; count_x++, vtx_num++)
+			for (int x_count = 0; x_count < m_x_num + 1; x_count++, vtx_num++)
 			{
-				pVtx[vtx_num].pos = D3DXVECTOR3(cosf(D3DX_PI * 2 / m_x_num * count_x) * sinf(D3DX_PI * 2 / m_y_num * count_y + (D3DX_PI / 2)) * m_radius,
-												sinf(D3DX_PI * 2 / m_x_num * count_y) * m_radius,
-												sinf(D3DX_PI * 2 / m_x_num * count_x) * sinf(D3DX_PI * 2 / m_y_num * count_y + (D3DX_PI / 2)) * m_radius);
-				pVtx[vtx_num].nor = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
-				pVtx[vtx_num].col = D3DCOLOR_RGBA(255, 255, 255, 255);
-				pVtx[vtx_num].tex = D3DXVECTOR2((1.0f / m_x_num) * count_x, (1.0f / m_y_num) * count_y);
+				vtx[vtx_num].pos = D3DXVECTOR3(cosf(D3DX_PI * 2 / m_x_num * x_count) * sinf(D3DX_PI * 2 / m_x_num * y_count + (D3DX_PI / 2)) * m_radius,
+					sinf(D3DX_PI * 2 / m_x_num * y_count) * m_radius,
+					sinf(D3DX_PI * 2 / m_x_num * x_count) * sinf(D3DX_PI * 2 / m_x_num * y_count + (D3DX_PI / 2)) * m_radius);
+				vtx[vtx_num].nor = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
+				vtx[vtx_num].col = D3DCOLOR_RGBA(255, 255, 255, 255);
+				vtx[vtx_num].tex = D3DXVECTOR2((1.0f / m_x_num) * x_count, (1.0f / m_y_num) * y_count);
 			}
 		}
 		vtx_num = 0;
-		// 頂点バッファをアンロックする
+		//頂点バッファをアンロックする
 		(*vtx_buff)->Unlock();
 	}
 

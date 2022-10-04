@@ -8,9 +8,9 @@
 // インクルード
 //=============================================================================
 #include "singlemodel.h"
-#include "model.h"
 #include "manager.h"
 #include "renderer.h"
+#include "fbx.h"
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -33,9 +33,19 @@ CSingleModel::~CSingleModel()
 //=============================================================================
 HRESULT CSingleModel::Init(void)
 {
-	m_model = CModel::Create(m_name);
-	m_model->SetScale(m_scale);
-	m_model->SetPrent(nullptr);
+	switch (m_type)
+	{
+	case CSingleModel::MODEL_FILE::X:
+		m_x_model = CModel::Create(m_name);
+		m_x_model->SetScale(m_scale);
+		m_x_model->SetPrent(nullptr);
+		break;
+	case CSingleModel::MODEL_FILE::FBX:
+		m_fbx_model = CFbx::Create(m_name);
+		break;
+	default:
+		break;
+	}
 
 	return S_OK;
 }
@@ -45,9 +55,21 @@ HRESULT CSingleModel::Init(void)
 //=============================================================================
 void CSingleModel::Uninit(void)
 {
-	m_model->Uninit();
-	delete m_model;
-	m_model = nullptr;
+	switch (m_type)
+	{
+	case CSingleModel::MODEL_FILE::X:
+		m_x_model->Uninit();
+		delete m_x_model;
+		m_x_model = nullptr;
+		break;
+	case CSingleModel::MODEL_FILE::FBX:
+		m_fbx_model->Uninit();
+		delete m_fbx_model;
+		m_fbx_model = nullptr;
+		break;
+	default:
+		break;
+	}
 }
 
 //=============================================================================
@@ -55,7 +77,17 @@ void CSingleModel::Uninit(void)
 //=============================================================================
 void CSingleModel::Update(void)
 {
-	m_model->Update();
+	switch (m_type)
+	{
+	case CSingleModel::MODEL_FILE::X:
+		m_x_model->Update();
+		break;
+	case CSingleModel::MODEL_FILE::FBX:
+		m_fbx_model->Update();
+		break;
+	default:
+		break;
+	}
 }
 
 //=============================================================================
@@ -93,13 +125,23 @@ void CSingleModel::Draw(void)
 	//マトリックスの設定
 	device->SetTransform(	D3DTS_WORLD,
 							&m_mtx_wold);
-	m_model->Draw();
+	switch (m_type)
+	{
+	case CSingleModel::MODEL_FILE::X:
+		m_x_model->Draw();
+		break;
+	case CSingleModel::MODEL_FILE::FBX:
+		m_fbx_model->Draw();
+		break;
+	default:
+		break;
+	}
 }
 
 //=============================================================================
 // モデルの生成
 //=============================================================================
-CSingleModel *CSingleModel::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, string name)
+CSingleModel *CSingleModel::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, string name, MODEL_FILE type)
 {
 	// モデルのポインタ
 	CSingleModel *single_model = nullptr;
@@ -113,6 +155,7 @@ CSingleModel *CSingleModel::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3
 		single_model->m_rot = rot;
 		single_model->m_scale = scale;
 		single_model->m_name = name;
+		single_model->m_type = type;
 
 		// 初期化
 		single_model->Init();

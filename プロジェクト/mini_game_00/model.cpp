@@ -132,7 +132,7 @@ void CModel::Draw(void)
 	LPDIRECT3DDEVICE9 device = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスの取得
 
 	//--------------------------------------
-	//プレイヤー(原点)のマトリックスの設定
+	// マトリックスの設定
 	//--------------------------------------
 	D3DXMATRIX mtx_rot, mtx_scale, mtx_trans, mtx_parent;	// 計算用マトリックス
 
