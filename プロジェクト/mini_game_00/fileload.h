@@ -22,13 +22,13 @@ public:
 	{
 		pair<vector<string>, vector<string>> file_name_pas;	// パスと名前の読み込み
 		map<string, int> type;		// 疑似列挙型
-	} TEXTURE_DATA;
+	} PAS_AND_NAME_DATA;
 
 	CFileLoad();		//コンストラクタ
 	~CFileLoad();		//デストラクタ
 	static vector<string> LoadFile(string load_file);	// ファイルロード
 	static vector<string> LoadTxt(string load_file);	// テキストロード
-	static TEXTURE_DATA CreateFilePasElement(vector<string> all_file_info, string load_file);	// パスと名前の取得
+	static PAS_AND_NAME_DATA CreatePasAndNameElement(vector<string> all_file_info, string load_file);	// パスと名前の取得
 
 private:
 };

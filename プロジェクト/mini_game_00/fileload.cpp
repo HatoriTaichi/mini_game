@@ -84,10 +84,10 @@ vector<string> CFileLoad::LoadTxt(string load_file)
 //=============================================================================
 // パスと名前の読み込み
 //=============================================================================
-CFileLoad::TEXTURE_DATA CFileLoad::CreateFilePasElement(vector<string> all_file_info, string load_file)
+CFileLoad::PAS_AND_NAME_DATA CFileLoad::CreatePasAndNameElement(vector<string> all_file_info, string load_file)
 {
 	vector<string> folder_name;	// フォルダの保存バッファ
-	CFileLoad::TEXTURE_DATA file_data_buf;	// 抽出する情報
+	CFileLoad::PAS_AND_NAME_DATA file_data_buf;	// 抽出する情報
 	int file_element;	// テキストファイルの文字列サイズ
 	file_element = all_file_info.size();
 

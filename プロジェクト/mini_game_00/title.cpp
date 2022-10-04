@@ -11,7 +11,7 @@
 #include "meshsphere.h"
 #include "keyinput.h"
 #include "fade.h"
-#include "counter.h"
+#include "singlemodel.h"
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -35,7 +35,7 @@ CTitle::~CTitle()
 HRESULT CTitle::Init(void)
 {
 	CMeshsphere::Create(D3DXVECTOR3(100.0f, 10.0f, 0.0f), D3DXVECTOR3(0.0f, 10.0f, 0.0f), 32, 8, 3200, "Sky.jpg");
-	CCounter::Create(D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), 5, "Sky.jpg");
+	CSingleModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "Player000.x");
 
 	return S_OK;
 }
