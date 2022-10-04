@@ -18,6 +18,7 @@
 #include "fade.h"
 #include "title.h"
 #include "game.h"
+#include "model.h"
 
 //=============================================================================
 // マクロ定義
@@ -92,6 +93,9 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 		m_renderer->Init(hWnd, bWindow);
 	}
 
+	// モデルのロード
+	CModel::Load();
+
 	// キーボードクラスの生成
 	m_key = new CKey;
 	if (m_key != nullptr)
@@ -142,6 +146,9 @@ void CManager::Uninit(void)
 {
 	// 全てのオブジェクトの破棄
 	CObject::ReleaseAll();
+
+	// モデルの破棄
+	CModel::UnLoad();
 
 	// テクスチャの破棄
 	if (m_texture != nullptr)

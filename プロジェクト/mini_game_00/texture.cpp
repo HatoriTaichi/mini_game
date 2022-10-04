@@ -36,7 +36,7 @@ void CTexture::Init(void)
 	// ファイルを読み込む
 	m_all_file = CFileLoad::LoadFile("data\\Texture\\");
 	// パスと名前を取得
-	m_file_data = CFileLoad::CreateFilePasElement(m_all_file, "data\\Texture\\");
+	m_file_data = CFileLoad::CreatePasAndNameElement(m_all_file, "data\\Texture\\");
 
 	// パスの要素数を取得
 	m_num_tex = m_file_data.file_name_pas.first.size();
@@ -45,10 +45,13 @@ void CTexture::Init(void)
 	for (int nCntTex = 0; nCntTex < m_num_tex; nCntTex++)
 	{
 		LPDIRECT3DTEXTURE9 pTexBuffer = NULL;	// テクスチャのバッファ
-		//テクスチャの生成
+		// テクスチャの生成
 		D3DXCreateTextureFromFile(	pDevice,
 									m_file_data.file_name_pas.first[nCntTex].c_str(),
 									&pTexBuffer);
+		// 疑似列挙型を作る
+		m_file_data.type[m_file_data.file_name_pas.second[nCntTex]] = nCntTex;
+
 		// vectorに格納
 		m_texture.push_back(pTexBuffer);
 	}
