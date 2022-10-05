@@ -63,13 +63,21 @@ vector<string> CFileLoad::LoadTxt(string load_file)
 		if (file != NULL)
 		{
 			char buf[1][128];	// 文字列のバッファ
-			string chek_end;	// 終わりかのチェック
+			string chek;	// 終わりかのチェック
 
 			fscanf(file, "%s", buf[0]);
-			chek_end = buf[0];
-			all_data.push_back(buf[0]);
-			if (chek_end == "END_SCRIPT")
+			chek = buf[0];
+
+			// コメントじゃなかったら
+			if (chek != "#")
 			{
+				all_data.push_back(chek);
+			}
+
+			// 最後まで読み込んだら
+			if (chek == "END_SCRIPT")
+			{
+				all_data.push_back(chek);
 				break;
 			}
 		}
@@ -89,7 +97,7 @@ CFileLoad::PAS_AND_NAME_DATA CFileLoad::CreatePasAndNameElement(vector<string> a
 	vector<string> folder_name;	// フォルダの保存バッファ
 	CFileLoad::PAS_AND_NAME_DATA file_data_buf;	// 抽出する情報
 	int file_element;	// テキストファイルの文字列サイズ
-	file_element = all_file_info.size();
+	file_element = all_file_info.size();	// サイズの取得
 
 	// テキストファイルのサイズ分のループ
 	for (int element_count = 0; element_count < file_element; element_count++)
@@ -140,4 +148,26 @@ CFileLoad::PAS_AND_NAME_DATA CFileLoad::CreatePasAndNameElement(vector<string> a
 		}
 	}
 	return file_data_buf;
+}
+
+//=============================================================================
+// 階層とモーションのデータ
+//=============================================================================
+CFileLoad::MODEL_DATA CFileLoad::CreateHierarchyMotion(vector<string> all_file_info)
+{
+	MODEL_DATA buf;	// 階層構造モデルの情報
+	int file_element;	// テキストファイルの文字列サイズ
+
+	file_element = all_file_info.size();	// サイズの取得
+
+	// テキストファイルのサイズ分のループ
+	for (int element_count = 0; element_count < file_element; element_count++)
+	{
+		if (all_file_info[element_count].find("") != string::npos)
+		{
+
+		}
+	}
+
+	return buf;
 }
