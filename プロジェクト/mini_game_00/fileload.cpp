@@ -67,12 +67,7 @@ vector<string> CFileLoad::LoadTxt(string load_file)
 
 			fscanf(file, "%s", buf[0]);
 			chek = buf[0];
-
-			// コメントじゃなかったら
-			if (chek != "#")
-			{
-				all_data.push_back(chek);
-			}
+			all_data.push_back(chek);
 
 			// 最後まで読み込んだら
 			if (chek == "END_SCRIPT")
@@ -153,9 +148,11 @@ CFileLoad::PAS_AND_NAME_DATA CFileLoad::CreatePasAndNameElement(vector<string> a
 //=============================================================================
 // 階層とモーションのデータ
 //=============================================================================
-CFileLoad::MODEL_DATA CFileLoad::CreateHierarchyMotion(vector<string> all_file_info)
+CFileLoad::MODEL_INFO CFileLoad::CreateHierarchyMotion(vector<string> all_file_info, string file_name)
 {
-	MODEL_DATA buf;	// 階層構造モデルの情報
+	MODEL_INFO buf;	// 階層構造モデルの情報
+	MOTIO_NINFO motion;	// モーション情報
+	string motion_name;	// モーションの名前
 	int file_element;	// テキストファイルの文字列サイズ
 
 	file_element = all_file_info.size();	// サイズの取得
@@ -163,9 +160,175 @@ CFileLoad::MODEL_DATA CFileLoad::CreateHierarchyMotion(vector<string> all_file_i
 	// テキストファイルのサイズ分のループ
 	for (int element_count = 0; element_count < file_element; element_count++)
 	{
-		if (all_file_info[element_count].find("") != string::npos)
+		// NUM_MODELを見つけたら
+		if (all_file_info[element_count].find("NUM_MODEL") != string::npos)
 		{
+			// 全体数の保存
+			buf.all_model_num = atoi(all_file_info[element_count + 2].c_str());
+		}
 
+		// MODEL_FILENAMEを見つけたら
+		if (all_file_info[element_count].find("MODEL_FILENAME") != string::npos)
+		{
+			// 名前の保存
+			buf.all_model_name.push_back(all_file_info[element_count + 2]);
+		}
+
+		// INDEXを見つけたら
+		if (all_file_info[element_count].find("INDEX") != string::npos)
+		{
+			// 全体数の保存
+			buf.my_index.push_back(atoi(all_file_info[element_count + 2].c_str()));
+		}
+
+		// PARENTを見つけたら
+		if (all_file_info[element_count].find("PARENT") != string::npos)
+		{
+			// 全体数の保存
+			buf.parent.push_back(atoi(all_file_info[element_count + 2].c_str()));
+		}
+
+		// POSを見つけたら
+		if (all_file_info[element_count].find("POS") != string::npos)
+		{
+			D3DXVECTOR3 pos_buf;	// posのバッファ
+
+			// 全体数の保存
+			pos_buf.x = static_cast<float>(atof(all_file_info[element_count + 2].c_str()));
+			pos_buf.y = static_cast<float>(atof(all_file_info[element_count + 3].c_str()));
+			pos_buf.z = static_cast<float>(atof(all_file_info[element_count + 4].c_str()));
+
+			// 配列に追加
+			buf.pos.push_back(pos_buf);
+		}
+
+		// ROTを見つけたら
+		if (all_file_info[element_count].find("ROT") != string::npos)
+		{
+			D3DXVECTOR3 rot_buf;	// rotのバッファ
+
+			// 全体数の保存
+			rot_buf.x = static_cast<float>(atof(all_file_info[element_count + 2].c_str()));
+			rot_buf.y = static_cast<float>(atof(all_file_info[element_count + 3].c_str()));
+			rot_buf.z = static_cast<float>(atof(all_file_info[element_count + 4].c_str()));
+
+			// 配列に追加
+			buf.rot.push_back(rot_buf);
+		}
+
+		// MOTIONNAMEを見つけたら
+		if (all_file_info[element_count].find("MOTIONNAME") != string::npos)
+		{
+			// モーションの名前を保存
+			motion_name = all_file_info[element_count + 2];
+		}
+
+		// LOOPを見つけたら
+		if (all_file_info[element_count].find("LOOP") != string::npos)
+		{
+			// 何か入ってたらクリア
+			motion.key_info.clear();
+			motion.key_count = 0;
+			motion.frame_count = 0;
+
+			// ループ情報
+			motion.loop = static_cast<bool>(atoi(all_file_info[element_count + 2].c_str()));
+		}
+
+		// NUM_KEYを見つけたら
+		if (all_file_info[element_count].find("NUM_KEY") != string::npos)
+		{
+			// キー数
+			motion.num_key = static_cast<int>(atoi(all_file_info[element_count + 2].c_str()));
+		}
+
+		// KEYSETを見つけたら
+		if (all_file_info[element_count].find("KEYSET") != string::npos)
+		{
+			KEY_INFO key_info_buf;	// キー情報のバッファ
+			int parts_count = 0;	// パーツカウント
+
+			// キー数ループ
+			while (true)
+			{
+				KEY key_buf;	// キーのバッファ
+				D3DXVECTOR3 key_pos_buf;	// posのバッファ
+				D3DXVECTOR3 key_rot_buf;	// rotのバッファ
+
+				// FRAMEを見つけたら
+				if (all_file_info[element_count].find("FRAME") != string::npos)
+				{
+					// フレーム数
+					key_info_buf.frame = static_cast<float>(atof(all_file_info[element_count + 2].c_str()));
+				}
+
+				// POSを見つけたら
+				if (all_file_info[element_count].find("POS") != string::npos)
+				{
+					// 全体数の保存
+					key_pos_buf.x = static_cast<float>(atof(all_file_info[element_count + 2].c_str()));
+					key_pos_buf.y = static_cast<float>(atof(all_file_info[element_count + 3].c_str()));
+					key_pos_buf.z = static_cast<float>(atof(all_file_info[element_count + 4].c_str()));
+
+					// 代入
+					key_buf.pos_x = buf.pos[parts_count].x + key_pos_buf.x;
+					key_buf.pos_y = buf.pos[parts_count].y + key_pos_buf.y;
+					key_buf.pos_z = buf.pos[parts_count].z + key_pos_buf.z;
+				}
+
+				// ROTを見つけたら
+				if (all_file_info[element_count].find("ROT") != string::npos)
+				{
+					// 全体数の保存
+					key_rot_buf.x = static_cast<float>(atof(all_file_info[element_count + 2].c_str()));
+					key_rot_buf.y = static_cast<float>(atof(all_file_info[element_count + 3].c_str()));
+					key_rot_buf.z = static_cast<float>(atof(all_file_info[element_count + 4].c_str()));
+
+					// 代入
+					key_buf.rot_x = buf.rot[parts_count].x + key_rot_buf.x;
+					key_buf.rot_y = buf.rot[parts_count].y + key_rot_buf.y;
+					key_buf.rot_z = buf.rot[parts_count].z + key_rot_buf.z;
+				}
+
+				// END_KEYを見つけたら
+				if (all_file_info[element_count].find("END_KEY") != string::npos)
+				{
+					// 配列に追加
+					key_info_buf.key.push_back(key_buf);
+					parts_count++;
+				}
+
+				// END_KEYSETを見つけたら
+				if (all_file_info[element_count].find("END_KEYSET") != string::npos)
+				{
+					// 配列に追加
+					motion.key_info.push_back(key_info_buf);
+					parts_count = 0;
+					break;
+				}
+				element_count++;
+			}
+		}
+		// END_MOTIONSETを見つけたら
+		if (all_file_info[element_count].find("END_MOTIONSET") != string::npos)
+		{
+			// モーション情報を保存
+			buf.motion_info[motion_name] = motion;
+		}
+	}
+
+	// サイズの取得
+	int namae_size = buf.all_model_name.size();
+
+	// サイズ分のループ
+	for (int element_count = 0; element_count < namae_size; element_count++)
+	{
+		// フォルダの名前のサイズを取得
+		int name_size = file_name.size();
+		for (int count_erase = 0; count_erase < name_size + 1; count_erase++)
+		{
+			// 名前だけを残す
+			buf.all_model_name[element_count].erase(buf.all_model_name[element_count].begin());
 		}
 	}
 
