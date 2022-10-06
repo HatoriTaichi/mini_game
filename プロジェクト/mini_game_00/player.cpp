@@ -14,13 +14,14 @@
 #include "motion.h"
 #include "keyinput.h"
 #include "ingredients.h"
-static const float MoveSpeed = 2.0f;
+static const float MoveSpeed = 5.0f;
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
 CPlayer::CPlayer(LAYER_TYPE layer) : CObject(layer)
 {
 	m_motion_controller = nullptr;
+	memset(m_pColliNoDrop, NULL, sizeof(m_pColliNoDrop));
 }
 
 //=============================================================================
@@ -36,7 +37,41 @@ CPlayer::~CPlayer()
 //=============================================================================
 HRESULT CPlayer::Init(void)
 {
+	SetObjType(CObject::OBJTYPE::PLAYER);
 	CreateModel();
+	if (!m_pCenter)
+	{
+		m_pCenter = CModel::Create("box000");
+		m_pCenter->SetTransparent(true);
+	}
+	if (!m_pColliNoDrop[RIGHT])
+	{
+		m_pColliNoDrop[RIGHT] = CModel::Create("crystal");
+		m_pColliNoDrop[RIGHT]->SetPos({ m_pos.x + 100.0f,m_pos.y,m_pos.z });
+		m_pColliNoDrop[RIGHT]->SetPrent(m_pCenter);
+	}
+	if (!m_pColliNoDrop[LEFT])
+	{
+		m_pColliNoDrop[LEFT] = CModel::Create("crystal");
+		m_pColliNoDrop[LEFT]->SetPos({ m_pos.x - 100.0f,m_pos.y,m_pos.z });
+		m_pColliNoDrop[LEFT]->SetPrent(m_pCenter);
+
+
+	}
+	if (!m_pColliNoDrop[UP])
+	{
+		m_pColliNoDrop[UP] = CModel::Create("crystal");
+		m_pColliNoDrop[UP]->SetPos({ m_pos.x,m_pos.y,m_pos.z + 100.0f });
+		m_pColliNoDrop[UP]->SetPrent(m_pCenter);
+
+
+	}
+	if (!m_pColliNoDrop[DOWN])
+	{
+		m_pColliNoDrop[DOWN] = CModel::Create("crystal");
+		m_pColliNoDrop[DOWN]->SetPos({ m_pos.x,m_pos.y,m_pos.z - 100.0f });
+		m_pColliNoDrop[DOWN]->SetPrent(m_pCenter);
+	}
 
 	return S_OK;
 }
@@ -58,6 +93,15 @@ void CPlayer::Uninit(void)
 	{
 		m_model.pop_back();
 	}
+	for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
+	{
+		if (m_pColliNoDrop[nCnt])
+		{
+			m_pColliNoDrop[nCnt]->Uninit();
+			m_pColliNoDrop[nCnt] = nullptr;
+		}
+	}
+	Release();
 }
 
 //=============================================================================
@@ -116,10 +160,24 @@ void CPlayer::Draw(void)
 
 	// サイズの取得
 	int size = m_model.size();
+	if (m_pCenter)
+	{
+		m_pCenter->Draw();
+	}
 	for (int count_model = 0; count_model < size; count_model++)
 	{
 		m_model[count_model]->Draw();
 	}
+
+	for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
+	{
+		if (m_pColliNoDrop[nCnt])
+		{
+			m_pColliNoDrop[nCnt]->Draw();
+		}
+	}
+
+
 }
 //=============================================================================
 // 移動
@@ -162,8 +220,27 @@ void CPlayer::DropItem()
 	CKey * pKey = CManager::GetKey();
 	if (pKey->GetTrigger(CKey::KEYBIND::SPACE))
 	{
-		CIngredients::Create({m_pos.x,m_pos.y + 90.0f,m_pos.z}, m_rot, { 1.0,1.0,1.0 }, "data/Model/Player/waist.x", true);
+		for (int nCnt = 0; nCnt < 1; nCnt++)
+		{
+			CIngredients::Create({ m_pos.x,m_pos.y + 90.0f,m_pos.z }, m_rot, { 1.0,1.0,1.0 }, "waist", true, nCnt);
+		}
 	}
+}
+//=============================================================================
+// 円の当たり判定
+//=============================================================================
+bool CPlayer::Collision(const D3DXVECTOR3 & pos, float fSize)
+{
+	D3DXVECTOR3 vec = pos - m_pos;
+	float LengthX = sqrtf((vec.x*vec.x));
+	float LengthZ = sqrtf((vec.z*vec.z));
+
+	if (LengthX <= fSize&&
+		LengthZ <= fSize)
+	{
+		return true;
+	}
+	return false;
 }
 
 //=============================================================================

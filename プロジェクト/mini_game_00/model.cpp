@@ -12,7 +12,6 @@
 #include "manager.h"
 #include "texture.h"
 #include "fileload.h"
-
 //=============================================================================
 // 静的メンバ変数宣言
 //=============================================================================
@@ -225,10 +224,10 @@ void CModel::Draw(void)
 bool CModel::BoxCollision(D3DXVECTOR3 *pos, D3DXVECTOR3 posold)
 {
 	// 正面の面の中だったら
-	if (m_box_vtx[0].x <= pos->x && 
-		m_box_vtx[0].y >= pos->y &&
-		m_box_vtx[3].x >= pos->x &&
-		m_box_vtx[3].y <= pos->y)
+	if (m_box_vtx[0].x <= pos->x /*&& 
+		m_box_vtx[0].y >= pos->y */&&
+		m_box_vtx[3].x >= pos->x /*&&
+		m_box_vtx[3].y <= pos->y*/)
 	{
 		D3DXVECTOR3 oldVec;
 
@@ -259,10 +258,10 @@ bool CModel::BoxCollision(D3DXVECTOR3 *pos, D3DXVECTOR3 posold)
 		}
 	}
 	// 裏面の面の中だったら
-	if (m_box_vtx[5].x >= pos->x &&
-		m_box_vtx[5].y >= pos->y &&
-		m_box_vtx[6].x <= pos->x &&
-		m_box_vtx[6].y <= pos->y)
+	if (m_box_vtx[5].x >= pos->x /*&&
+		m_box_vtx[5].y >= pos->y */&&
+		m_box_vtx[6].x <= pos->x /*&&
+		m_box_vtx[6].y <= pos->y*/)
 	{
 		D3DXVECTOR3 oldVec;
 
@@ -293,10 +292,10 @@ bool CModel::BoxCollision(D3DXVECTOR3 *pos, D3DXVECTOR3 posold)
 		}
 	}
 	// 右面の面の中だったら
-	if (m_box_vtx[1].z <= pos->z &&
-		m_box_vtx[1].y >= pos->y &&
-		m_box_vtx[7].z >= pos->z &&
-		m_box_vtx[7].y <= pos->y)
+	if (m_box_vtx[1].z <= pos->z /*&&
+		m_box_vtx[1].y >= pos->y */&&
+		m_box_vtx[7].z >= pos->z /*&&
+		m_box_vtx[7].y <= pos->y*/)
 	{
 		D3DXVECTOR3 oldVec;
 
@@ -327,10 +326,10 @@ bool CModel::BoxCollision(D3DXVECTOR3 *pos, D3DXVECTOR3 posold)
 		}
 	}
 	// 左面の面の中だったら
-	if (m_box_vtx[4].z >= pos->z &&
-		m_box_vtx[4].y >= pos->y &&
-		m_box_vtx[2].z <= pos->z &&
-		m_box_vtx[2].y <= pos->y)
+	if (m_box_vtx[4].z >= pos->z /*&&
+		m_box_vtx[4].y >= pos->y */&&
+		m_box_vtx[2].z <= pos->z /*&&
+		m_box_vtx[2].y <= pos->y*/)
 	{
 		D3DXVECTOR3 oldVec;
 
@@ -360,74 +359,74 @@ bool CModel::BoxCollision(D3DXVECTOR3 *pos, D3DXVECTOR3 posold)
 			}
 		}
 	}
-	// 上面の面の中だったら
-	if (m_box_vtx[4].x <= pos->x &&
-		m_box_vtx[4].z >= pos->z &&
-		m_box_vtx[1].x >= pos->x &&
-		m_box_vtx[1].z <= pos->z)
-	{
-		D3DXVECTOR3 oldVec;
+	//// 上面の面の中だったら
+	//if (m_box_vtx[4].x <= pos->x &&
+	//	m_box_vtx[4].z >= pos->z &&
+	//	m_box_vtx[1].x >= pos->x &&
+	//	m_box_vtx[1].z <= pos->z)
+	//{
+	//	D3DXVECTOR3 oldVec;
 
-		// 1フレーム前のプレイヤーと面の内積
-		oldVec = posold - m_center_vtx[3];
-		float foldDot = D3DXVec3Dot(&m_nor[3], &oldVec);
-		if (foldDot >= 0.0f)
-		{
-			D3DXVECTOR3 Vector;
+	//	// 1フレーム前のプレイヤーと面の内積
+	//	oldVec = posold - m_center_vtx[3];
+	//	float foldDot = D3DXVec3Dot(&m_nor[3], &oldVec);
+	//	if (foldDot >= 0.0f)
+	//	{
+	//		D3DXVECTOR3 Vector;
 
-			// 今のプレイヤーと面の内積
-			Vector = *pos - m_center_vtx[3];
-			float fDot = D3DXVec3Dot(&m_nor[3], &Vector);
-			if (fDot <= 0.0f)
-			{
-				// 進行方向ベクトル
-				D3DXVECTOR3 MoveVec = *pos - posold;
+	//		// 今のプレイヤーと面の内積
+	//		Vector = *pos - m_center_vtx[3];
+	//		float fDot = D3DXVec3Dot(&m_nor[3], &Vector);
+	//		if (fDot <= 0.0f)
+	//		{
+	//			// 進行方向ベクトル
+	//			D3DXVECTOR3 MoveVec = *pos - posold;
 
-				// 内積
-				float fDotMoveVec = -D3DXVec3Dot(&MoveVec, &m_nor[3]);
+	//			// 内積
+	//			float fDotMoveVec = -D3DXVec3Dot(&MoveVec, &m_nor[3]);
 
-				// 内積を法線ベクトルにかける
-				D3DXVECTOR3 NorVecApply = (D3DXVECTOR3(m_nor[3].x * fDotMoveVec, m_nor[3].y * fDotMoveVec, m_nor[3].z * fDotMoveVec));
+	//			// 内積を法線ベクトルにかける
+	//			D3DXVECTOR3 NorVecApply = (D3DXVECTOR3(m_nor[3].x * fDotMoveVec, m_nor[3].y * fDotMoveVec, m_nor[3].z * fDotMoveVec));
 
-				*pos += NorVecApply;
-				return true;
-			}
-		}
-	}
-	// 下面の面の中だったら
-	if (m_box_vtx[7].x >= pos->x &&
-		m_box_vtx[7].z >= pos->z &&
-		m_box_vtx[2].x <= pos->x &&
-		m_box_vtx[2].z <= pos->z)
-	{
-		D3DXVECTOR3 oldVec;
+	//			*pos += NorVecApply;
+	//			return true;
+	//		}
+	//	}
+	//}
+	//// 下面の面の中だったら
+	//if (m_box_vtx[7].x >= pos->x &&
+	//	m_box_vtx[7].z >= pos->z &&
+	//	m_box_vtx[2].x <= pos->x &&
+	//	m_box_vtx[2].z <= pos->z)
+	//{
+	//	D3DXVECTOR3 oldVec;
 
-		// 1フレーム前のプレイヤーと面の内積
-		oldVec = posold - m_center_vtx[4];
-		float foldDot = D3DXVec3Dot(&m_nor[4], &oldVec);
-		if (foldDot >= 0.0f)
-		{
-			D3DXVECTOR3 Vector;
+	//	// 1フレーム前のプレイヤーと面の内積
+	//	oldVec = posold - m_center_vtx[4];
+	//	float foldDot = D3DXVec3Dot(&m_nor[4], &oldVec);
+	//	if (foldDot >= 0.0f)
+	//	{
+	//		D3DXVECTOR3 Vector;
 
-			// 今のプレイヤーと面の内積
-			Vector = *pos - m_center_vtx[4];
-			float fDot = D3DXVec3Dot(&m_nor[4], &Vector);
-			if (fDot <= 0.0f)
-			{
-				// 進行方向ベクトル
-				D3DXVECTOR3 MoveVec = *pos - posold;
+	//		// 今のプレイヤーと面の内積
+	//		Vector = *pos - m_center_vtx[4];
+	//		float fDot = D3DXVec3Dot(&m_nor[4], &Vector);
+	//		if (fDot <= 0.0f)
+	//		{
+	//			// 進行方向ベクトル
+	//			D3DXVECTOR3 MoveVec = *pos - posold;
 
-				// 内積
-				float fDotMoveVec = -D3DXVec3Dot(&MoveVec, &m_nor[4]);
+	//			// 内積
+	//			float fDotMoveVec = -D3DXVec3Dot(&MoveVec, &m_nor[4]);
 
-				// 内積を法線ベクトルにかける
-				D3DXVECTOR3 NorVecApply = (D3DXVECTOR3(m_nor[4].x * fDotMoveVec, m_nor[4].y * fDotMoveVec, m_nor[4].z * fDotMoveVec));
+	//			// 内積を法線ベクトルにかける
+	//			D3DXVECTOR3 NorVecApply = (D3DXVECTOR3(m_nor[4].x * fDotMoveVec, m_nor[4].y * fDotMoveVec, m_nor[4].z * fDotMoveVec));
 
-				*pos += NorVecApply;
-				return true;
-			}
-		}
-	}
+	//			*pos += NorVecApply;
+	//			return true;
+	//		}
+	//	}
+	//}
 	return false;
 }
 
