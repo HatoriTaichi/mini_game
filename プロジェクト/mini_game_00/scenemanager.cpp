@@ -50,9 +50,6 @@ HRESULT CSceneManager::Init(void)
 		m_fade->Init();
 	}
 
-	// ƒ‚[ƒh‚Ìİ’è
-	SetMode(m_mode);
-
 	return S_OK;
 }
 
