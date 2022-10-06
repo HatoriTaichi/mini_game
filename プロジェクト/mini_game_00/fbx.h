@@ -29,15 +29,15 @@ public:
 	static CFbx *Create(string pas);	// ê∂ê¨
 
 private:
-	bool GetAverageNormal(unsigned short *index, unsigned int index_count, FbxLayerElementNormal *normal, D3DXVECTOR3 **out);
 	void RecursiveNode(FbxNode *node);
-	void GetMesh(FbxNodeAttribute *attrib);
+	void GetMesh(FbxNodeAttribute *attrib, FbxNode *node);
 	vector<int> m_index_number;
 	vector<int> m_mesh_vertex_count;
 	vector<int> m_mesh_index_count;
-	vector<pair<int, vector<D3DXVECTOR3>>> m_triangle_info;
+	map<int, vector<D3DXVECTOR3>> m_triangle_mormal;
 	vector<vector<D3DXVECTOR4>> m_control_ary;
 	vector<vector<D3DXVECTOR3>> m_mormal_ary;
+	vector<vector<D3DXMATERIAL>> m_material;
 	string m_pas;
 	vector<LPDIRECT3DVERTEXBUFFER9> m_vtx_buff;
 	vector<LPDIRECT3DINDEXBUFFER9> m_idx_buff;

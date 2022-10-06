@@ -59,7 +59,6 @@ HRESULT CFbx::Init(void)
 		for (int count_vertex = 0; count_vertex < m_mesh_vertex_count[count_mesh]; count_vertex++)
 		{
 			vtx[count_vertex].pos = D3DXVECTOR3(m_control_ary[count_mesh][count_vertex].x, m_control_ary[count_mesh][count_vertex].y, m_control_ary[count_mesh][count_vertex].z);
-			vtx[count_vertex].nor = D3DXVECTOR3(m_mormal_ary[count_mesh][count_vertex].x, m_mormal_ary[count_mesh][count_vertex].y, m_mormal_ary[count_mesh][count_vertex].z);
 			vtx[count_vertex].col = D3DCOLOR_RGBA(255, 255, 255, 255);
 			vtx[count_vertex].tex = D3DXVECTOR2(0.0f, 0.0f);
 			int buf = 0;
@@ -67,9 +66,18 @@ HRESULT CFbx::Init(void)
 			{
 				if (m_index_number[count_index] == count_vertex)
 				{
-
+					m_triangle_mormal[count_vertex].push_back(m_mormal_ary[count_mesh][count_index]);
 				}
 			}
+
+			D3DXVECTOR3 normal_buf;
+			int size = m_triangle_mormal[count_vertex].size();
+			for (int count_normal = 0; count_normal < size; count_normal++)
+			{
+				normal_buf += m_triangle_mormal[count_vertex][count_normal];
+			}
+			D3DXVec3Normalize(&normal_buf, &normal_buf);
+			vtx[count_vertex].nor = D3DXVECTOR3(normal_buf.x, normal_buf.y, normal_buf.z);
 		}
 
 		// 頂点バッファをアンロックする
@@ -172,6 +180,35 @@ void CFbx::Draw(void)
 		// 頂点フォーマットの設定
 		pDevice->SetFVF(FVF_VERTEX_3D);
 
+		int mat_size = m_material[count_mesh].size();
+		for (int count_mat = 0; count_mat < mat_size; count_mat++)
+		{
+			/*m_material[count_mesh][count_mat].MatD3D.Ambient.a = 1.0f;
+			m_material[count_mesh][count_mat].MatD3D.Ambient.r = 1.0f;
+			m_material[count_mesh][count_mat].MatD3D.Ambient.g = 0.0f;
+			m_material[count_mesh][count_mat].MatD3D.Ambient.b = 0.0f;
+
+			m_material[count_mesh][count_mat].MatD3D.Diffuse.a = 1.0f;
+			m_material[count_mesh][count_mat].MatD3D.Diffuse.r = 1.0f;
+			m_material[count_mesh][count_mat].MatD3D.Diffuse.g = 0.0f;
+			m_material[count_mesh][count_mat].MatD3D.Diffuse.b = 0.0f;
+
+			m_material[count_mesh][count_mat].MatD3D.Emissive.a = 1.0f;
+			m_material[count_mesh][count_mat].MatD3D.Emissive.r = 1.0f;
+			m_material[count_mesh][count_mat].MatD3D.Emissive.g = 0.0f;
+			m_material[count_mesh][count_mat].MatD3D.Emissive.b = 0.0f;
+
+			m_material[count_mesh][count_mat].MatD3D.Specular.a = 1.0f;
+			m_material[count_mesh][count_mat].MatD3D.Specular.r = 1.0f;
+			m_material[count_mesh][count_mat].MatD3D.Specular.g = 0.0f;
+			m_material[count_mesh][count_mat].MatD3D.Specular.b = 0.0f;
+
+			m_material[count_mesh][count_mat].MatD3D.Power = 1.0f;*/
+
+			// マテリアルの設定
+			pDevice->SetMaterial(&m_material[count_mesh][count_mat].MatD3D);
+		}
+
 		// テクスチャの設定
 		pDevice->SetTexture(0, NULL);
 
@@ -243,7 +280,7 @@ void CFbx::RecursiveNode(FbxNode *node)
 		case fbxsdk::FbxNodeAttribute::eSkeleton:
 			break;
 		case fbxsdk::FbxNodeAttribute::eMesh:
-			GetMesh(attrib);
+			GetMesh(attrib, node);
 			break;
 		case fbxsdk::FbxNodeAttribute::eNurbs:
 			break;
@@ -288,7 +325,7 @@ void CFbx::RecursiveNode(FbxNode *node)
 //=============================================================================
 // テクスチャの生成
 //=============================================================================
-void CFbx::GetMesh(FbxNodeAttribute *attrib)
+void CFbx::GetMesh(FbxNodeAttribute *attrib, FbxNode *node)
 {
 	// メッシュにダウンキャスト
 	FbxMesh *mesh = static_cast<FbxMesh*>(attrib);
@@ -341,7 +378,7 @@ void CFbx::GetMesh(FbxNodeAttribute *attrib)
 		FbxLayerElementNormal *normal_elem = layer->GetNormals();
 
 		// 法線無し
-		if (normal_elem == 0)
+		if (normal_elem == nullptr)
 		{
 			continue;
 		}
@@ -391,6 +428,148 @@ void CFbx::GetMesh(FbxNodeAttribute *attrib)
 				m_mormal_ary.push_back(vector_buf);
 			}
 		}
+
+		FbxLayerElementUV *uv_elem = layer->GetUVs();
+
+		// 法線無し
+		if (uv_elem == 0)
+		{
+			continue;
+		}
+
+		// UVの数・インデックス
+		int uv_num = uv_elem->GetDirectArray().GetCount();
+		int index_num = uv_elem->GetIndexArray().GetCount();
+		int size = uv_num > index_num ? uv_num : index_num;
+		D3DXVECTOR2 *buf = new D3DXVECTOR2[size];
+
+		// マッピングモード・リファレンスモード取得
+		mapping_mode = uv_elem->GetMappingMode();
+		ref_mode = uv_elem->GetReferenceMode();
+
+		if (mapping_mode == FbxLayerElement::eByPolygonVertex)
+		{
+			if (ref_mode == FbxLayerElement::eDirect)
+			{
+				for (int count_size = 0; count_size < size; count_size++)
+				{
+					buf[count_size].x = static_cast<float>(uv_elem->GetDirectArray().GetAt(count_size)[0]);
+					buf[count_size].y = static_cast<float>(uv_elem->GetDirectArray().GetAt(count_size)[1]);
+				}
+			}
+			else if (ref_mode == FbxLayerElement::eIndexToDirect)
+			{
+				for (int count_size = 0; count_size < size; count_size++)
+				{
+					int index = uv_elem->GetIndexArray().GetAt(count_size);
+					buf[count_size].x = static_cast<float>(uv_elem->GetDirectArray().GetAt(index)[0]);
+					buf[count_size].y = static_cast<float>(uv_elem->GetDirectArray().GetAt(index)[1]);
+				}
+			}
+		}
 	}
+
+	vector<D3DXMATERIAL> mat_vector_buf;
+	int material_num = mesh->GetElementMaterialCount();
+	for (int count_material = 0; count_material < material_num; count_material++)
+	{
+		FbxGeometryElementMaterial *material_element = mesh->GetElementMaterial();
+		int index_material = material_element->GetIndexArray().GetAt(count_material);
+		FbxSurfaceMaterial *material = mesh->GetNode()->GetSrcObject<FbxSurfaceMaterial>(index_material);
+
+		if (material != nullptr)
+		{
+			D3DXMATERIAL mat_buf;
+			if (material->GetClassId().Is(FbxSurfaceLambert::ClassId))
+			{
+				FbxSurfaceLambert *lambert = static_cast<FbxSurfaceLambert*>(material);
+				FbxDouble3 fbx_ambuent = lambert->Ambient;
+				FbxDouble3 fbx_diffuse = lambert->Diffuse;
+				FbxDouble3 fbx_emissive = lambert->Emissive;
+				D3DXCOLOR ambient;
+				D3DXCOLOR diffuse;
+				D3DXCOLOR emissive;
+
+				ambient.r = fbx_ambuent.mData[0];
+				ambient.g = fbx_ambuent.mData[1];
+				ambient.b = fbx_ambuent.mData[2];
+
+				diffuse.r = fbx_diffuse.mData[0];
+				diffuse.g = fbx_diffuse.mData[1];
+				diffuse.b = fbx_diffuse.mData[2];
+
+				emissive.r = fbx_emissive.mData[0];
+				emissive.g = fbx_emissive.mData[1];
+				emissive.b = fbx_emissive.mData[2];
+
+				FbxDouble fbx_transparency = lambert->TransparencyFactor;
+				float transparency = fbx_transparency;
+
+				FbxDouble fbx_ambient_factor = lambert->AmbientFactor;
+				float ambient_factor = fbx_ambient_factor;
+
+				FbxDouble fbx_diffuse_factor = lambert->DiffuseFactor;
+				float diffuse_factor = fbx_diffuse_factor;
+
+				FbxDouble fbx_emissive_factor = lambert->EmissiveFactor;
+				float emissive_factor = fbx_emissive_factor;
+
+				mat_buf.MatD3D.Ambient = ambient;
+				mat_buf.MatD3D.Ambient.a = ambient_factor;
+				mat_buf.MatD3D.Diffuse = diffuse;
+				mat_buf.MatD3D.Diffuse.a = diffuse_factor;
+				mat_buf.MatD3D.Emissive = emissive;
+				mat_buf.MatD3D.Emissive.a = emissive_factor;
+				mat_buf.MatD3D.Specular.a = 1.0f;
+				mat_buf.MatD3D.Specular.r = 1.0f;
+				mat_buf.MatD3D.Specular.g = 1.0f;
+				mat_buf.MatD3D.Specular.b = 1.0f;
+				mat_buf.MatD3D.Power = transparency;
+			}
+			else if (material->GetClassId().Is(FbxSurfacePhong::ClassId))
+			{
+				FbxSurfacePhong *phong = static_cast<FbxSurfacePhong*>(material);
+				FbxDouble3 fbx_ambuent = phong->Ambient;
+				FbxDouble3 fbx_diffuse = phong->Diffuse;
+				FbxDouble3 fbx_emissive = phong->Emissive;
+				FbxDouble3 fbx_specular = phong->Specular;
+				D3DXCOLOR ambient;
+				D3DXCOLOR diffuse;
+				D3DXCOLOR emissive;
+				D3DXCOLOR specular;
+
+				ambient.r = fbx_ambuent.mData[0];
+				ambient.g = fbx_ambuent.mData[1];
+				ambient.b = fbx_ambuent.mData[2];
+
+				diffuse.r = fbx_diffuse.mData[0];
+				diffuse.g = fbx_diffuse.mData[1];
+				diffuse.b = fbx_diffuse.mData[2];
+
+				emissive.r = fbx_emissive.mData[0];
+				emissive.g = fbx_emissive.mData[1];
+				emissive.b = fbx_emissive.mData[2];
+
+				specular.r = fbx_specular.mData[0];
+				specular.g = fbx_specular.mData[1];
+				specular.b = fbx_specular.mData[2];
+
+				FbxDouble fbx_transparency = phong->TransparencyFactor;
+				float transparency = fbx_transparency;
+
+				mat_buf.MatD3D.Ambient = ambient;
+				mat_buf.MatD3D.Diffuse = diffuse;
+				mat_buf.MatD3D.Emissive = emissive;
+				mat_buf.MatD3D.Specular.a = 1.0f;
+				mat_buf.MatD3D.Specular.r = 1.0f;
+				mat_buf.MatD3D.Specular.g = 1.0f;
+				mat_buf.MatD3D.Specular.b = 1.0f;
+				mat_buf.MatD3D.Power = transparency;
+			}
+			mat_vector_buf.push_back(mat_buf);
+		}
+	}
+
+	m_material.push_back(mat_vector_buf);
 	m_mesh_count++;
 }
