@@ -13,6 +13,7 @@
 #include "renderer.h"
 #include "motion.h"
 #include "keyinput.h"
+#include "ingredients.h"
 static const float MoveSpeed = 2.0f;
 //=============================================================================
 // デフォルトコンストラクタ
@@ -68,6 +69,7 @@ void CPlayer::Update(void)
 	m_motion_controller->PlayMotin("NUTLARAL");
 	//移動処理
 	KeyMove();
+	DropItem();
 	// サイズの取得
 	int size = m_model.size();
 	for (int count_model = 0; count_model < size; count_model++)
@@ -157,8 +159,11 @@ void CPlayer::KeyMove(void)
 void CPlayer::DropItem()
 {
 	//具材のクラスにある落とす関数を呼び出す
-
-
+	CKey * pKey = CManager::GetKey();
+	if (pKey->GetTrigger(CKey::KEYBIND::SPACE))
+	{
+		CIngredients::Create({m_pos.x,m_pos.y + 90.0f,m_pos.z}, m_rot, { 1.0,1.0,1.0 }, "data/Model/Player/waist.x", true);
+	}
 }
 
 //=============================================================================
