@@ -154,6 +154,7 @@
     <ClInclude Include="fade.h" />
     <ClInclude Include="fileload.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="ingredients.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="keyinput.h" />
     <ClInclude Include="light.h" />
@@ -180,6 +181,7 @@
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="fileload.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="ingredients.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="keyinput.cpp" />
     <ClCompile Include="light.cpp" />
