@@ -31,6 +31,8 @@ public:
 	void Uninit(void);	// ポリゴンの終了
 	void Update(void);	// ポリゴンの更新
 	void Draw(void);	// ポリゴンの描画
+	void KeyMove(void);//移動処理
+	void DropItem();//具材を落とす
 	static CPlayer *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, string motion_pas);	// 生成
 	D3DXVECTOR3 GetPos(void) { return m_pos; }	// ゲッダー
 	D3DXVECTOR3 GetRot(void) { return m_rot; }	// ゲッダー

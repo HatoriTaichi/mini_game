@@ -12,7 +12,8 @@
 #include "manager.h"
 #include "renderer.h"
 #include "motion.h"
-
+#include "keyinput.h"
+static const float MoveSpeed = 2.0f;
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
@@ -63,8 +64,10 @@ void CPlayer::Uninit(void)
 //=============================================================================
 void CPlayer::Update(void)
 {
-	m_motion_controller->PlayMotin("NUTLARAL");
 
+	m_motion_controller->PlayMotin("NUTLARAL");
+	//移動処理
+	KeyMove();
 	// サイズの取得
 	int size = m_model.size();
 	for (int count_model = 0; count_model < size; count_model++)
@@ -115,6 +118,47 @@ void CPlayer::Draw(void)
 	{
 		m_model[count_model]->Draw();
 	}
+}
+//=============================================================================
+// 移動
+//=============================================================================
+void CPlayer::KeyMove(void)
+{
+	//キーボード情報取得
+	CKey * pKey = CManager::GetKey();
+	if (pKey->GetPress(CKey::KEYBIND::W))
+	{
+		m_pos.z += MoveSpeed;
+		m_rot.y = D3DXToRadian(180.0f);
+	}
+	else if (pKey->GetPress(CKey::KEYBIND::S))
+	{
+		m_pos.z -= MoveSpeed;
+		m_rot.y = D3DXToRadian(0.0f);
+
+	}
+	else if (pKey->GetPress(CKey::KEYBIND::A))
+	{
+		m_pos.x -= MoveSpeed;
+		m_rot.y = D3DXToRadian(90.0f);
+		
+
+	}
+	else if (pKey->GetPress(CKey::KEYBIND::D))
+	{
+		m_pos.x += MoveSpeed;
+		m_rot.y = D3DXToRadian(-90.0f);
+
+	}
+}
+//=============================================================================
+// 具材を落とす処理
+//=============================================================================
+void CPlayer::DropItem()
+{
+	//具材のクラスにある落とす関数を呼び出す
+
+
 }
 
 //=============================================================================

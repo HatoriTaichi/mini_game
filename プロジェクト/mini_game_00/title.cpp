@@ -57,10 +57,10 @@ void CTitle::Update(void)
 {
 	CKey *key = CManager::GetInstance()->GetKey();
 
-	if (key->GetTrigger(CKey::KEYBIND::W) == true)
-	{
-		CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::GAME);
-	}
+	//if (key->GetTrigger(CKey::KEYBIND::W) == true)
+	//{
+	//	CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::GAME);
+	//}
 }
 
 //=============================================================================
