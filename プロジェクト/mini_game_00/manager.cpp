@@ -125,6 +125,9 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 
 	// キーバインド
 	m_key->BindKey(CKey::KEYBIND::W, DIK_W);
+	m_key->BindKey(CKey::KEYBIND::S, DIK_S);
+	m_key->BindKey(CKey::KEYBIND::A, DIK_A);
+	m_key->BindKey(CKey::KEYBIND::D, DIK_D);
 
 	// 初期シーン
 	m_scene_manager->SetMode(CSceneManager::MODE::TITLE);
