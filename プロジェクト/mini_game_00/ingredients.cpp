@@ -22,6 +22,9 @@ static const float FallSpeed = 10.0f;
 static const float UpLimit = 2.0f;
 static const float DownLimit = -2.0f;
 static const float UpDownSpeed = 0.1f;
+static const D3DXVECTOR3 IngredientsOfSet00 = {0.0f,20.0f,10.0f};
+static const D3DXVECTOR3 IngredientsOfSet01 = { -5.0f,25.0f,-10.0f };
+static const D3DXVECTOR3 IngredientsOfSet02 = { 5.0f,30.0f,-10.0f };
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -30,6 +33,13 @@ CIngredients::CIngredients(LAYER_TYPE layer) : CObject(layer)
 {
 	m_fUpDown = 0.0f;
 	m_bUpDown = true;
+	for (int nCnt = 0; nCnt < IngredientsMax; nCnt++)
+	{
+		m_Data.m_IngredientModel[nCnt] = nullptr;
+
+	}
+	m_Data.m_BasketModel = nullptr;
+	m_bDoDrop = false;
 }
 
 //=============================================================================
@@ -46,6 +56,53 @@ CIngredients::~CIngredients()
 HRESULT CIngredients::Init(void)
 {
 	m_bUninit = false;
+	//具材のモデルを生成
+	if (!m_Data.m_BasketModel)
+	{
+		m_Data.m_BasketModel = CModel::Create("player body 1.x");
+	}
+	for (int nCnt = 0; nCnt < IngredientsMax; nCnt++)
+	{
+		if (!m_Data.m_IngredientModel[nCnt])
+		{
+			switch (m_Type)
+			{
+			case CIngredients::Basil:
+				m_Data.m_IngredientModel[nCnt] = CModel::Create("basil.x");
+				break;
+			case CIngredients::Tomato:
+				m_Data.m_IngredientModel[nCnt] = CModel::Create("cut_tomato.x");
+				break;
+			case CIngredients::Cheese:
+				m_Data.m_IngredientModel[nCnt] = CModel::Create("mozzarella_cheese.x");
+				break;
+			case CIngredients::Mushroom:
+				m_Data.m_IngredientModel[nCnt] = CModel::Create("mushroom.x");
+				break;
+			case CIngredients::Salami:
+				m_Data.m_IngredientModel[nCnt] = CModel::Create("salami.x");
+				break;
+			}
+		}
+	}
+	if (m_Data.m_IngredientModel[0])
+	{
+		m_Data.m_IngredientModel[0]->SetPos(IngredientsOfSet00);
+		m_Data.m_IngredientModel[0]->SetPrent(m_Data.m_BasketModel);
+	}
+	if (m_Data.m_IngredientModel[1])
+	{
+		m_Data.m_IngredientModel[1]->SetPos(IngredientsOfSet01);
+		m_Data.m_IngredientModel[1]->SetPrent(m_Data.m_BasketModel);
+
+	}
+	if (m_Data.m_IngredientModel[2])
+	{
+		m_Data.m_IngredientModel[2]->SetPos(IngredientsOfSet02);
+		m_Data.m_IngredientModel[2]->SetPrent(m_Data.m_BasketModel);
+
+	}
+
 	return S_OK;
 }
 
@@ -54,11 +111,20 @@ HRESULT CIngredients::Init(void)
 //=============================================================================
 void CIngredients::Uninit(void)
 {
-	if (m_model)
+	for (int nCnt = 0; nCnt < IngredientsMax; nCnt++)
 	{
-		m_model->Uninit();
-		m_model = nullptr;
+		if (m_Data.m_IngredientModel[nCnt])
+		{
+			m_Data.m_IngredientModel[nCnt]->Uninit();
+			m_Data.m_IngredientModel[nCnt] = nullptr;
+		}
 	}
+	if (m_Data.m_BasketModel)
+	{
+		m_Data.m_BasketModel->Uninit();
+		m_Data.m_BasketModel = nullptr;
+	}
+
 	Release();
 }
 
@@ -122,7 +188,19 @@ void CIngredients::Draw(void)
 	device->SetTransform(D3DTS_WORLD,
 		&m_mtx_wold);
 
-	m_model->Draw();
+	if (m_Data.m_BasketModel)
+	{
+		m_Data.m_BasketModel->Draw();
+	}
+	for (int nCnt = 0; nCnt < IngredientsMax; nCnt++)
+	{
+		if (m_Data.m_IngredientModel[nCnt])
+		{
+			m_Data.m_IngredientModel[nCnt]->Draw();
+		}
+	}
+
+
 	m_oldPos = m_pos;
 
 	//// サイズの取得
@@ -243,7 +321,7 @@ void CIngredients::ColisionPlayer(void)
 // モデルの生成
 //=============================================================================
 CIngredients *CIngredients::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, 
-	D3DXVECTOR3 scale, string ModelPass, bool bDoDrop, const int& DropNum)
+	D3DXVECTOR3 scale, IngredientsType nType, bool bDoDrop, const int& DropNum)
 {
 	// モデルのポインタ
 	CIngredients *Ingredients = nullptr;
@@ -256,14 +334,35 @@ CIngredients *CIngredients::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot,
 		Ingredients->m_pos = pos;
 		Ingredients->m_rot = rot;
 		Ingredients->m_scale = scale;
-		Ingredients->m_model = CModel::Create(ModelPass);
 		Ingredients->m_bDoDrop = bDoDrop;
 		Ingredients->m_nNumDropType = DropNum;
-
+		Ingredients->m_Type = nType;
+		//ドロップの情報を入れる
 		if (Ingredients->m_bDoDrop)
 		{
 			Ingredients->DoDrop(bDoDrop, rot.y);
 		}
+		// 初期化
+		Ingredients->Init();
+	}
+	return Ingredients;
+}
+
+CIngredients *CIngredients::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot,
+	D3DXVECTOR3 scale, IngredientsType nType)
+{
+	// モデルのポインタ
+	CIngredients *Ingredients = nullptr;
+	Ingredients = new CIngredients;
+
+	// nullチェック
+	if (Ingredients != nullptr)
+	{
+		// 値を代入
+		Ingredients->m_pos = pos;
+		Ingredients->m_rot = rot;
+		Ingredients->m_scale = scale;
+		Ingredients->m_Type = nType;
 		// 初期化
 		Ingredients->Init();
 	}

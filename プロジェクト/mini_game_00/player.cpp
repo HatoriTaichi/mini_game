@@ -52,12 +52,15 @@ HRESULT CPlayer::Init(void)
 		m_pColliNoDrop[RIGHT] = CModel::Create("box000.x");
 		m_pColliNoDrop[RIGHT]->SetPos({ m_pos.x + 100.0f,m_pos.y,m_pos.z });
 		m_pColliNoDrop[RIGHT]->SetPrent(m_pCenter);
+		m_pColliNoDrop[RIGHT]->SetTransparent(true);
+
 	}
 	if (!m_pColliNoDrop[LEFT])
 	{
 		m_pColliNoDrop[LEFT] = CModel::Create("crystal.x");
 		m_pColliNoDrop[LEFT]->SetPos({ m_pos.x - 100.0f,m_pos.y,m_pos.z });
 		m_pColliNoDrop[LEFT]->SetPrent(m_pCenter);
+		m_pColliNoDrop[LEFT]->SetTransparent(true);
 
 
 	}
@@ -66,6 +69,7 @@ HRESULT CPlayer::Init(void)
 		m_pColliNoDrop[UP] = CModel::Create("crystal.x");
 		m_pColliNoDrop[UP]->SetPos({ m_pos.x,m_pos.y,m_pos.z + 100.0f });
 		m_pColliNoDrop[UP]->SetPrent(m_pCenter);
+		m_pColliNoDrop[UP]->SetTransparent(true);
 
 
 	}
@@ -74,6 +78,8 @@ HRESULT CPlayer::Init(void)
 		m_pColliNoDrop[DOWN] = CModel::Create("crystal.x");
 		m_pColliNoDrop[DOWN]->SetPos({ m_pos.x,m_pos.y,m_pos.z - 100.0f });
 		m_pColliNoDrop[DOWN]->SetPrent(m_pCenter);
+		m_pColliNoDrop[DOWN]->SetTransparent(true);
+
 	}
 
 	return S_OK;
@@ -318,7 +324,7 @@ void CPlayer::DropItem()
 		}
 		for (int nCnt = 0; nCnt < 1; nCnt++)
 		{
-			CIngredients::Create({ m_pos.x,m_pos.y + 90.0f,m_pos.z }, {m_rot.x,DropRot ,m_rot.z}, { 1.0,1.0,1.0 }, "waist.x", true, nCnt);
+			CIngredients::Create({ m_pos.x,m_pos.y + 90.0f,m_pos.z }, {m_rot.x,DropRot ,m_rot.z}, { 1.0,1.0,1.0 }, CIngredients::IngredientsType::Salami, true, nCnt);
 		}
 	}
 }
