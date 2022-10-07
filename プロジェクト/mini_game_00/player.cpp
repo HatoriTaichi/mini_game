@@ -14,7 +14,10 @@
 #include "motion.h"
 #include "keyinput.h"
 #include "ingredients.h"
+#include "singlemodel.h"
 static const float MoveSpeed = 5.0f;
+static const float NoDropSize = 25.0f;
+
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
@@ -41,18 +44,18 @@ HRESULT CPlayer::Init(void)
 	CreateModel();
 	if (!m_pCenter)
 	{
-		m_pCenter = CModel::Create("box000");
+		m_pCenter = CModel::Create("box000.x");
 		m_pCenter->SetTransparent(true);
 	}
 	if (!m_pColliNoDrop[RIGHT])
 	{
-		m_pColliNoDrop[RIGHT] = CModel::Create("crystal");
+		m_pColliNoDrop[RIGHT] = CModel::Create("box000.x");
 		m_pColliNoDrop[RIGHT]->SetPos({ m_pos.x + 100.0f,m_pos.y,m_pos.z });
 		m_pColliNoDrop[RIGHT]->SetPrent(m_pCenter);
 	}
 	if (!m_pColliNoDrop[LEFT])
 	{
-		m_pColliNoDrop[LEFT] = CModel::Create("crystal");
+		m_pColliNoDrop[LEFT] = CModel::Create("crystal.x");
 		m_pColliNoDrop[LEFT]->SetPos({ m_pos.x - 100.0f,m_pos.y,m_pos.z });
 		m_pColliNoDrop[LEFT]->SetPrent(m_pCenter);
 
@@ -60,7 +63,7 @@ HRESULT CPlayer::Init(void)
 	}
 	if (!m_pColliNoDrop[UP])
 	{
-		m_pColliNoDrop[UP] = CModel::Create("crystal");
+		m_pColliNoDrop[UP] = CModel::Create("crystal.x");
 		m_pColliNoDrop[UP]->SetPos({ m_pos.x,m_pos.y,m_pos.z + 100.0f });
 		m_pColliNoDrop[UP]->SetPrent(m_pCenter);
 
@@ -68,7 +71,7 @@ HRESULT CPlayer::Init(void)
 	}
 	if (!m_pColliNoDrop[DOWN])
 	{
-		m_pColliNoDrop[DOWN] = CModel::Create("crystal");
+		m_pColliNoDrop[DOWN] = CModel::Create("crystal.x");
 		m_pColliNoDrop[DOWN]->SetPos({ m_pos.x,m_pos.y,m_pos.z - 100.0f });
 		m_pColliNoDrop[DOWN]->SetPrent(m_pCenter);
 	}
@@ -109,6 +112,27 @@ void CPlayer::Uninit(void)
 //=============================================================================
 void CPlayer::Update(void)
 {
+	if (m_pCenter)
+	{
+		m_pCenter->SetPos(m_pos);
+	}
+	if (m_pColliNoDrop[RIGHT])
+	{
+		m_pColliNoDrop[RIGHT]->SetPos({ m_pos.x + 100.0f,m_pos.y,m_pos.z });
+	}
+	if (m_pColliNoDrop[LEFT])
+	{
+		m_pColliNoDrop[LEFT]->SetPos({ m_pos.x - 100.0f,m_pos.y,m_pos.z });
+	}
+	if (m_pColliNoDrop[UP])
+	{
+		m_pColliNoDrop[UP]->SetPos({ m_pos.x,m_pos.y,m_pos.z + 100.0f });
+	}
+	if (m_pColliNoDrop[DOWN])
+	{
+		m_pColliNoDrop[DOWN]->SetPos({ m_pos.x,m_pos.y,m_pos.z - 100.0f });
+	}
+
 
 	m_motion_controller->PlayMotin("NUTLARAL");
 	//移動処理
@@ -120,6 +144,34 @@ void CPlayer::Update(void)
 	{
 		m_model[count_model]->Update();
 	}
+	for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
+	{
+		m_bDrop[nCnt] = true;
+	}
+	vector<CObject *>Obj = CObject::GetObjTypeObject(CObject::OBJTYPE::BLOCK);
+	int nSize = Obj.size();
+	if (nSize != 0)
+	{
+		for (int nCnt = 0; nCnt < nSize; nCnt++)
+		{
+			CSingleModel *pSModel = static_cast<CSingleModel*>(Obj[nCnt]);
+			for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
+			{
+				D3DXVECTOR3 pos = m_pColliNoDrop[nCnt]->GetPos();
+				D3DXVECTOR3 vec = pSModel->GetPos() - pos;
+				float LengthX = sqrtf((vec.x*vec.x));
+				float LengthZ = sqrtf((vec.z*vec.z));
+				if (LengthX <= NoDropSize&&
+					LengthZ <= NoDropSize)
+				{
+					//ドロップしないようにする
+					m_bDrop[nCnt] = false;
+				}
+			}
+
+		}
+	}
+
 }
 
 //=============================================================================
@@ -128,7 +180,10 @@ void CPlayer::Update(void)
 void CPlayer::Draw(void)
 {
 	LPDIRECT3DDEVICE9 device = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスの取得
-
+	//if (m_pCenter)
+	//{
+	//	m_pCenter->Draw();
+	//}
 	//--------------------------------------
 	//プレイヤー(原点)のマトリックスの設定
 	//--------------------------------------
@@ -160,10 +215,7 @@ void CPlayer::Draw(void)
 
 	// サイズの取得
 	int size = m_model.size();
-	if (m_pCenter)
-	{
-		m_pCenter->Draw();
-	}
+
 	for (int count_model = 0; count_model < size; count_model++)
 	{
 		m_model[count_model]->Draw();
@@ -190,25 +242,25 @@ void CPlayer::KeyMove(void)
 	{
 		m_pos.z += MoveSpeed;
 		m_rot.y = D3DXToRadian(180.0f);
+		nFacing = UP;
 	}
 	else if (pKey->GetPress(CKey::KEYBIND::S))
 	{
 		m_pos.z -= MoveSpeed;
 		m_rot.y = D3DXToRadian(0.0f);
-
+		nFacing = DOWN;
 	}
 	else if (pKey->GetPress(CKey::KEYBIND::A))
 	{
 		m_pos.x -= MoveSpeed;
 		m_rot.y = D3DXToRadian(90.0f);
-		
-
+		nFacing = LEFT;
 	}
 	else if (pKey->GetPress(CKey::KEYBIND::D))
 	{
 		m_pos.x += MoveSpeed;
 		m_rot.y = D3DXToRadian(-90.0f);
-
+		nFacing = RIGHT;
 	}
 }
 //=============================================================================
@@ -220,9 +272,53 @@ void CPlayer::DropItem()
 	CKey * pKey = CManager::GetKey();
 	if (pKey->GetTrigger(CKey::KEYBIND::SPACE))
 	{
+		//int n
+		float DropRot = 0.0f;
+		for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
+		{
+			//ドロップ方向が可能な範囲なら
+			if (m_bDrop[nFacing])
+			{
+				switch (nFacing)
+				{
+				case CPlayer::UP:
+					DropRot = D3DXToRadian(180.0f);
+					break;
+				case CPlayer::DOWN:
+					DropRot = D3DXToRadian(0.0f);
+					break;
+				case CPlayer::RIGHT:
+					DropRot = D3DXToRadian(-90.0f);
+					break;
+				case CPlayer::LEFT:
+					DropRot = D3DXToRadian(90.0f);
+					break;
+				}
+				break;
+			}
+			else
+			{
+				switch (nCnt)
+				{
+				case CPlayer::UP:
+					DropRot = D3DXToRadian(180.0f);
+					break;
+				case CPlayer::DOWN:
+					DropRot = D3DXToRadian(0.0f);
+					break;
+				case CPlayer::RIGHT:
+					DropRot = D3DXToRadian(-90.0f);
+					break;
+				case CPlayer::LEFT:
+					DropRot = D3DXToRadian(90.0f);
+					break;
+				}
+				break;
+			}
+		}
 		for (int nCnt = 0; nCnt < 1; nCnt++)
 		{
-			CIngredients::Create({ m_pos.x,m_pos.y + 90.0f,m_pos.z }, m_rot, { 1.0,1.0,1.0 }, "waist", true, nCnt);
+			CIngredients::Create({ m_pos.x,m_pos.y + 90.0f,m_pos.z }, {m_rot.x,DropRot ,m_rot.z}, { 1.0,1.0,1.0 }, "waist.x", true, nCnt);
 		}
 	}
 }

@@ -205,7 +205,7 @@ void CIngredients::Motion(void)
 //=============================================================================
 void CIngredients::ColisionWall()
 {
-	vector<CObject *>Obj = CObject::GetObjTypeObject(CObject::OBJTYPE::MODEL);
+	vector<CObject *>Obj = CObject::GetObjTypeObject(CObject::OBJTYPE::BLOCK);
 	int nSize = Obj.size();
 	if (nSize != 0)
 	{

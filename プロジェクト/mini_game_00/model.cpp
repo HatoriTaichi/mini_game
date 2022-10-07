@@ -63,10 +63,10 @@ HRESULT CModel::Init(void)
 	int tex_num = CManager::GetInstance()->GetTexture()->GetNum();	// テクスチャ総数取得
 
 	// マテリアル情報のポインタ
-	mat = (D3DXMATERIAL*)m_model_data[static_cast<int>(m_file_data.type[m_pas])].buff_mat->GetBufferPointer();
+	mat = (D3DXMATERIAL*)m_model_data[m_file_data.type[m_pas]].buff_mat->GetBufferPointer();
 
 	// マテリアル分のループ
-	for (int count_mat = 0; count_mat < static_cast<int>(m_model_data[static_cast<int>(m_file_data.type[m_pas])].num_mat); count_mat++)
+	for (int count_mat = 0; count_mat < static_cast<int>(m_model_data[m_file_data.type[m_pas]].num_mat); count_mat++)
 	{
 		// マテリアルにテクスチャがあったら
 		if (mat[count_mat].pTextureFilename != NULL)
