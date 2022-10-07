@@ -33,6 +33,8 @@ CSingleModel::~CSingleModel()
 //=============================================================================
 HRESULT CSingleModel::Init(void)
 {
+	CObject::SetObjType(CObject::OBJTYPE::MODEL);
+
 	m_model = CModel::Create(m_name);
 	m_model->SetScale(m_scale);
 	m_model->SetPrent(nullptr);

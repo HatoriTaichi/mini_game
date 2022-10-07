@@ -17,7 +17,7 @@
 //*****************************************************************************
 #define CAMERA_DESTAANCE (500)	// カメラと注視点の距離
 #define CAMERA_ZOOM_MAX (10)	// ズーム
-#define CAMERA_ZOOM_NORMAL (90)	// ノーマル
+#define CAMERA_ZOOM_NORMAL (70)	// ノーマル
 #define CAMERA_MAX_RENDERER	(50000.0f)	// カメラでの描画最大Z値
 #define CAMERA_MIN_RENDERER	(4.0f)	// カメラでの描画最小Z値
 //=============================================================================
@@ -70,22 +70,22 @@ void CCamera::Uninit(void)
 //=============================================================================
 void CCamera::Update(void)
 {
-	CMouse *mouse = CManager::GetMouse();
+	//CMouse *mouse = CManager::GetMouse();
 
-	m_rot.x += mouse->GetMouseState().lX * 0.01f;
-	m_rot.y += mouse->GetMouseState().lY * 0.01f;
+	//m_rot.x += mouse->GetMouseState().lX * 0.01f;
+	//m_rot.y += mouse->GetMouseState().lY * 0.01f;
 
-	if (m_rot.y >= D3DX_PI - 0.1f)
-	{
-		m_rot.y = D3DX_PI - 0.1f;
-	}
-	else if (m_rot.y <= -0.0f + 0.1f)
-	{
-		m_rot.y = -0.0f + 0.1f;
-	}
-	m_pos_r.x = m_pos_v.x + (sinf(m_rot.y) * sinf(m_rot.x)) * m_long;
-	m_pos_r.y = m_pos_v.y + cosf(m_rot.y)				  * m_long;
-	m_pos_r.z = m_pos_v.z + (sinf(m_rot.y) * cosf(m_rot.x)) * m_long;
+	//if (m_rot.y >= D3DX_PI - 0.1f)
+	//{
+	//	m_rot.y = D3DX_PI - 0.1f;
+	//}
+	//else if (m_rot.y <= -0.0f + 0.1f)
+	//{
+	//	m_rot.y = -0.0f + 0.1f;
+	//}
+	//m_pos_r.x = m_pos_v.x + (sinf(m_rot.y) * sinf(m_rot.x)) * m_long;
+	//m_pos_r.y = m_pos_v.y + cosf(m_rot.y)				  * m_long;
+	//m_pos_r.z = m_pos_v.z + (sinf(m_rot.y) * cosf(m_rot.x)) * m_long;
 }
 
 //=============================================================================

@@ -121,6 +121,29 @@ void CObject::DrawAll(void)
 	}
 }
 
+vector<CObject*> CObject::GetObjTypeObject(const OBJTYPE & ObjType)
+{
+	vector<CObject*> buf;
+	// レイヤー数ループ
+	for (int count_priolty = 0; count_priolty < static_cast<int>(LAYER_TYPE::MAX); count_priolty++)
+	{
+		// サイズを取得
+		int object_size = m_object[count_priolty].size();
+
+		// サイズ数分ループ
+		for (int count_object = 0; count_object < object_size; count_object++)
+		{
+			// 引数のOBJTypeと一緒なら
+			if (m_object[count_priolty][count_object]->m_obj_type == ObjType)
+			{
+				buf.push_back(m_object[count_priolty][count_object]);
+			}
+		}
+	}
+
+	return buf;
+}
+
 //================================================
 // レイヤー変更処理
 //================================================

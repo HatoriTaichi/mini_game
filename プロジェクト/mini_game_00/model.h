@@ -47,6 +47,8 @@ public:
 	void SetScale(D3DXVECTOR3 scale) { m_scale = scale; }	// セッター
 	void SetMatrix(D3DXMATRIX mtx) { m_mtx_wold = mtx; }	// セッター
 	void SetPrent(CModel *pModel) { m_parent = pModel; }	// セッター
+	void SetTransparent(bool bTransparent) { m_transparent = bTransparent; }	// セッター
+
 	D3DXVECTOR3 GetPos(void) { return m_pos; }		// ゲッター
 	D3DXVECTOR3 GetRot(void) { return m_rot; }		// ゲッター
 	D3DXVECTOR3 GetScale(void) { return m_scale; }		// ゲッター
