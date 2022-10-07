@@ -213,7 +213,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\MODEL\\TEXTURE\\pizza logo.png";
+    "data\\TEXTURE\\Player\\pizza_logo.png";
    }
   }
  }
