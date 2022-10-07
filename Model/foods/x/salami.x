@@ -227,7 +227,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    \\data\\TEXTURE\\Foods\\salami.jpg";
+    "data\\TEXTURE\\Foods\\salami.jpg";
    }
   }
  }
