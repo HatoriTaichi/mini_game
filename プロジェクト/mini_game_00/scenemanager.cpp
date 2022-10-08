@@ -23,11 +23,11 @@ CSceneManager::MODE CSceneManager::m_mode;
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
-CSceneManager::CSceneManager()
+CSceneManager::CSceneManager(CSceneManager::MODE mode)
 {
 	m_title = nullptr;
 	m_game = nullptr;
-	m_mode = CSceneManager::MODE::TITLE;
+	m_mode = mode;
 }
 
 //=============================================================================

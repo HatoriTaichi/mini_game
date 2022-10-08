@@ -27,7 +27,7 @@
 #define LIGHT_DIR_00 (D3DXVECTOR3(0.2f, -0.8f, 0.4f))	// ライトの向き
 #define LIGHT_DIR_01 (D3DXVECTOR3(0.0f, -1.0f, 0.0f))	// ライトの向き
 #define LIGHT_DIR_02 (D3DXVECTOR3(-0.2f, 0.8f, -0.4f))	// ライトの向き
-#define CAMERA_POS_V (D3DXVECTOR3(150.0f, 150.0f, 150.0f))	// カメラの位置
+#define CAMERA_POS_V (D3DXVECTOR3(0.0f, -50.0f, 0.0f))	// カメラの位置
 #define CAMERA_POS_R (D3DXVECTOR3(0.0f, 0.0f, 500.0f))	// カメラの注視点
 #define CAMERA_ROT (D3DXVECTOR3(0.0f, 0.0f, 0.0f))	// カメラの向き
 
@@ -111,7 +111,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	}
 
 	// シーンマネージャークラスの生成
-	m_scene_manager = new CSceneManager;
+	m_scene_manager = new CSceneManager(CSceneManager::MODE::TITLE);
 	if (m_scene_manager != nullptr)
 	{
 		m_scene_manager->Init();
@@ -125,9 +125,6 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 
 	// キーバインド
 	m_key->BindKey(CKey::KEYBIND::W, DIK_W);
-
-	// 初期シーン
-	m_scene_manager->SetMode(CSceneManager::MODE::TITLE);
 
 	return S_OK;
 }

@@ -32,7 +32,7 @@ public:
 		RESULT,	// リザルト
 		MAX
 	};
-	CSceneManager();	// デフォルトコンストラクタ
+	CSceneManager(CSceneManager::MODE mode);	// デフォルトコンストラクタ
 	~CSceneManager();	// デフォルトデストラクタ
 	HRESULT Init(void);	// 初期化
 	void Uninit(void);	// 終了
