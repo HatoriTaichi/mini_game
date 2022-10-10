@@ -15,6 +15,7 @@
 #include "player.h"
 #include "singlemodel.h"
 #include "ingredients.h"
+#include "enemy.h"
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
@@ -51,6 +52,7 @@ HRESULT CTitle::Init(void)
 	{ 1.0,1.0,1.0 }, CIngredients::IngredientsType::Cheese);
 	CIngredients::Create(D3DXVECTOR3(-200.0f,200.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 	{ 1.0,1.0,1.0 }, CIngredients::IngredientsType::Tomato);
+	CEnemy::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/motion.txt");
 
 	
 	return S_OK;

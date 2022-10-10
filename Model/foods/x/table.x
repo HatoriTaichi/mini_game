@@ -670,7 +670,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Downloads\\texture-of-checkered-tablecloth_1205-247.jpg";
+    "data/Texture/Foods/table.jpg";
    }
   }
   Material {
@@ -679,7 +679,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Downloads\\texture-of-checkered-tablecloth_1205-247.jpg";
+    "data/Texture/Foods/table.jpg";
    }
   }
   Material {
@@ -688,7 +688,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Downloads\\texture-of-checkered-tablecloth_1205-247.jpg";
+    "data/Texture/Foods/table.jpg";
    }
   }
  }
