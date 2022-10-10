@@ -1,3 +1,12 @@
+//=============================================================================
+//
+// fbxモデル処理 [fbx.cpp]
+// Author : 羽鳥太一
+//
+//=============================================================================
+//=============================================================================
+// インクルード
+//=============================================================================
 #include "fbx.h"
 #include "manager.h"
 #include "renderer.h"
@@ -7,8 +16,19 @@
 //=============================================================================
 CFbx::CFbx()
 {
-	m_pos = { 0.0f, 0.0f, 0.0f };
-	m_rot = { 0.0f, 0.0f, 0.0f };
+	m_vertex_ary.clear();
+	m_mormal_ary.clear();
+	m_uv_ary.clear();
+	m_material.clear();
+	m_tex.clear();
+	m_index_number.clear();
+	m_vtx_buff.clear();
+	m_idx_buff.clear();
+	D3DXMatrixIdentity(&m_mtx_wold);
+	m_pas.clear();
+	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_mesh_count = 0;
 }
 
 //=============================================================================
@@ -20,33 +40,40 @@ CFbx::~CFbx()
 }
 
 //=============================================================================
-// テクスチャの生成
+// 初期化
 //=============================================================================
 HRESULT CFbx::Init(void)
 {
-	FbxManager *manager = FbxManager::Create();
-	FbxImporter *importer = FbxImporter::Create(manager, "Importer");
-	FbxScene *scene = FbxScene::Create(manager, "Scene");
+	m_manager = FbxManager::Create();	// fbxマネージャーの生成
+	m_importer = FbxImporter::Create(m_manager, "Importer");	// fbxインポーターの生成
+	m_scene = FbxScene::Create(m_manager, "Scene");	// fbxシーンの生成
 	LPDIRECT3DDEVICE9 device = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスの取得
 
-	importer->Initialize(m_pas.c_str());
+	// インポーターでファイルの初期化
+	m_importer->Initialize(m_pas.c_str());
 
-	importer->Import(scene);
+	// インポーターでシーンに情報を渡す
+	m_importer->Import(m_scene);
 
-	FbxGeometryConverter converter(manager);
-	converter.Triangulate(scene, true);
+	// 四角形ポリゴンを三角形ポリゴンに直す
+	FbxGeometryConverter converter(m_manager);
+	converter.Triangulate(m_scene, true);
 
-	FbxNode *root_node = scene->GetRootNode();
+	// ルートノードを取得
+	FbxNode *root_node = m_scene->GetRootNode();
 
+	// ノードの情報を再帰処理で取得
 	RecursiveNode(root_node);
 
+	// メッシュ分のループ
 	for (int count_mesh = 0; count_mesh < m_mesh_count; count_mesh++)
 	{
-		LPDIRECT3DVERTEXBUFFER9 buf = nullptr;
-		VERTEX_3D *vtx;
-		vector<pair<int, vector<D3DXVECTOR3>>> triangle_info_buf;
+		LPDIRECT3DVERTEXBUFFER9 buf = nullptr;	// 頂点バッファ
+		VERTEX_3D *vtx;	// 頂点情報
+		int vertex_size = m_vertex_ary[count_mesh].size();	// 頂点サイズの取得
 
-		device->CreateVertexBuffer(	sizeof(VERTEX_3D) * m_mesh_vertex_count[count_mesh],
+		// 頂点バッファの生成
+		device->CreateVertexBuffer(	sizeof(VERTEX_3D) * vertex_size,
 									D3DUSAGE_WRITEONLY,
 									FVF_VERTEX_3D,
 									D3DPOOL_MANAGED,
@@ -56,79 +83,52 @@ HRESULT CFbx::Init(void)
 		// 頂点バッファをロックし、頂点データへのポインタを取得
 		buf->Lock(0, 0, (void**)&vtx, 0);
 
-		for (int count_vertex = 0; count_vertex < m_mesh_vertex_count[count_mesh]; count_vertex++)
+		// 頂点サイズ分のループ
+		for (int count_vertex = 0; count_vertex < vertex_size; count_vertex++)
 		{
-			map<int, vector<D3DXVECTOR3>> nor_map_buf;
-			map<int, vector<D3DXVECTOR2>> uv_map_buf;
-			vector<D3DXVECTOR3> nor_buf;
-			vector<D3DXVECTOR2> uv_buf;
-
-			vtx[count_vertex].pos = D3DXVECTOR3(m_control_ary[count_mesh][count_vertex].x, m_control_ary[count_mesh][count_vertex].y, m_control_ary[count_mesh][count_vertex].z);
+			// 頂上情報を設定
+			vtx[count_vertex].pos = D3DXVECTOR3(m_vertex_ary[count_mesh][count_vertex].x, m_vertex_ary[count_mesh][count_vertex].y, m_vertex_ary[count_mesh][count_vertex].z);
 			vtx[count_vertex].col = D3DCOLOR_RGBA(255, 255, 255, 255);
-			int buf = 0;
-			for (int count_index = 0; count_index < m_mesh_index_count[count_mesh]; count_index++)
-			{
-				if (m_index_number[count_index] == count_vertex)
-				{
-					int uv_num = m_uv_ary[count_mesh].size();
-
-					nor_buf.push_back(m_mormal_ary[count_mesh][count_index]);
-
-					if (uv_num > 0)
-					{
-						uv_buf.push_back(m_uv_ary[count_mesh][count_index]);
-					}
-				}
-			}
-			nor_map_buf[count_vertex] = nor_buf;
-			uv_map_buf[count_vertex] = uv_buf;
-			m_triangle_mormal.push_back(nor_map_buf);
-			m_triangle_uv.push_back(uv_map_buf);
-
-			D3DXVECTOR3 normal_buf;
-			int size = m_triangle_mormal[count_vertex][count_vertex].size();
-			for (int count_normal = 0; count_normal < size; count_normal++)
-			{
-				normal_buf += m_triangle_mormal[count_vertex][count_vertex][count_normal];
-			}
-			D3DXVec3Normalize(&normal_buf, &normal_buf);
-			vtx[count_vertex].nor = D3DXVECTOR3(normal_buf.x, normal_buf.y, normal_buf.z);
-			int uv_num = m_triangle_uv[count_vertex][count_vertex].size();
-			if (uv_num > 0)
-			{
-				vtx[count_vertex].tex = D3DXVECTOR2(m_triangle_uv[count_vertex][count_vertex][0].x, m_triangle_uv[count_vertex][count_vertex][0].y);
-			}
+			vtx[count_vertex].nor = D3DXVECTOR3(m_mormal_ary[count_mesh][count_vertex].x, m_mormal_ary[count_mesh][count_vertex].y, m_mormal_ary[count_mesh][count_vertex].z);
+			vtx[count_vertex].tex = D3DXVECTOR2(m_uv_ary[count_mesh][count_vertex].x, m_uv_ary[count_mesh][count_vertex].y);
 		}
 
 		// 頂点バッファをアンロックする
 		buf->Unlock();
 
+		// 頂点バッファの保存
 		m_vtx_buff.push_back(buf);
 	}
 
+	// メッシュ分のループ
 	for (int count_mesh = 0; count_mesh < m_mesh_count; count_mesh++)
 	{
-		LPDIRECT3DINDEXBUFFER9 buf;
-		WORD *indx;
+		LPDIRECT3DINDEXBUFFER9 buf;	// インデックスバッファ
+		WORD *indx;	// インデックス情報
+		int index_size = m_index_number[count_mesh].size();	// インデックスのサイズを取得
 
-		device->CreateIndexBuffer(	sizeof(WORD) * m_mesh_index_count[count_mesh],
+		// インデックスバッファの生成
+		device->CreateIndexBuffer(	sizeof(WORD) * index_size,
 									D3DUSAGE_WRITEONLY,
 									D3DFMT_INDEX16,
 									D3DPOOL_MANAGED,
 									&buf,
 									nullptr);
 
-		// 頂点バッファをロックし、頂点データへのポインタを取得
+		// インデックスバッファをロックし、インデックスデータへのポインタを取得
 		buf->Lock(0, 0, (void**)&indx, 0);
 
-		for (int count_index = 0; count_index < m_mesh_index_count[count_mesh]; count_index++)
+		// インデックス分のループ
+		for (int count_index = 0; count_index < index_size; count_index++)
 		{
-			indx[count_index] = m_index_number[count_index];
+			// インデックスの設定
+			indx[count_index] = m_index_number[count_mesh][count_index];
 		}
 
-		// 頂点バッファをアンロックする
+		// インデックスバッファをアンロックする
 		buf->Unlock();
 
+		// インデックスバッファの保存
 		m_idx_buff.push_back(buf);
 	}
 
@@ -136,15 +136,59 @@ HRESULT CFbx::Init(void)
 }
 
 //=============================================================================
-// テクスチャの生成
+// 終了
 //=============================================================================
 void CFbx::Uninit(void)
 {
+	// 頂点バッファサイズを取得
+	int vtx_size = m_vtx_buff.size();
 
+	// 頂点バッファ数分のループ
+	for (int count_tvx = 0; count_tvx < vtx_size; count_tvx++)
+	{
+		//頂点バッファの破棄
+		if (m_vtx_buff[count_tvx] != nullptr)
+		{
+			m_vtx_buff[count_tvx]->Release();
+			m_vtx_buff[count_tvx] = nullptr;
+		}
+	}
+
+	// インデックスバッファサイズを取得
+	int index_size = m_idx_buff.size();
+
+	// インデックスバッファ数分のループ
+	for (int count_index = 0; count_index < index_size; count_index++)
+	{
+		//インデックスバッファの破棄
+		if (m_idx_buff[count_index] != nullptr)
+		{
+			m_idx_buff[count_index]->Release();
+			m_idx_buff[count_index] = nullptr;
+		}
+	}
+
+	// データの破棄
+	m_vertex_ary.clear();
+	m_mormal_ary.clear();
+	m_uv_ary.clear();
+	m_material.clear();
+	m_tex.clear();
+	m_index_number.clear();
+	D3DXMatrixIdentity(&m_mtx_wold);
+	m_pas.clear();
+	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_mesh_count = 0;
+	m_vtx_buff.clear();
+	m_idx_buff.clear();
+	m_manager->Destroy();
+	m_importer->Destroy();
+	m_scene->Destroy();
 }
 
 //=============================================================================
-// テクスチャの生成
+// 更新
 //=============================================================================
 void CFbx::Update(void)
 {
@@ -152,7 +196,7 @@ void CFbx::Update(void)
 }
 
 //=============================================================================
-// テクスチャの生成
+// 描画
 //=============================================================================
 void CFbx::Draw(void)
 {
@@ -195,19 +239,26 @@ void CFbx::Draw(void)
 	pDevice->SetTransform(	D3DTS_WORLD,
 							&m_mtx_wold);
 
+	// メッシュ数分のループ
 	for (int count_mesh = 0; count_mesh < m_mesh_count; count_mesh++)
 	{
 		// 頂点フォーマットの設定
 		pDevice->SetFVF(FVF_VERTEX_3D);
 
+		// テクスチャのサイズを取得
 		int tex_num = m_tex[count_mesh].size();
+
+		//テクスチャ数分のループ
 		for (int count_mat = 0; count_mat < tex_num; count_mat++)
 		{
 			// テクスチャの設定
 			pDevice->SetTexture(0, m_tex[count_mesh][count_mat]);
 		}
 
+		// マテリアル数の取得
 		int material_size = m_material[count_mesh].size();
+
+		// マテリアル数分のループ
 		for (int count_mat= 0; count_mat < material_size; count_mat++)
 		{
 			// マテリアルの設定
@@ -225,51 +276,63 @@ void CFbx::Draw(void)
 		pDevice->DrawIndexedPrimitive(	D3DPT_TRIANGLELIST,
 										0,
 										0,
-										m_mesh_vertex_count[count_mesh],	// 使用する頂点数
+										m_vertex_ary[count_mesh].size(),	// 使用する頂点数
 										0,	// ここの値が最初のインデックス
-										m_mesh_index_count[count_mesh]);	// 三角形の数
+										m_index_number[count_mesh].size());	// 三角形の数
 	}
 	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 }
 
 //=============================================================================
-// テクスチャの生成
+// 生成
 //=============================================================================
 CFbx *CFbx::Create(string pas)
 {
+	// fbxモデルクラス
 	CFbx *buf;
 	buf = new CFbx;
 
+	// new出来てたら
 	if (buf != nullptr)
 	{
+		// 引数の代入
 		buf->m_pas = pas;
+
+		// 初期化
 		buf->Init();
 	}
 	return buf;
 }
 
 //=============================================================================
-// テクスチャの生成
+// ノードの再帰処理
 //=============================================================================
 void CFbx::RecursiveNode(FbxNode *node)
 {
-	FbxNodeAttribute *attrib = nullptr;
-	FbxNode *chiled = nullptr;
-	int child_node_num = node->GetChildCount();
+	FbxNodeAttribute *attrib = nullptr;	// attribのポインタ
+	FbxNode *chiled = nullptr;	// 子ノードのポインタ
+	int child_node_num = node->GetChildCount();	// 子ノードの数を取得
 
+	// 子ノード数分のループ
 	for (int count_node = 0; count_node < child_node_num; count_node++)
 	{
+		// 子ノードを取得
 		chiled = node->GetChild(count_node);
 
+		// 再帰処理
 		RecursiveNode(chiled);
 	}
 
+	// ノードのattribを取得
 	attrib = node->GetNodeAttribute();
 
+	// attribがあったら
 	if (attrib != nullptr)
 	{
+		// attribの種類を入手
 		FbxNodeAttribute::EType type = attrib->GetAttributeType();
 
+		// 種類によって処理を変える
 		switch (type)
 		{
 		case fbxsdk::FbxNodeAttribute::eUnknown:
@@ -324,140 +387,186 @@ void CFbx::RecursiveNode(FbxNode *node)
 }
 
 //=============================================================================
-// テクスチャの生成
+// メッシュの入手
 //=============================================================================
 void CFbx::GetMesh(FbxNodeAttribute *attrib)
 {
 	// メッシュにダウンキャスト
 	FbxMesh *mesh = static_cast<FbxMesh*>(attrib);
-	int polygon_num = mesh->GetPolygonCount();
-	int polygon_vertex_num = mesh->GetPolygonVertexCount();
-	int *index_ary = mesh->GetPolygonVertices();
-	int mesh_vertex_count = 0;
-	int mesh_index_count = 0;
 
-	for (int count_polygon = 0; count_polygon < polygon_num; count_polygon++)
-	{
-		int index_num_in_polygon = mesh->GetPolygonSize(count_polygon);  // p番目のポリゴンの頂点数
-		for (int count_vertex = 0; count_vertex < index_num_in_polygon; count_vertex++)
-		{
-			// ポリゴンpを構成するn番目の頂点のインデックス番号
-			m_index_number.push_back(mesh->GetPolygonVertex(count_polygon, count_vertex));
-			mesh_index_count++;
-		}
-	}
+	// 頂点情報の取得
+	GetVertex(mesh);
 
-	m_mesh_index_count.push_back(mesh_index_count);
-	int control_num = mesh->GetControlPointsCount();	// 頂点数
-	FbxVector4 *src = mesh->GetControlPoints();	// 頂点座標配列
-	vector<D3DXVECTOR4> vetor_buf;
+	// インデックス情報の取得
+	GetIndex(mesh);
 
-	// コピー
-	for (int count_control = 0; count_control < control_num; count_control++)
-	{
-		D3DXVECTOR4 buf;
+	// 法線情報の取得
+	GetNormal(mesh);
 
-		buf.x = static_cast<float>(src[count_control][0] * 100.0f);
-		buf.y = static_cast<float>(src[count_control][1] * 100.0f);
-		buf.z = static_cast<float>(src[count_control][2] * 100.0f);
-		buf.w = static_cast<float>(src[count_control][3] * 100.0f);
+	// 頂点カラーの取得
+	GetColor(mesh);
 
-		vetor_buf.push_back(buf);
-		mesh_vertex_count++;
-	}
-
-	m_control_ary.push_back(vetor_buf);
-	m_mesh_vertex_count.push_back(mesh_vertex_count);
-
-	GetMormal(mesh);
-
+	// UV座標の取得
 	GetUv(mesh);
 
+	// マテリアル情報の取得
 	GetMaterial(mesh);
 
+	// ボーン情報の取得
+	GetBone(mesh);
+
+	// メッシュカウント
 	m_mesh_count++;
 }
 
 //=============================================================================
-// テクスチャの生成
+// インデックス情報の取得
 //=============================================================================
-void CFbx::GetMormal(FbxMesh *mesh)
+void CFbx::GetIndex(FbxMesh *mesh)
 {
-	int layer_num = mesh->GetLayerCount();
-	int normal_num = 0;
-	int index_num = 0;
+	int polygon_num = mesh->GetPolygonCount();	// ポリゴン数の取得
+	vector<int> vetor_buf;	// vector配列のバッファ
 
-	for (int count_layer = 0; count_layer < layer_num; count_layer++)
+	// ポリゴン数分のループ
+	for (int count_polygon = 0; count_polygon < polygon_num; count_polygon++)
 	{
-		FbxLayer *layer = mesh->GetLayer(count_layer);
-		FbxLayerElementNormal *normal_elem = layer->GetNormals();
-
-		// 法線無し
-		if (normal_elem == nullptr)
-		{
-			continue;
-		}
-		// 法線の数・インデックス
-		normal_num = normal_elem->GetDirectArray().GetCount();
-		index_num = normal_elem->GetIndexArray().GetCount();
-
-		// マッピングモード・リファレンスモード取得
-		FbxLayerElement::EMappingMode mapping_mode = normal_elem->GetMappingMode();
-		FbxLayerElement::EReferenceMode ref_mode = normal_elem->GetReferenceMode();
-
-		if (mapping_mode == FbxLayerElement::eByPolygonVertex)
-		{
-			if (ref_mode == FbxLayerElement::eDirect)
-			{
-				vector<D3DXVECTOR3> vector_buf;
-				for (int count_normal = 0; count_normal < normal_num; count_normal++)
-				{
-					D3DXVECTOR3 buf;
-
-					buf.x = static_cast<float>(normal_elem->GetDirectArray().GetAt(count_normal)[0]);
-					buf.y = static_cast<float>(normal_elem->GetDirectArray().GetAt(count_normal)[1]);
-					buf.z = static_cast<float>(normal_elem->GetDirectArray().GetAt(count_normal)[2]);
-
-					D3DXVec3Normalize(&buf, &buf);
-
-					vector_buf.push_back(buf);
-				}
-				m_mormal_ary.push_back(vector_buf);
-			}
-		}
-		else if (mapping_mode == FbxLayerElement::eByControlPoint)
-		{
-			if (ref_mode == FbxLayerElement::eDirect)
-			{
-				vector<D3DXVECTOR3> vector_buf;
-				for (int count_normal = 0; count_normal < normal_num; count_normal++)
-				{
-					D3DXVECTOR3 buf;
-
-					buf.x = static_cast<float>(normal_elem->GetDirectArray().GetAt(count_normal)[0]);
-					buf.y = static_cast<float>(normal_elem->GetDirectArray().GetAt(count_normal)[1]);
-					buf.z = static_cast<float>(normal_elem->GetDirectArray().GetAt(count_normal)[2]);
-
-					vector_buf.push_back(buf);
-				}
-				m_mormal_ary.push_back(vector_buf);
-			}
-		}
+		// インデックス情報の保存
+		vetor_buf.push_back(count_polygon * 3 + 2);
+		vetor_buf.push_back(count_polygon * 3 + 1);
+		vetor_buf.push_back(count_polygon * 3);
 	}
+	// インデックス情報の保存
+	m_index_number.push_back(vetor_buf);
 }
 
 //=============================================================================
-// テクスチャの生成
+// 頂点情報の取得
+//=============================================================================
+void CFbx::GetVertex(FbxMesh * mesh)
+{
+	int polygon_vertex_num = mesh->GetPolygonVertexCount();	// ポリゴンの頂上数の取得
+	int *index_ary = mesh->GetPolygonVertices();	// ポリゴンのインデックスの取得
+	FbxVector4 *src = mesh->GetControlPoints();	// 頂点座標の取得
+	vector<D3DXVECTOR4> vetor_buf;	// vetor配列のバッファ
+
+	// ポリゴンの頂点数分のループ
+	for (int count_control = 0; count_control < polygon_vertex_num; count_control++)
+	{
+		D3DXVECTOR4 buf;	// 頂点のバッファ
+		int index = index_ary[count_control];	// インデックスから配列を取得
+
+		// 頂点情報の保存
+		buf.x = static_cast<float>(-src[index][0] * 100.0f);
+		buf.y = static_cast<float>(src[index][1] * 100.0f);
+		buf.z = static_cast<float>(src[index][2] * 100.0f);
+		buf.w = static_cast<float>(src[index][3] * 100.0f);
+
+		// 頂点情報の保存
+		vetor_buf.push_back(buf);
+	}
+	// 頂点情報の保存
+	m_vertex_ary.push_back(vetor_buf);
+}
+
+//=============================================================================
+// 法線情報の取得
+//=============================================================================
+void CFbx::GetNormal(FbxMesh *mesh)
+{
+	FbxArray<FbxVector4> normal;	// 法線情報の配列
+	vector<D3DXVECTOR3> vector_buf;	// vector配列のバッファ
+	int normal_size = 0;	// 法線情報のサイズ
+
+	mesh->GetPolygonVertexNormals(normal);	// 法線情報の取得
+	normal_size = normal.Size();	// サイズを取得
+	
+	// 法線数分のループ
+	for (int count_normal = 0; count_normal < normal_size; count_normal++)
+	{
+		D3DXVECTOR3 buf;	// 法線情報のバッファ
+
+		// 法線情報の保存
+		buf.x = static_cast<float>(-normal[count_normal][0]);
+		buf.y = static_cast<float>(normal[count_normal][1]);
+		buf.z = static_cast<float>(normal[count_normal][2]);
+
+		// 法線情報の保存
+		vector_buf.push_back(buf);
+	}
+	// 法線情報の保存
+	m_mormal_ary.push_back(vector_buf);
+}
+
+//=============================================================================
+// 頂点カラーの取得
+//=============================================================================
+void CFbx::GetColor(FbxMesh *mesh)
+{
+	vector<D3DXCOLOR> vector_col;	// カラーのvector配列
+	int color_num = mesh->GetElementVertexColorCount();	// 頂点カラーのデータ数を確認
+
+	// 頂点カラーがあったら
+	if (color_num != 0)
+	{
+		for (int color_count = 0; color_count < color_num; color_count++)
+		{
+			// 頂点カラーデータの取得
+			FbxGeometryElementVertexColor *color_buffer = mesh->GetElementVertexColor(color_count);
+
+			// カラーを取得出来たら
+			if (color_buffer != nullptr)
+			{
+				FbxLayerElement::EMappingMode mapping_mode = color_buffer->GetMappingMode();	// マッピングモード取得
+				FbxLayerElement::EReferenceMode reference_mode = color_buffer->GetReferenceMode();	// リファレンスモードモード取得
+
+				// 頂点にカラーがあるなら
+				if (mapping_mode == FbxLayerElement::eByPolygonVertex)
+				{
+					// インデックス順に格納されていたら
+					if (reference_mode == FbxLayerElement::eIndexToDirect)
+					{
+						FbxLayerElementArrayTemplate<FbxColor>& colors = color_buffer->GetDirectArray();	// 頂点カラーバッファ取得
+						FbxLayerElementArrayTemplate<int>& indeces = color_buffer->GetIndexArray();	// 頂点カラーインデックスバッファ
+						int color_num = indeces.GetCount();
+
+						// サイズ数分のループ
+						for (int count_color = 0; count_color < color_num; count_color++)
+						{
+							int index = indeces.GetAt(count_color);	// インデックスの取得
+							FbxColor color = colors.GetAt(index);	// カラーの取得
+							D3DXCOLOR col;	// カラーのバッファ
+
+							// カラーを代入
+							col.a = static_cast<float>(color.mAlpha);
+							col.r = static_cast<float>(color.mRed);
+							col.g = static_cast<float>(color.mGreen);
+							col.b = static_cast<float>(color.mBlue);
+
+							// カラーを保存
+							vector_col.push_back(col);
+						}
+					}
+				}
+			}
+		}
+	}
+	// カラーを保存
+	m_color_ary.push_back(vector_col);
+}
+
+//=============================================================================
+// UV座標の取得
 //=============================================================================
 void CFbx::GetUv(FbxMesh *mesh)
 {
-	int layer_num = mesh->GetLayerCount();
+	int layer_num = mesh->GetLayerCount();	// レイヤー数の取得
 
+	// レイヤー数分のループ
 	for (int count_layer = 0; count_layer < layer_num; count_layer++)
 	{
-		vector<D3DXVECTOR2> vector_buf;
-		FbxLayer *layer = mesh->GetLayer(count_layer);
-		FbxLayerElementUV *uv_elem = layer->GetUVs();
+		vector<D3DXVECTOR2> vector_buf;	// vector配列のバッファ
+		FbxLayer *layer = mesh->GetLayer(count_layer);	// レイヤーの取得
+		FbxLayerElementUV *uv_elem = layer->GetUVs();	// UV情報の取得
 
 		// 法線無し
 		if (uv_elem == nullptr)
@@ -466,99 +575,112 @@ void CFbx::GetUv(FbxMesh *mesh)
 			continue;
 		}
 
-		// UVの数・インデックス
-		int uv_num = uv_elem->GetDirectArray().GetCount();
-		int index_num = uv_elem->GetIndexArray().GetCount();
-		int size = uv_num > index_num ? uv_num : index_num;
+		FbxLayerElement::EMappingMode mapping_mode = uv_elem->GetMappingMode();	// マッピングモード取得
+		FbxLayerElement::EReferenceMode ref_mode = uv_elem->GetReferenceMode();	// リファレンスモードモード取得
+		int uv_num = uv_elem->GetDirectArray().GetCount();	// UVの数
+		int index_num = uv_elem->GetIndexArray().GetCount();	// インデックス
+		int size = uv_num > index_num ? uv_num : index_num;	// サイズの設定
 
-		// マッピングモード・リファレンスモード取得
-		FbxLayerElement::EMappingMode mapping_mode = uv_elem->GetMappingMode();
-		FbxLayerElement::EReferenceMode ref_mode = uv_elem->GetReferenceMode();
-
+		// 頂点に法線があるなら
 		if (mapping_mode == FbxLayerElement::eByPolygonVertex)
 		{
-			vector<D3DXVECTOR2> vector_buf;
+			// 頂点順に格納されていたら
 			if (ref_mode == FbxLayerElement::eDirect)
 			{
+				// サイズ数分のループ
 				for (int count_size = 0; count_size < size; count_size++)
 				{
-					D3DXVECTOR2 buf;
+					D3DXVECTOR2 buf;	// バッファ
 
+					// UV座標の保存
 					buf.x = static_cast<float>(uv_elem->GetDirectArray().GetAt(count_size)[0]);
 					buf.y = static_cast<float>(uv_elem->GetDirectArray().GetAt(count_size)[1]);
 
+					// UV座標の保存
 					vector_buf.push_back(buf);
 				}
 			}
+			// インデックス順に格納されていたら
 			else if (ref_mode == FbxLayerElement::eIndexToDirect)
 			{
+				// サイズ数分のループ
 				for (int count_size = 0; count_size < size; count_size++)
 				{
-					D3DXVECTOR2 buf;
-					int index = uv_elem->GetIndexArray().GetAt(count_size);
+					D3DXVECTOR2 buf;	// バッファ
+					int index = uv_elem->GetIndexArray().GetAt(count_size);	// インデックスを取得
 
+					// UV座標の保存
 					buf.x = static_cast<float>(uv_elem->GetDirectArray().GetAt(index)[0]);
 					buf.y = static_cast<float>(uv_elem->GetDirectArray().GetAt(index)[1]);
 
+					// UV座標の保存
 					vector_buf.push_back(buf);
 				}
 			}
+			// UV座標の保存
 			m_uv_ary.push_back(vector_buf);
 		}
 	}
 }
 
 //=============================================================================
-// テクスチャの生成
+// マテリアル情報の取得
 //=============================================================================
 void CFbx::GetMaterial(FbxMesh *mesh)
 {
-	vector<D3DXMATERIAL> mat_vector_buf;
-	int material_num = mesh->GetElementMaterialCount();
+	vector<D3DXMATERIAL> mat_vector_buf;	// マテリアルの情報
+	int material_num = mesh->GetElementMaterialCount();	// マテリアル数
 
+	// マテリアル数分のループ
 	for (int count_material = 0; count_material < material_num; count_material++)
 	{
-		FbxGeometryElementMaterial *material_element = mesh->GetElementMaterial();
-		int index_material = material_element->GetIndexArray().GetAt(count_material);
-		FbxSurfaceMaterial *material = mesh->GetNode()->GetSrcObject<FbxSurfaceMaterial>(index_material);
+		FbxGeometryElementMaterial *material_element = mesh->GetElementMaterial();	// マテリアル情報の取得
+		int index_material = material_element->GetIndexArray().GetAt(count_material);	// マテリアルのインデックスを取得
+		FbxSurfaceMaterial *material = mesh->GetNode()->GetSrcObject<FbxSurfaceMaterial>(index_material);	// マテリアルの取得
 
+		// マテリアルがあったら
 		if (material != nullptr)
 		{
+			// マテリアルのバッファ
 			D3DXMATERIAL mat_buf;
+
+			// マテリアルの種類がLambertだったら
 			if (material->GetClassId().Is(FbxSurfaceLambert::ClassId))
 			{
-				FbxSurfaceLambert *lambert = static_cast<FbxSurfaceLambert*>(material);
-				FbxDouble3 fbx_ambuent = lambert->Ambient;
-				FbxDouble3 fbx_diffuse = lambert->Diffuse;
-				FbxDouble3 fbx_emissive = lambert->Emissive;
-				D3DXCOLOR ambient;
-				D3DXCOLOR diffuse;
-				D3DXCOLOR emissive;
+				FbxSurfaceLambert *lambert = static_cast<FbxSurfaceLambert*>(material);	// Lambertにダウンキャスト
+				FbxDouble3 fbx_ambuent = lambert->Ambient;	// Ambientカラー
+				FbxDouble3 fbx_diffuse = lambert->Diffuse;	// Diffuseカラー
+				FbxDouble3 fbx_emissive = lambert->Emissive;	// Emissiveカラー
+				D3DXCOLOR ambient;	//	D3DXCOLO用
+				D3DXCOLOR diffuse;	//	D3DXCOLO用
+				D3DXCOLOR emissive;	//	D3DXCOLO用
 
-				ambient.r = fbx_ambuent.mData[0];
-				ambient.g = fbx_ambuent.mData[1];
-				ambient.b = fbx_ambuent.mData[2];
+				// D3DXMATERIAL用に直す
+				ambient.r = static_cast<float>(fbx_ambuent.mData[0]);
+				ambient.g = static_cast<float>(fbx_ambuent.mData[1]);
+				ambient.b = static_cast<float>(fbx_ambuent.mData[2]);
 
-				diffuse.r = fbx_diffuse.mData[0];
-				diffuse.g = fbx_diffuse.mData[1];
-				diffuse.b = fbx_diffuse.mData[2];
+				diffuse.r = static_cast<float>(fbx_diffuse.mData[0]);
+				diffuse.g = static_cast<float>(fbx_diffuse.mData[1]);
+				diffuse.b = static_cast<float>(fbx_diffuse.mData[2]);
 
-				emissive.r = fbx_emissive.mData[0];
-				emissive.g = fbx_emissive.mData[1];
-				emissive.b = fbx_emissive.mData[2];
+				emissive.r = static_cast<float>(fbx_emissive.mData[0]);
+				emissive.g = static_cast<float>(fbx_emissive.mData[1]);
+				emissive.b = static_cast<float>(fbx_emissive.mData[2]);
 
 				FbxDouble fbx_transparency = lambert->TransparencyFactor;
-				float transparency = fbx_transparency;
+				float transparency = static_cast<float>(fbx_transparency);
 
 				FbxDouble fbx_ambient_factor = lambert->AmbientFactor;
-				float ambient_factor = fbx_ambient_factor;
+				float ambient_factor = static_cast<float>(fbx_ambient_factor);
 
 				FbxDouble fbx_diffuse_factor = lambert->DiffuseFactor;
-				float diffuse_factor = fbx_diffuse_factor;
+				float diffuse_factor = static_cast<float>(fbx_diffuse_factor);
 
 				FbxDouble fbx_emissive_factor = lambert->EmissiveFactor;
-				float emissive_factor = fbx_emissive_factor;
+				float emissive_factor = static_cast<float>(fbx_emissive_factor);
 
+				// D3DXMATERIALに代入
 				mat_buf.MatD3D.Ambient = ambient;
 				mat_buf.MatD3D.Ambient.a = ambient_factor;
 				mat_buf.MatD3D.Diffuse = diffuse;
@@ -571,46 +693,49 @@ void CFbx::GetMaterial(FbxMesh *mesh)
 				mat_buf.MatD3D.Specular.b = 1.0f;
 				mat_buf.MatD3D.Power = transparency;
 			}
+			// マテリアルの種類がPhongだったら
 			else if (material->GetClassId().Is(FbxSurfacePhong::ClassId))
 			{
-				FbxSurfacePhong *phong = static_cast<FbxSurfacePhong*>(material);
-				FbxDouble3 fbx_ambuent = phong->Ambient;
-				FbxDouble3 fbx_diffuse = phong->Diffuse;
-				FbxDouble3 fbx_emissive = phong->Emissive;
-				FbxDouble3 fbx_specular = phong->Specular;
-				D3DXCOLOR ambient;
-				D3DXCOLOR diffuse;
-				D3DXCOLOR emissive;
-				D3DXCOLOR specular;
+				FbxSurfacePhong *phong = static_cast<FbxSurfacePhong*>(material);	// Phongにダウンキャスト
+				FbxDouble3 fbx_ambuent = phong->Ambient;	// Ambientカラー
+				FbxDouble3 fbx_diffuse = phong->Diffuse;	// Diffuseカラー
+				FbxDouble3 fbx_emissive = phong->Emissive;	// Emissiveカラー
+				FbxDouble3 fbx_specular = phong->Specular;	// Specularカラー
+				D3DXCOLOR ambient;	//	D3DXCOLO用
+				D3DXCOLOR diffuse;	//	D3DXCOLO用
+				D3DXCOLOR emissive;	//	D3DXCOLO用
+				D3DXCOLOR specular;	//	D3DXCOLO用
 
-				ambient.r = fbx_ambuent.mData[0];
-				ambient.g = fbx_ambuent.mData[1];
-				ambient.b = fbx_ambuent.mData[2];
+				// D3DXMATERIAL用に直す
+				ambient.r = static_cast<float>(fbx_ambuent.mData[0]);
+				ambient.g = static_cast<float>(fbx_ambuent.mData[1]);
+				ambient.b = static_cast<float>(fbx_ambuent.mData[2]);
 
-				diffuse.r = fbx_diffuse.mData[0];
-				diffuse.g = fbx_diffuse.mData[1];
-				diffuse.b = fbx_diffuse.mData[2];
+				diffuse.r = static_cast<float>(fbx_diffuse.mData[0]);
+				diffuse.g = static_cast<float>(fbx_diffuse.mData[1]);
+				diffuse.b = static_cast<float>(fbx_diffuse.mData[2]);
 
-				emissive.r = fbx_emissive.mData[0];
-				emissive.g = fbx_emissive.mData[1];
-				emissive.b = fbx_emissive.mData[2];
+				emissive.r = static_cast<float>(fbx_emissive.mData[0]);
+				emissive.g = static_cast<float>(fbx_emissive.mData[1]);
+				emissive.b = static_cast<float>(fbx_emissive.mData[2]);
 
-				specular.r = fbx_specular.mData[0];
-				specular.g = fbx_specular.mData[1];
-				specular.b = fbx_specular.mData[2];
+				specular.r = static_cast<float>(fbx_specular.mData[0]);
+				specular.g = static_cast<float>(fbx_specular.mData[1]);
+				specular.b = static_cast<float>(fbx_specular.mData[2]);
 
 				FbxDouble fbx_transparency = phong->TransparencyFactor;
-				float transparency = fbx_transparency;
+				float transparency = static_cast<float>(fbx_transparency);
 
 				FbxDouble fbx_ambient_factor = phong->AmbientFactor;
-				float ambient_factor = fbx_ambient_factor;
+				float ambient_factor = static_cast<float>(fbx_ambient_factor);
 
 				FbxDouble fbx_diffuse_factor = phong->DiffuseFactor;
-				float diffuse_factor = fbx_diffuse_factor;
+				float diffuse_factor = static_cast<float>(fbx_diffuse_factor);
 
 				FbxDouble fbx_emissive_factor = phong->EmissiveFactor;
-				float emissive_factor = fbx_emissive_factor;
+				float emissive_factor = static_cast<float>(fbx_emissive_factor);
 
+				// D3DXMATERIALに代入
 				mat_buf.MatD3D.Ambient = ambient;
 				mat_buf.MatD3D.Diffuse = diffuse;
 				mat_buf.MatD3D.Emissive = emissive;
@@ -620,10 +745,13 @@ void CFbx::GetMaterial(FbxMesh *mesh)
 				mat_buf.MatD3D.Specular.b = 1.0f;
 				mat_buf.MatD3D.Power = transparency;
 			}
+			// マテリアルの保存
 			mat_vector_buf.push_back(mat_buf);
 		}
+		// テクスチャの取得
 		GetTexture(material);
 	}
+	// マテリアルの保存
 	m_material.push_back(mat_vector_buf);
 }
 
@@ -632,46 +760,53 @@ void CFbx::GetMaterial(FbxMesh *mesh)
 //=============================================================================
 void CFbx::GetTexture(FbxSurfaceMaterial *material)
 {
-	// ディフューズプロパティを検索
-	FbxProperty property = material->FindProperty(FbxSurfaceMaterial::sDiffuse);
-	vector<LPDIRECT3DTEXTURE9> vector_tex_buf;
-	LPDIRECT3DTEXTURE9 tex_buf;
+	FbxProperty property = material->FindProperty(FbxSurfaceMaterial::sDiffuse);	// ディフューズプロパティを検索
+	vector<LPDIRECT3DTEXTURE9> vector_tex_buf;	// テクスチャのvector配列バッファ
+	LPDIRECT3DTEXTURE9 tex_buf;	// テクスチャのバッファ
 
-	// プロパティが持っているレイヤードテクスチャの枚数をチェック
-	int layerNum = property.GetSrcObjectCount<FbxLayeredTexture>();
+	// レイヤードテクスチャの数を取得
+	int layer_num = property.GetSrcObjectCount<FbxLayeredTexture>();
 
 	// レイヤードテクスチャが無ければ通常テクスチャ
-	if (layerNum == 0)
+	if (layer_num == 0)
 	{
-		// 通常テクスチャの枚数をチェック
-		int numGeneralTexture = property.GetSrcObjectCount<FbxFileTexture>();
+		// 通常テクスチャの数を取得
+		int num_general_texture = property.GetSrcObjectCount<FbxFileTexture>();
 
 		// 各テクスチャについてテクスチャ情報をゲット
-		for (int i = 0; i < numGeneralTexture; ++i)
+		for (int count_tex = 0; count_tex < num_general_texture; count_tex++)
 		{
-			// i番目のテクスチャオブジェクト取得
-			FbxFileTexture *texture = FbxCast<FbxFileTexture>(property.GetSrcObject(i));
+			FbxFileTexture *texture = FbxCast<FbxFileTexture>(property.GetSrcObject(count_tex));	// テクスチャオブジェクト取得
+			string absolute_file_name = texture->GetFileName();	// テクスチャファイルパスを取得（フルパス）
+			string folder_name = "C:/Users/student/Desktop/Git/mini_game/プロジェクト/mini_game_00/data/Texture/Mesh/";	// パスを消す為の名前
+			int folder_size = folder_name.size();	// パスのサイズ
+			char *file_name;	// 名前のバッファ
+			size_t size = 0;	// サイズ
 
-			// テクスチャファイルパスを取得（フルパス）
-			string absolute_file_name = texture->GetFileName();
-			string folder_name = "C:/Users/student/Desktop/Git/mini_game/プロジェクト/mini_game_00/data/Texture/Mesh/";
-			int folder_size = folder_name.size();
-			char *file_name;
-			size_t size = 0;
-
-			// 文字コード変換
+			// 文字コード変換(日本語パスがダメな為)
 			FbxUTF8ToAnsi(absolute_file_name.c_str(), file_name, &size);
 
+			// 正規パスをstrigに代入
 			absolute_file_name = file_name;
 
+			// パスのサイズ数分のループ
 			for (int count_erase = 0; count_erase < folder_size; count_erase++)
 			{
 				// 名前だけを残す
 				absolute_file_name.erase(absolute_file_name.begin());
 			}
-			tex_buf = CManager::GetInstance()->GetTexture()->GetTexture(absolute_file_name);
-			vector_tex_buf.push_back(tex_buf);
+			tex_buf = CManager::GetInstance()->GetTexture()->GetTexture(absolute_file_name);	// テクスチャの取得
+			vector_tex_buf.push_back(tex_buf);	// テクスチャの保存
 		}
 	}
+	// テクスチャの保存
 	m_tex.push_back(vector_tex_buf);
+}
+
+//=============================================================================
+// ボーンの取得
+//=============================================================================
+void CFbx::GetBone(FbxMesh *mesh)
+{
+
 }

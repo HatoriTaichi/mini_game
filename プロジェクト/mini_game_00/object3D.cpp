@@ -47,16 +47,16 @@ HRESULT CObject3D::Init(void)
 void CObject3D::Uninit(void)
 {
 	//頂点バッファの破棄
-	if (m_vtx_buff != NULL)
+	if (m_vtx_buff != nullptr)
 	{
 		m_vtx_buff->Release();
-		m_vtx_buff = NULL;
+		m_vtx_buff = nullptr;
 	}
 	//インデックスバッファの破棄
-	if (m_idx_buff != NULL)
+	if (m_idx_buff != nullptr)
 	{
 		m_idx_buff->Release();
-		m_idx_buff = NULL;
+		m_idx_buff = nullptr;
 	}
 	//オブジェクトの破棄
 	Release();
