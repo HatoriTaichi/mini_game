@@ -60,12 +60,25 @@ public:
 		int all_model_num;	// 階層構造モデル数
 	} MODEL_INFO;
 
+	typedef struct
+	{
+		vector<string> type;	// オブジェクトタイプ
+		vector<D3DXVECTOR3> pos;	// 位置
+		vector<D3DXVECTOR3> rot;	// 回転
+	} STAGE_MODEL_INFO;
+
+	typedef struct
+	{
+		vector<STAGE_MODEL_INFO> stage_model;	// ステージ配置モデル
+	} STAGE_INFO;
+
 	CFileLoad();		//コンストラクタ
 	~CFileLoad();		//デストラクタ
 	static vector<string> LoadFile(string load_file);	// ファイルロード
 	static vector<string> LoadTxt(string load_file);	// テキストロード
 	static PAS_AND_NAME_DATA CreatePasAndNameElement(vector<string> all_file_info, string load_file);	// パスと名前の取得
 	static MODEL_INFO CreateHierarchyMotion(vector<string> all_file_info, string file_name);	// 階層とモーションのデータ
+	static STAGE_INFO CreateStageInfo(vector<string> all_file_info);	// ステージ配置情報に分解
 
 private:
 };
