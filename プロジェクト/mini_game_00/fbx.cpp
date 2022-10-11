@@ -28,7 +28,6 @@ CFbx::CFbx()
 	m_pas.clear();
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_mesh_count = 0;
 }
 
 //=============================================================================
@@ -65,8 +64,11 @@ HRESULT CFbx::Init(void)
 	// ノードの情報を再帰処理で取得
 	RecursiveNode(root_node);
 
+	// メッシュ数を取得
+	int mesh_size = m_mesh.size();
+
 	// メッシュ分のループ
-	for (int count_mesh = 0; count_mesh < m_mesh_count; count_mesh++)
+	for (int count_mesh = 0; count_mesh < mesh_size; count_mesh++)
 	{
 		LPDIRECT3DVERTEXBUFFER9 buf = nullptr;	// 頂点バッファ
 		VERTEX_3D *vtx;	// 頂点情報
@@ -101,7 +103,7 @@ HRESULT CFbx::Init(void)
 	}
 
 	// メッシュ分のループ
-	for (int count_mesh = 0; count_mesh < m_mesh_count; count_mesh++)
+	for (int count_mesh = 0; count_mesh < mesh_size; count_mesh++)
 	{
 		LPDIRECT3DINDEXBUFFER9 buf;	// インデックスバッファ
 		WORD *indx;	// インデックス情報
@@ -179,7 +181,6 @@ void CFbx::Uninit(void)
 	m_pas.clear();
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_mesh_count = 0;
 	m_vtx_buff.clear();
 	m_idx_buff.clear();
 	m_manager->Destroy();
@@ -202,6 +203,7 @@ void CFbx::Draw(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();	//デバイスのポインタ
 	D3DXMATRIX mtx_rot, mtx_trans, mtx_parent;	// 計算用マトリックス
+	int mesh_size = m_mesh.size();	// メッシュ数を取得
 
 	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
@@ -240,8 +242,15 @@ void CFbx::Draw(void)
 							&m_mtx_wold);
 
 	// メッシュ数分のループ
-	for (int count_mesh = 0; count_mesh < m_mesh_count; count_mesh++)
+	for (int count_mesh = 0; count_mesh < mesh_size; count_mesh++)
 	{
+		UpdateMatrix(m_mesh[count_mesh]);
+		m_count++;
+		if (m_count >= 144)
+		{
+			m_frame_count++;
+		}
+
 		// 頂点フォーマットの設定
 		pDevice->SetFVF(FVF_VERTEX_3D);
 
@@ -415,8 +424,8 @@ void CFbx::GetMesh(FbxNodeAttribute *attrib)
 	// ボーン情報の取得
 	GetBone(mesh);
 
-	// メッシュカウント
-	m_mesh_count++;
+	// メッシュの保存
+	m_mesh.push_back(mesh);
 }
 
 //=============================================================================
@@ -809,4 +818,201 @@ void CFbx::GetTexture(FbxSurfaceMaterial *material)
 void CFbx::GetBone(FbxMesh *mesh)
 {
 
+}
+
+//=============================================================================
+// アニメーションの更新
+//=============================================================================
+void CFbx::UpdateMatrix(FbxMesh *mesh)
+{
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();	//デバイスのポインタ
+	//int deformer_count = mesh->GetDeformerCount(FbxDeformer::eSkin);
+	FbxGlobalSettings &global_settings = m_scene->GetGlobalSettings();
+	FbxTime::EMode time_mode = global_settings.GetTimeMode();
+	FbxTime period, start, stop;
+	FbxNode *node = mesh->GetNode();
+	FbxArray<FbxString*> take_name_ary;
+
+	period.SetTime(0, 0, 0, 1, 0, time_mode);
+
+	m_scene->FillAnimStackNameArray(take_name_ary);
+
+	int num_take = take_name_ary.GetCount();
+	bool is_take_exist = false;
+	for (int count_take = 0; count_take < num_take; count_take)
+	{
+		// テイク名からテイク情報を取得
+		FbxTakeInfo *currentTakeInfo = m_scene->GetTakeInfo(*(take_name_ary[count_take]));
+		if (currentTakeInfo != nullptr)
+		{
+			start = currentTakeInfo->mLocalTimeSpan.GetStart();
+			stop = currentTakeInfo->mLocalTimeSpan.GetStop();
+			is_take_exist = true;
+			break;
+		}
+	}
+
+	// 1フレーム時間（period）で割ればフレーム数になります
+	int start_frame = (int)(start.Get() / period.Get());
+	int stop_frame = (int)(stop.Get() / period.Get());
+
+	if (m_frame_count >= stop_frame)
+	{
+		m_frame_count = 0;
+	}
+
+	FbxMatrix pos = node->EvaluateGlobalTransform(period * m_frame_count);
+	D3DXMATRIX mtrix, parent;
+
+	double _11 = pos.mData[0][0];
+	double _12 = pos.mData[0][1];
+	double _13 = pos.mData[0][2];
+	double _14 = pos.mData[0][3];
+
+	double _21 = pos.mData[1][0];
+	double _22 = pos.mData[1][1];
+	double _23 = pos.mData[1][2];
+	double _24 = pos.mData[1][3];
+
+	double _31 = pos.mData[2][0];
+	double _32 = pos.mData[2][1];
+	double _33 = pos.mData[2][2];
+	double _34 = pos.mData[2][3];
+
+	double _41 = pos.mData[3][0];
+	double _42 = pos.mData[3][1];
+	double _43 = pos.mData[3][2];
+	double _44 = pos.mData[3][3];
+
+	mtrix._11 = _11;
+	mtrix._12 = _12;
+	mtrix._13 = _13;
+	mtrix._14 = _14;
+
+	mtrix._21 = _21;
+	mtrix._22 = _22;
+	mtrix._23 = _23;
+	mtrix._24 = _24;
+
+	mtrix._31 = _31;
+	mtrix._32 = _32;
+	mtrix._33 = _33;
+	mtrix._34 = _34;
+
+	mtrix._41 = _41;
+	mtrix._42 = _42;
+	mtrix._43 = _43;
+	mtrix._44 = _44;
+
+	/*pDevice->GetTransform(D3DTS_WORLD,
+		&parent);
+
+	//パーツのワールドマトリックスと親のワールドマトリックスを掛け合わせる
+	D3DXMatrixMultiply(&mtrix,
+		&mtrix,
+		&parent);
+
+	//マトリックスの設定
+	pDevice->SetTransform(D3DTS_WORLD,
+		&mtrix);*/
+
+/*	for (int count_skin = 0; count_skin < deformer_count; count_skin++)
+	{
+		FbxSkin *fbx_skin = (FbxSkin*)mesh->GetDeformer(count_skin, FbxDeformer::eSkin);
+		int cluster_count = fbx_skin->GetClusterCount();
+
+		for (int count_cluster = 0; count_cluster < cluster_count; count_cluster++)
+		{
+			FbxCluster *fbx_cluster = fbx_skin->GetCluster(count_skin);
+			const char *cluster_link_name = fbx_cluster->GetLink()->GetName();
+			int control_point_indices_count = fbx_cluster->GetControlPointIndicesCount();
+			int *control_point_indices = fbx_cluster->GetControlPointIndices();
+			double *control_point_weights = fbx_cluster->GetControlPointWeights();
+			FbxArray<FbxString*> take_name_ary;
+			m_scene->FillAnimStackNameArray(take_name_ary);
+			int num_take = take_name_ary.GetCount();
+			FbxTime start;
+			FbxTime stop;
+			FbxTime period;
+			period.SetTime(0, 0, 0, 1, 0, FbxTime::eFrames60);
+
+			bool is_take_exist = false;
+			for (int count_take = 0; count_take < num_take; count_take++)
+			{
+				// テイク名からテイク情報を取得
+				FbxTakeInfo *currentTakeInfo = m_scene->GetTakeInfo(*(take_name_ary[count_take]));
+				if (currentTakeInfo)
+				{
+					start = currentTakeInfo->mLocalTimeSpan.GetStart();
+					stop = currentTakeInfo->mLocalTimeSpan.GetStop();
+					is_take_exist = true;
+					break;
+				}
+			}
+
+			// 1フレーム時間（period）で割ればフレーム数になります
+			int startFrame = (int)(start.Get() / period.Get());
+			int stopFrame = (int)(stop.Get() / period.Get());
+
+			if (m_frame_count >= stopFrame)
+			{
+				m_frame_count = 0;
+			}
+
+			const FbxMatrix &global_transform = fbx_cluster->GetLink()->EvaluateGlobalTransform(period * m_frame_count);
+			D3DXMATRIX mtrix, parent;
+
+			double _11 = global_transform[0][0];
+			double _12 = global_transform[0][1];
+			double _13 = global_transform[0][2];
+			double _14 = global_transform[0][3];
+
+			double _21 = global_transform[1][0];
+			double _22 = global_transform[1][1];
+			double _23 = global_transform[1][2];
+			double _24 = global_transform[1][3];
+
+			double _31 = global_transform[2][0];
+			double _32 = global_transform[2][1];
+			double _33 = global_transform[2][2];
+			double _34 = global_transform[2][3];
+
+			double _41 = global_transform[3][0];
+			double _42 = global_transform[3][1];
+			double _43 = global_transform[3][2];
+			double _44 = global_transform[3][3];
+
+			mtrix._11 = _11;
+			mtrix._12 = _12;
+			mtrix._13 = _13;
+			mtrix._14 = _14;
+
+			mtrix._21 = _21;
+			mtrix._22 = _22;
+			mtrix._23 = _23;
+			mtrix._24 = _24;
+
+			mtrix._31 = _31;
+			mtrix._32 = _32;
+			mtrix._33 = _33;
+			mtrix._34 = _34;
+
+			mtrix._41 = _41;
+			mtrix._42 = _42;
+			mtrix._43 = _43;
+			mtrix._44 = _44;
+
+			pDevice->GetTransform(D3DTS_WORLD,
+				&parent);
+
+			//パーツのワールドマトリックスと親のワールドマトリックスを掛け合わせる
+			D3DXMatrixMultiply(&mtrix,
+				&mtrix,
+				&parent);
+
+			//マトリックスの設定
+			pDevice->SetTransform(D3DTS_WORLD,
+				&mtrix);
+		}
+	}*/
 }

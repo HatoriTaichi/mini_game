@@ -39,6 +39,7 @@ private:
 	void GetMaterial(FbxMesh *mesh);
 	void GetTexture(FbxSurfaceMaterial *material);
 	void GetBone(FbxMesh *mesh);
+	void UpdateMatrix(FbxMesh *mesh);
 	FbxManager *m_manager;
 	FbxImporter *m_importer;
 	FbxScene *m_scene;
@@ -52,11 +53,13 @@ private:
 	vector<pair<vector<int>, vector<float>>> m_index_weight;
 	vector<LPDIRECT3DVERTEXBUFFER9> m_vtx_buff;
 	vector<LPDIRECT3DINDEXBUFFER9> m_idx_buff;
+	vector<FbxMesh*> m_mesh;
 	string m_pas;
 	D3DXMATRIX m_mtx_wold;
 	D3DXVECTOR3 m_pos;
 	D3DXVECTOR3 m_rot;
-	int m_mesh_count;
+	int m_frame_count;
+	int m_count;
 };
 
 #endif
