@@ -75,7 +75,7 @@ HRESULT CModel::Init(void)
 			for (int count_tex = 0; count_tex < tex_num; count_tex++)
 			{
 				// パスを取得
-				string pas = CManager::GetInstance()->GetTexture()->GetPas(count_tex);
+ 				string pas = CManager::GetInstance()->GetTexture()->GetPas(count_tex);
 
 				// パスとマテリアルのパスが一緒なら
 				if (pas.find(mat[count_mat].pTextureFilename) != string::npos)
