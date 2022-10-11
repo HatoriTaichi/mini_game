@@ -60,6 +60,11 @@ public:
 		int all_model_num;	// 階層構造モデル数
 	} MODEL_INFO;
 
+	typedef struct
+	{
+
+	} STAGE_INFO;
+
 	CFileLoad();		//コンストラクタ
 	~CFileLoad();		//デストラクタ
 	static vector<string> LoadFile(string load_file);	// ファイルロード
