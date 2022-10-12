@@ -15,8 +15,9 @@
 #include "keyinput.h"
 #include "ingredients.h"
 #include "singlemodel.h"
-static const float MoveSpeed = 5.0f;
-static const float NoDropSize = 25.0f;
+static const float MoveSpeed = 2.0f;
+static const float NoDropSize = 30.0f;
+static const float HitDistance = 50.0f;
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -25,6 +26,8 @@ CEnemy::CEnemy(LAYER_TYPE layer) : CObject(layer)
 {
 	m_motion_controller = nullptr;
 	memset(m_pColliNoDrop, NULL, sizeof(m_pColliNoDrop));
+	m_nFacing = DOWN;
+	m_bSwing = false;
 }
 
 //=============================================================================
@@ -50,15 +53,15 @@ HRESULT CEnemy::Init(void)
 	if (!m_pColliNoDrop[RIGHT])
 	{
 		m_pColliNoDrop[RIGHT] = CModel::Create("box000.x");
-		m_pColliNoDrop[RIGHT]->SetPos({ m_pos.x + 100.0f,m_pos.y,m_pos.z });
+		m_pColliNoDrop[RIGHT]->SetPos({ m_pos.x + HitDistance,m_pos.y,m_pos.z });
 		m_pColliNoDrop[RIGHT]->SetPrent(m_pCenter);
 		//m_pColliNoDrop[RIGHT]->SetTransparent(true);
 
 	}
 	if (!m_pColliNoDrop[LEFT])
 	{
-		m_pColliNoDrop[LEFT] = CModel::Create("crystal.x");
-		m_pColliNoDrop[LEFT]->SetPos({ m_pos.x - 100.0f,m_pos.y,m_pos.z });
+		m_pColliNoDrop[LEFT] = CModel::Create("box000.x");
+		m_pColliNoDrop[LEFT]->SetPos({ m_pos.x - HitDistance,m_pos.y,m_pos.z });
 		m_pColliNoDrop[LEFT]->SetPrent(m_pCenter);
 		//m_pColliNoDrop[LEFT]->SetTransparent(true);
 
@@ -66,8 +69,8 @@ HRESULT CEnemy::Init(void)
 	}
 	if (!m_pColliNoDrop[UP])
 	{
-		m_pColliNoDrop[UP] = CModel::Create("crystal.x");
-		m_pColliNoDrop[UP]->SetPos({ m_pos.x,m_pos.y,m_pos.z + 100.0f });
+		m_pColliNoDrop[UP] = CModel::Create("box000.x");
+		m_pColliNoDrop[UP]->SetPos({ m_pos.x,m_pos.y,m_pos.z + HitDistance });
 		m_pColliNoDrop[UP]->SetPrent(m_pCenter);
 		//m_pColliNoDrop[UP]->SetTransparent(true);
 
@@ -75,8 +78,8 @@ HRESULT CEnemy::Init(void)
 	}
 	if (!m_pColliNoDrop[DOWN])
 	{
-		m_pColliNoDrop[DOWN] = CModel::Create("crystal.x");
-		m_pColliNoDrop[DOWN]->SetPos({ m_pos.x,m_pos.y,m_pos.z - 100.0f });
+		m_pColliNoDrop[DOWN] = CModel::Create("box000.x");
+		m_pColliNoDrop[DOWN]->SetPos({ m_pos.x,m_pos.y,m_pos.z - HitDistance });
 		m_pColliNoDrop[DOWN]->SetPrent(m_pCenter);
 		//m_pColliNoDrop[DOWN]->SetTransparent(true);
 
@@ -122,28 +125,29 @@ void CEnemy::Update(void)
 	{
 		m_pCenter->SetPos(m_pos);
 	}
-	if (m_pColliNoDrop[RIGHT])
-	{
-		m_pColliNoDrop[RIGHT]->SetPos({ m_pos.x + 100.0f,m_pos.y,m_pos.z });
-	}
-	if (m_pColliNoDrop[LEFT])
-	{
-		m_pColliNoDrop[LEFT]->SetPos({ m_pos.x - 100.0f,m_pos.y,m_pos.z });
-	}
 	if (m_pColliNoDrop[UP])
 	{
-		m_pColliNoDrop[UP]->SetPos({ m_pos.x,m_pos.y,m_pos.z + 100.0f });
+		m_pColliNoDrop[UP]->SetPos({ m_pos.x,m_pos.y,m_pos.z + HitDistance });
 	}
 	if (m_pColliNoDrop[DOWN])
 	{
-		m_pColliNoDrop[DOWN]->SetPos({ m_pos.x,m_pos.y,m_pos.z - 100.0f });
+		m_pColliNoDrop[DOWN]->SetPos({ m_pos.x,m_pos.y,m_pos.z - HitDistance });
 	}
+	if (m_pColliNoDrop[RIGHT])
+	{
+		m_pColliNoDrop[RIGHT]->SetPos({ m_pos.x + HitDistance,m_pos.y,m_pos.z });
+	}
+	if (m_pColliNoDrop[LEFT])
+	{
+		m_pColliNoDrop[LEFT]->SetPos({ m_pos.x - HitDistance,m_pos.y,m_pos.z });
+	}
+
 
 
 	m_motion_controller->PlayMotin("NUTLARAL");
 	//移動処理
 	CEnemy::Move();
-	//DropItem();
+	//CEnemy::KeyMove();
 	// サイズの取得@
 	int size = m_model.size();
 	for (int count_model = 0; count_model < size; count_model++)
@@ -189,6 +193,7 @@ void CEnemy::Draw(void)
 		&m_mtx_wold);
 
 	// サイズの取得
+	
 	int size = m_model.size();
 
 	for (int count_model = 0; count_model < size; count_model++)
@@ -196,97 +201,261 @@ void CEnemy::Draw(void)
 		m_model[count_model]->Draw();
 	}
 
+	//for (int nCnt = 0; nCnt < RotColli; nCnt++)
+	//{
+	//	if (m_pColliNoDrop[nCnt])
+	//	{
+	//		m_pColliNoDrop[nCnt]->Draw();
+	//		m_pColliNoDrop[nCnt]->SetOldPos(m_pos);
+	//	}
+	//}
+	Drawtxt();
+
+}
+void CEnemy::Drawtxt(void)
+{
+	RECT rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+	char str[3000];
+	int nNum = 0;
+
+	nNum = sprintf(&str[0], "\n\n 情報 \n");
+	nNum += sprintf(&str[nNum], " [m_pColliNoDropPOS] %.2f,%.2f,%.2f\n", m_pCenter->GetPos().x, m_pCenter->GetPos().y, m_pCenter->GetPos().z);
+
 	for (int nCnt = 0; nCnt < RotColli; nCnt++)
 	{
-		if (m_pColliNoDrop[nCnt])
+		nNum += sprintf(&str[nNum], " [m_bHit] *%d\n", m_bHit[nCnt]);
+		nNum += sprintf(&str[nNum], " [m_pColliNoDropPOS] %.2f,%.2f,%.2f\n", m_pColliNoDrop[nCnt]->GetPos().x, m_pColliNoDrop[nCnt]->GetPos().y, m_pColliNoDrop[nCnt]->GetPos().z);
+		nNum += sprintf(&str[nNum], " [m_fHitLength] %.2f\n", m_fHitLength[nCnt]);
+
+	}
+	nNum += sprintf(&str[nNum], "\n\n [m_nFacing] *%d\n", m_nFacing);
+	nNum += sprintf(&str[nNum], " [m_bSwing] *%d\n", m_bSwing);
+
+	LPD3DXFONT pFont = CManager::GetRenderer()->GetFont();
+	// テキスト描画
+	pFont->DrawText(NULL, str, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));
+
+
+}
+bool CEnemy::RayColl(void)
+{
+	//上下左右の当たり判定
+	vector<CObject *>Obj = CObject::GetObjTypeObject(CObject::OBJTYPE::BLOCK);
+	int nSize = Obj.size();
+	if (nSize != 0)
+	{
+		for (int nModel = 0; nModel < nSize; nModel++)
 		{
-			m_pColliNoDrop[nCnt]->Draw();
+			CSingleModel *pSModel = static_cast<CSingleModel*>(Obj[nModel]);
+			vector<CModel::MODEL_DATA> modeldata = pSModel->GetModel()->GetModelData();
+			D3DXMATRIX modelInvMtx;
+			D3DXMATRIX modelMtx = pSModel->GetModel()->GetMatrix();
+			D3DXMatrixIdentity(&modelInvMtx);
+			D3DXMatrixInverse(&modelInvMtx, NULL, &modelMtx);
+			D3DXVECTOR3 pos = m_pos;
+
+			int nModelDataSize = modeldata.size();
+			float fRotUp = D3DXToRadian(0.0f);
+			float fRotDown = D3DXToRadian(180.0f);
+			float fRotL = D3DXToRadian(-90.0f);
+			float fRotR = D3DXToRadian(90.0f);
+
+			D3DXVECTOR3 RayPos[RotColli] ;
+			RayPos[UP] = { m_pos.x + sinf(fRotUp)*HitDistance, m_pos.y, m_pos.z + cosf(fRotUp)*HitDistance };
+			RayPos[DOWN] = { m_pos.x + sinf(fRotDown)*HitDistance ,m_pos.y,m_pos.z + cosf(fRotDown)*HitDistance };
+			RayPos[LEFT] = { m_pos.x + sinf(fRotL)*HitDistance ,m_pos.y,m_pos.z + cosf(fRotL)*HitDistance };
+			RayPos[RIGHT] = { m_pos.x + sinf(fRotR)*HitDistance, m_pos.y, m_pos.z + cosf(fRotR)*HitDistance };
+
+			D3DXVec3TransformCoord(&pos, &pos, &modelInvMtx);
+			for (int nRay = 0; nRay < RotColli; nRay++)
+			{
+				D3DXVec3TransformCoord(&RayPos[nRay], &RayPos[nRay], &modelInvMtx);
+			}
+			D3DXVECTOR3 RayVec[RotColli];
+			RayVec[UP] = RayPos[UP] - pos;
+			RayVec[DOWN] = RayPos[DOWN] - pos;
+			RayVec[LEFT] = RayPos[LEFT] - pos;
+			RayVec[RIGHT] = RayPos[RIGHT] - pos;
+			//ベクトルを正規化
+			D3DXVec3Normalize(&RayVec[UP], &RayVec[UP]);
+			//ベクトルを正規化
+			D3DXVec3Normalize(&RayVec[DOWN], &RayVec[DOWN]);
+			//ベクトルを正規化
+			D3DXVec3Normalize(&RayVec[LEFT], &RayVec[LEFT]);
+			//ベクトルを正規化
+			D3DXVec3Normalize(&RayVec[RIGHT], &RayVec[RIGHT]);
+
+			BOOL bHit = false;
+			BOOL bHitD = false;
+			BOOL bHitL = false;
+			BOOL bHitR = false;
+
+			for (int nRay = 0; nRay < RotColli; nRay++)
+			{
+				D3DXIntersect(modeldata[7].mesh, &pos, &RayVec[nRay],
+					&bHit, nullptr, nullptr, nullptr, &m_fHitLength[nRay], nullptr, nullptr);
+				if (bHit)
+				{
+					if (m_fHitLength[nRay] < NoDropSize)
+					{
+						m_bHit[nRay] = true;
+						if (m_bHit[m_nFacing])
+						{
+							m_bSwing = true;
+						}
+					}
+				}
+			}
+
 		}
 	}
+	return false;
+}
+//=============================================================================
+// 移動
+//=============================================================================
+void CEnemy::KeyMove(void)
+{
+	RayColl();
 
-
+	//キーボード情報取得
+	CKey * pKey = CManager::GetKey();
+	if (pKey->GetPress(CKey::KEYBIND::W))
+	{
+		m_pos.z += MoveSpeed;
+		m_rot.y = D3DXToRadian(180.0f);
+		//nFacing = UP;
+	}
+	else if (pKey->GetPress(CKey::KEYBIND::S))
+	{
+		m_pos.z -= MoveSpeed;
+		m_rot.y = D3DXToRadian(0.0f);
+		//nFacing = DOWN;
+	}
+	else if (pKey->GetPress(CKey::KEYBIND::A))
+	{
+		m_pos.x -= MoveSpeed;
+		m_rot.y = D3DXToRadian(90.0f);
+		//nFacing = LEFT;
+	}
+	else if (pKey->GetPress(CKey::KEYBIND::D))
+	{
+		m_pos.x += MoveSpeed;
+		m_rot.y = D3DXToRadian(-90.0f);
+		//nFacing = RIGHT;
+	}
 }
 //=============================================================================
 // 自動移動の処理
 //=============================================================================
 void CEnemy::Move(void)
 {
-	//向いてる方向に移動
-	m_pos.x += sinf(m_rot.y)*MoveSpeed;
-	m_pos.z += cosf(m_rot.y)*MoveSpeed;
+	std::random_device random;	// 非決定的な乱数生成器
+	std::mt19937_64 mt(random());            // メルセンヌ・ツイスタの64ビット版、引数は初期シード
+	std::uniform_real_distribution<> randPassive(0, 4);
 
-	for (int nCnt = 0; nCnt < RotColli; nCnt++)
-	{
-		m_bHit[nCnt] = false;
-	}
+	//向いてる方向に移動
+	m_pos.x -= sinf(m_rot.y)*MoveSpeed;
+	m_pos.z -= cosf(m_rot.y)*MoveSpeed;
+
+	RayColl();
 	//上下左右の当たり判定
 	vector<CObject *>Obj = CObject::GetObjTypeObject(CObject::OBJTYPE::BLOCK);
 	int nSize = Obj.size();
 	if (nSize != 0)
 	{
-		for (int nCnt = 0; nCnt < nSize; nCnt++)
+		//for (int nModel = 0; nModel < nSize; nModel++)
+		//{
+		//	CSingleModel *pSModel = static_cast<CSingleModel*>(Obj[nModel]);
+		//	for (int nCnt = 0; nCnt < RotColli; nCnt++)
+		//	{
+		//		//D3DXVECTOR3 pos = m_pColliNoDrop[nCnt]->GetPos();
+		//		//D3DXVECTOR3 ModelPos = pSModel->GetPos();
+		//		//D3DXVECTOR3 vec = ModelPos - pos;
+		//		//float LengthX = sqrtf((vec.x*vec.x));
+		//		//float LengthZ = sqrtf((vec.z*vec.z));
+		//		//if (LengthX <= NoDropSize&&
+		//		//	LengthZ <= NoDropSize)
+		//		//{
+
+		//		//	m_bHit[nCnt] = true;
+		//		//	if (m_bHit[m_nFacing])
+		//		//	{
+		//		//		m_bSwing = true;
+		//		//	}
+		//		//}
+		//		if (pSModel->CircleCollision(m_pColliNoDrop[nCnt]->GetPos(), NoDropSize))
+		//		{
+		//			//ドロップしないようにする
+		//				m_bHit[nCnt] = true;
+		//				if (m_bHit[m_nFacing])
+		//				{
+		//					m_bSwing = true;
+		//				}
+		//		}
+		//	}
+		//}
+		if (m_bSwing)
 		{
-			CSingleModel *pSModel = static_cast<CSingleModel*>(Obj[nCnt]);
-			for (int nCnt = 0; nCnt < RotColli; nCnt++)
+
+			m_bSwing = false;
+			float Rot = 0.0f;
+			bool bOK = false;
+			int nSwing = 0;
+
+			while (!bOK)
 			{
-				D3DXVECTOR3 pos = m_pColliNoDrop[nCnt]->GetPos();
-				D3DXVECTOR3 vec = pSModel->GetPos() - pos;
-				float LengthX = sqrtf((vec.x*vec.x));
-				float LengthZ = sqrtf((vec.z*vec.z));
-				if (LengthX <= NoDropSize&&
-					LengthZ <= NoDropSize)
+				nSwing = (int)randPassive(mt);
+				for (int nCnt = 0; nCnt < RotColli; nCnt++)
 				{
-					//ドロップしないようにする
-					m_bHit[nCnt] = true;
+					if (!m_bHit[nSwing])
+					{
+						bOK = true;
+					}
+					else
+					{
+						bOK = false;
+					}
+
+				}
+				if (m_bHit[0] && m_bHit[1] &&
+					m_bHit[2] && m_bHit[3])
+				{
+					bOK = true;
 				}
 			}
-		}
-	}
-	float Rot = 0.0f;
-	for (int nCnt = 0; nCnt < RotColli; nCnt++)
-	{
-		//振りむきが可能な範囲なら
-		if (m_bHit[nFacing])
-		{
-			switch (nFacing)
-			{
-			case CEnemy::UP:
-				Rot = D3DXToRadian(180.0f);
-				break;
-			case CEnemy::DOWN:
-				Rot = D3DXToRadian(0.0f);
-				break;
-			case CEnemy::RIGHT:
-				Rot = D3DXToRadian(-90.0f);
-				break;
-			case CEnemy::LEFT:
-				Rot = D3DXToRadian(90.0f);
-				break;
-			}
-			break;
-		}
-		else
-		{
-			switch (nCnt)
-			{
-			case CEnemy::UP:
-				Rot = D3DXToRadian(180.0f);
-				break;
-			case CEnemy::DOWN:
-				Rot = D3DXToRadian(0.0f);
-				break;
-			case CEnemy::RIGHT:
-				Rot = D3DXToRadian(-90.0f);
-				break;
-			case CEnemy::LEFT:
-				Rot = D3DXToRadian(90.0f);
-				break;
-			}
-			break;
-		}
-	}
-	m_rot.y = Rot;
 
+			switch (nSwing)
+			{
+			case CEnemy::UP:
+				Rot = D3DXToRadian(180.0f);
+				m_nFacing = UP;
+
+				break;
+			case CEnemy::DOWN:
+				Rot = D3DXToRadian(0.0f);
+				m_nFacing = DOWN;
+
+				break;
+			case CEnemy::RIGHT:
+				Rot = D3DXToRadian(-90.0f);
+				m_nFacing = RIGHT;
+
+				break;
+			case CEnemy::LEFT:
+				Rot = D3DXToRadian(90.0f);
+				m_nFacing = LEFT;
+
+				break;
+			}
+			m_rot.y = Rot;
+			for (int nCnt = 0; nCnt < RotColli; nCnt++)
+			{
+				m_bHit[nCnt] = false;
+			}
+		}
+
+	}
 }
 //=============================================================================
 // 円の当たり判定

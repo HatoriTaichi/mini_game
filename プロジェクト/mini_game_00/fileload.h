@@ -65,6 +65,7 @@ public:
 		vector<string> type;	// オブジェクトタイプ
 		vector<D3DXVECTOR3> pos;	// 位置
 		vector<D3DXVECTOR3> rot;	// 回転
+		int all_model;	// 総数
 	} STAGE_MODEL_INFO;
 
 	typedef struct

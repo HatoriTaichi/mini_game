@@ -97,6 +97,19 @@ void CSingleModel::Draw(void)
 	m_model->Draw();
 }
 
+bool CSingleModel::CircleCollision(const D3DXVECTOR3 & pos, const float & size)
+{
+	D3DXVECTOR3 vec = pos - m_pos;
+	float LengthX = sqrtf((vec.x*vec.x));
+	float LengthZ = sqrtf((vec.z*vec.z));
+	if (LengthX <= size&&
+		LengthZ <= size)
+	{
+		return true;
+	}
+	return false;
+}
+
 //=============================================================================
 // ƒ‚ƒfƒ‹‚Ì¶¬
 //=============================================================================

@@ -119,7 +119,7 @@ HRESULT CRenderer::Init(const HWND &hWnd, const bool &bWindow)
 
 #ifdef _DEBUG
 	// デバッグ情報表示用フォントの生成
-	D3DXCreateFont(m_pD3DDevice, 18, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
+	D3DXCreateFont(m_pD3DDevice, 20, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
 		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Terminal", &m_pFont);
 #endif //!_DEBUG
 

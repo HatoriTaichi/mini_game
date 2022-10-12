@@ -342,6 +342,7 @@ CFileLoad::STAGE_INFO CFileLoad::CreateStageInfo(vector<string> all_file_info)
 {
 	STAGE_INFO stage_buf;	// ステージ配置情報
 	STAGE_MODEL_INFO mdoel_buf;	// モデルの情報
+	mdoel_buf.all_model = 0;
 
 	int file_element;	// テキストファイルの文字列サイズ
 
@@ -382,11 +383,20 @@ CFileLoad::STAGE_INFO CFileLoad::CreateStageInfo(vector<string> all_file_info)
 					rot_buf.y = static_cast<float>(atof(all_file_info[element_count + 3].c_str()));
 					rot_buf.z = static_cast<float>(atof(all_file_info[element_count + 4].c_str()));
 				}
+				// END_MODELSETを見つけたら
+				if (all_file_info[element_count].find("END_MODELSET") != string::npos)
+				{
+					// 情報を保存
+					mdoel_buf.type.push_back(type_bug);
+					mdoel_buf.pos.push_back(pos_buf);
+					mdoel_buf.rot.push_back(rot_buf);
+					mdoel_buf.all_model++;
+
+					// ループ抜け
+					break;
+				}
+				element_count++;
 			}
-			// 情報を保存
-			mdoel_buf.type.push_back(type_bug);
-			mdoel_buf.pos.push_back(pos_buf);
-			mdoel_buf.rot.push_back(rot_buf);
 		}
 	}
 

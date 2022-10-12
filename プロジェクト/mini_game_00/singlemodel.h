@@ -26,6 +26,7 @@ public:
 	void Uninit(void);	// ポリゴンの終了
 	void Update(void);	// ポリゴンの更新
 	void Draw(void);	// ポリゴンの描画
+	bool CircleCollision(const D3DXVECTOR3& pos, const float& size);	// 当たり判定
 	static CSingleModel *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, string namae, CObject::OBJTYPE type = CObject::OBJTYPE::MODEL);	// 生成
 	void SetScale(D3DXVECTOR3 scale) { m_model->SetScale(scale); }	// セッター
 	D3DXVECTOR3 GetPos(void) { return m_pos; }	// ゲッダー
