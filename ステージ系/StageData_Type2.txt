@@ -1,0 +1,93 @@
++===========================+
++     モデル配置の情報      +
++===========================+
+MODELSET
+	TYPE = box000.x
+	POS = 0.00 0.00 0.00
+	ROT = 0.00 0.00 0.00
+END_MODELSET
+MODELSET
+	TYPE = box000.x
+	POS = 105.00 0.00 0.00
+	ROT = 0.00 0.00 0.00
+END_MODELSET
+MODELSET
+	TYPE = box000.x
+	POS = 188.89 0.00 -78.89
+	ROT = 0.00 0.00 0.00
+END_MODELSET
+MODELSET
+	TYPE = box000.x
+	POS = 96.97 0.00 -245.81
+	ROT = 0.00 0.00 0.00
+END_MODELSET
+MODELSET
+	TYPE = box000.x
+	POS = -36.92 0.00 -284.71
+	ROT = 0.00 0.00 0.00
+END_MODELSET
+MODELSET
+	TYPE = box000.x
+	POS = -172.63 0.00 -213.99
+	ROT = 0.00 0.00 0.00
+END_MODELSET
+MODELSET
+	TYPE = box000.x
+	POS = -225.67 0.00 -105.96
+	ROT = 0.00 0.00 0.00
+END_MODELSET
+MODELSET
+	TYPE = box000.x
+	POS = -179.71 0.00 45.00
+	ROT = 0.00 0.00 0.00
+END_MODELSET
+MODELSET
+	TYPE = box000.x
+	POS = -77.18 0.00 147.53
+	ROT = 0.00 0.00 0.00
+END_MODELSET
+MODELSET
+	TYPE = box000.x
+	POS = 56.72 0.00 186.42
+	ROT = 0.00 0.00 0.00
+END_MODELSET
+MODELSET
+	TYPE = box000.x
+	POS = 208.28 0.00 129.85
+	ROT = 0.00 0.00 0.00
+END_MODELSET
+MODELSET
+	TYPE = box000.x
+	POS = 332.03 0.00 6.11
+	ROT = 0.00 0.00 0.00
+END_MODELSET
+MODELSET
+	TYPE = box000.x
+	POS = 388.60 0.00 -156.53
+	ROT = 0.00 0.00 0.00
+END_MODELSET
+MODELSET
+	TYPE = box000.x
+	POS = 275.46 0.00 -269.66
+	ROT = 0.00 0.00 0.00
+END_MODELSET
+MODELSET
+	TYPE = box000.x
+	POS = 159.39 0.00 -375.73
+	ROT = 0.00 0.00 0.00
+END_MODELSET
+MODELSET
+	TYPE = box000.x
+	POS = -10.61 0.00 -375.73
+	ROT = 0.00 0.00 0.00
+END_MODELSET
++===========================+
++     敵配置の情報      +
++===========================+
++===========================+
++        壁配置の情報       +
++===========================+
++===========================+
++        床配置の情報       +
++===========================+
+END_SCRIPT

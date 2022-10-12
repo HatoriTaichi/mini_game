@@ -33,7 +33,6 @@ CSingleModel::~CSingleModel()
 //=============================================================================
 HRESULT CSingleModel::Init(void)
 {
-	CObject::SetObjType(CObject::OBJTYPE::MODEL);
 
 	m_model = CModel::Create(m_name);
 	m_model->SetScale(m_scale);
@@ -98,10 +97,23 @@ void CSingleModel::Draw(void)
 	m_model->Draw();
 }
 
+bool CSingleModel::CircleCollision(const D3DXVECTOR3 & pos, const float & size)
+{
+	D3DXVECTOR3 vec = pos - m_pos;
+	float LengthX = sqrtf((vec.x*vec.x));
+	float LengthZ = sqrtf((vec.z*vec.z));
+	if (LengthX <= size&&
+		LengthZ <= size)
+	{
+		return true;
+	}
+	return false;
+}
+
 //=============================================================================
 // モデルの生成
 //=============================================================================
-CSingleModel *CSingleModel::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, string name)
+CSingleModel *CSingleModel::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, string name, CObject::OBJTYPE type)
 {
 	// モデルのポインタ
 	CSingleModel *single_model = nullptr;
@@ -110,6 +122,8 @@ CSingleModel *CSingleModel::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3
 	// nullチェック
 	if (single_model != nullptr)
 	{
+		single_model->SetObjType(type);
+
 		// 値を代入
 		single_model->m_pos = pos;
 		single_model->m_rot = rot;

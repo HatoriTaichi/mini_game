@@ -50,6 +50,7 @@ public:
 private:
 	void CreateModel(void);	// モデルの生成
 	void InitMotionController(void);	// モーションコントローラーの初期化
+	bool m_bDrop[NoDropColli];//ドロップ可能か
 	vector<CModel*> m_model;	// モデル
 	CModel*m_pColliNoDrop[NoDropColli];//ドロップしない場所を検知するための当たり判定
 	CModel*m_pCenter;//ドロップしない場所を検知するための当たり判定
@@ -58,9 +59,11 @@ private:
 	CFileLoad::MODEL_INFO m_model_info;	// モデル情報
 	CMotionController *m_motion_controller;	// モーションコントローラー
 	D3DXVECTOR3 m_pos;	// 位置
+	D3DXVECTOR3 m_posold;	// 位置
 	D3DXVECTOR3 m_rot;	// 向き
 	D3DXVECTOR3 m_scale;	// スケール
 	D3DXMATRIX m_mtx_wold;	// ワールドマトリックス
+	int nFacing;//向いてる方向
 };
 
 #endif

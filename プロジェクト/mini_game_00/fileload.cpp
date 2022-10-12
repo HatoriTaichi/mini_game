@@ -334,3 +334,73 @@ CFileLoad::MODEL_INFO CFileLoad::CreateHierarchyMotion(vector<string> all_file_i
 
 	return buf;
 }
+
+//=============================================================================
+// ステージ配置情報に分解
+//=============================================================================
+CFileLoad::STAGE_INFO CFileLoad::CreateStageInfo(vector<string> all_file_info)
+{
+	STAGE_INFO stage_buf;	// ステージ配置情報
+	STAGE_MODEL_INFO mdoel_buf;	// モデルの情報
+	mdoel_buf.all_model = 0;
+
+	int file_element;	// テキストファイルの文字列サイズ
+
+	file_element = all_file_info.size();	// サイズの取得
+
+	// テキストファイルのサイズ分のループ
+	for (int element_count = 0; element_count < file_element; element_count++)
+	{
+		// NUM_MODELを見つけたら
+		if (all_file_info[element_count].find("MODELSET") != string::npos)
+		{
+			string type_bug;	// タイプ
+			D3DXVECTOR3 pos_buf;	// posのバッファ
+			D3DXVECTOR3 rot_buf;	// rotのバッファ
+
+			// 無限ループ
+			while (true)
+			{
+				// TYPEを見つけたら
+				if (all_file_info[element_count].find("TYPE") != string::npos)
+				{
+					// 保存
+					type_bug = all_file_info[element_count + 2].c_str();
+				}
+				// POSを見つけたら
+				if (all_file_info[element_count].find("POS") != string::npos)
+				{
+					// 保存
+					pos_buf.x = static_cast<float>(atof(all_file_info[element_count + 2].c_str()));
+					pos_buf.y = static_cast<float>(atof(all_file_info[element_count + 3].c_str()));
+					pos_buf.z = static_cast<float>(atof(all_file_info[element_count + 4].c_str()));
+				}
+				// ROTを見つけたら
+				if (all_file_info[element_count].find("ROT") != string::npos)
+				{
+					// 保存
+					rot_buf.x = static_cast<float>(atof(all_file_info[element_count + 2].c_str()));
+					rot_buf.y = static_cast<float>(atof(all_file_info[element_count + 3].c_str()));
+					rot_buf.z = static_cast<float>(atof(all_file_info[element_count + 4].c_str()));
+				}
+				// END_MODELSETを見つけたら
+				if (all_file_info[element_count].find("END_MODELSET") != string::npos)
+				{
+					// 情報を保存
+					mdoel_buf.type.push_back(type_bug);
+					mdoel_buf.pos.push_back(pos_buf);
+					mdoel_buf.rot.push_back(rot_buf);
+					mdoel_buf.all_model++;
+
+					// ループ抜け
+					break;
+				}
+				element_count++;
+			}
+		}
+	}
+
+	stage_buf.stage_model.push_back(mdoel_buf);
+
+	return stage_buf;
+}

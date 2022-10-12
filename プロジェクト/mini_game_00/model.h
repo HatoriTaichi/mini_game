@@ -43,17 +43,20 @@ public:
 	void Draw(void);	// ポリゴンの描画
 	bool BoxCollision(D3DXVECTOR3 *pos, D3DXVECTOR3 posold);	// 当たり判定
 	void SetPos(D3DXVECTOR3 pos) { m_pos = pos; }	// セッター
+	void SetOldPos(D3DXVECTOR3 pos) { m_oldPos = pos; }	// セッター
 	void SetRot(D3DXVECTOR3 rot) { m_rot = rot; }	// セッター
 	void SetScale(D3DXVECTOR3 scale) { m_scale = scale; }	// セッター
 	void SetMatrix(D3DXMATRIX mtx) { m_mtx_wold = mtx; }	// セッター
 	void SetPrent(CModel *pModel) { m_parent = pModel; }	// セッター
 	void SetTransparent(bool bTransparent) { m_transparent = bTransparent; }	// セッター
-
 	D3DXVECTOR3 GetPos(void) { return m_pos; }		// ゲッター
+	D3DXVECTOR3 GetOldPos(void) { return m_oldPos; }		// ゲッター
 	D3DXVECTOR3 GetRot(void) { return m_rot; }		// ゲッター
 	D3DXVECTOR3 GetScale(void) { return m_scale; }		// ゲッター
+	D3DXVECTOR3 GetVtx_Max(void) { return m_vtx_max; }		// ゲッター
+
 	D3DXMATRIX GetMatrix(void) { return m_mtx_wold; }	// ゲッター
-	vector<MODEL_DATA> GetModelData(void) { return m_model_data; }
+	static vector<MODEL_DATA> GetModelData(void) { return m_model_data; }
 	static HRESULT Load(void);	// モデルデータの読み込み
 	static void UnLoad(void);	// モデルデータの破棄
 	static CModel *Create(string name);	// 生成
@@ -68,6 +71,7 @@ private:
 	CModel *m_parent;	// 親のモデル
 	D3DXMATRIX m_mtx_wold;	// ワールドマトリックス
 	D3DXVECTOR3 m_pos;	// 位置
+	D3DXVECTOR3 m_oldPos;	// 位置
 	D3DXVECTOR3 m_scale;	// スケール
 	D3DXVECTOR3 m_rot;	// 向き
 	D3DXVECTOR3 m_vtx_min = D3DXVECTOR3(10000.0f, 10000.0f, 10000.0f);	// 頂点の端情報
