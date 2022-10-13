@@ -16,9 +16,8 @@
 #include "ingredients.h"
 #include "singlemodel.h"
 static const float MoveSpeed = 2.0f;
-static const float NoDropSize = 30.0f;
+static const float NoDropSize = 25.0f;
 static const float HitDistance = 50.0f;
-
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
@@ -242,6 +241,17 @@ bool CEnemy::RayColl(void)
 	//上下左右の当たり判定
 	vector<CObject *>Obj = CObject::GetObjTypeObject(CObject::OBJTYPE::BLOCK);
 	int nSize = Obj.size();
+	float fRotUp = D3DXToRadian(0.0f);
+	float fRotDown = D3DXToRadian(180.0f);
+	float fRotL = D3DXToRadian(-90.0f);
+	float fRotR = D3DXToRadian(90.0f);
+
+	D3DXVECTOR3 RayPos[RotColli];
+	RayPos[UP] = { m_pos.x + sinf(fRotUp)*HitDistance, m_pos.y, m_pos.z + cosf(fRotUp)*HitDistance };
+	RayPos[DOWN] = { m_pos.x + sinf(fRotDown)*HitDistance ,m_pos.y,m_pos.z + cosf(fRotDown)*HitDistance };
+	RayPos[LEFT] = { m_pos.x + sinf(fRotL)*HitDistance ,m_pos.y,m_pos.z + cosf(fRotL)*HitDistance };
+	RayPos[RIGHT] = { m_pos.x + sinf(fRotR)*HitDistance, m_pos.y, m_pos.z + cosf(fRotR)*HitDistance };
+
 	if (nSize != 0)
 	{
 		for (int nModel = 0; nModel < nSize; nModel++)
@@ -255,16 +265,7 @@ bool CEnemy::RayColl(void)
 			D3DXVECTOR3 pos = m_pos;
 
 			int nModelDataSize = modeldata.size();
-			float fRotUp = D3DXToRadian(0.0f);
-			float fRotDown = D3DXToRadian(180.0f);
-			float fRotL = D3DXToRadian(-90.0f);
-			float fRotR = D3DXToRadian(90.0f);
 
-			D3DXVECTOR3 RayPos[RotColli] ;
-			RayPos[UP] = { m_pos.x + sinf(fRotUp)*HitDistance, m_pos.y, m_pos.z + cosf(fRotUp)*HitDistance };
-			RayPos[DOWN] = { m_pos.x + sinf(fRotDown)*HitDistance ,m_pos.y,m_pos.z + cosf(fRotDown)*HitDistance };
-			RayPos[LEFT] = { m_pos.x + sinf(fRotL)*HitDistance ,m_pos.y,m_pos.z + cosf(fRotL)*HitDistance };
-			RayPos[RIGHT] = { m_pos.x + sinf(fRotR)*HitDistance, m_pos.y, m_pos.z + cosf(fRotR)*HitDistance };
 
 			D3DXVec3TransformCoord(&pos, &pos, &modelInvMtx);
 			for (int nRay = 0; nRay < RotColli; nRay++)
@@ -294,6 +295,7 @@ bool CEnemy::RayColl(void)
 			{
 				D3DXIntersect(modeldata[7].mesh, &pos, &RayVec[nRay],
 					&bHit, nullptr, nullptr, nullptr, &m_fHitLength[nRay], nullptr, nullptr);
+
 				if (bHit)
 				{
 					if (m_fHitLength[nRay] < NoDropSize)
@@ -358,43 +360,43 @@ void CEnemy::Move(void)
 	m_pos.x -= sinf(m_rot.y)*MoveSpeed;
 	m_pos.z -= cosf(m_rot.y)*MoveSpeed;
 
-	RayColl();
+	//RayColl();
 	//上下左右の当たり判定
 	vector<CObject *>Obj = CObject::GetObjTypeObject(CObject::OBJTYPE::BLOCK);
 	int nSize = Obj.size();
 	if (nSize != 0)
 	{
-		//for (int nModel = 0; nModel < nSize; nModel++)
-		//{
-		//	CSingleModel *pSModel = static_cast<CSingleModel*>(Obj[nModel]);
-		//	for (int nCnt = 0; nCnt < RotColli; nCnt++)
-		//	{
-		//		//D3DXVECTOR3 pos = m_pColliNoDrop[nCnt]->GetPos();
-		//		//D3DXVECTOR3 ModelPos = pSModel->GetPos();
-		//		//D3DXVECTOR3 vec = ModelPos - pos;
-		//		//float LengthX = sqrtf((vec.x*vec.x));
-		//		//float LengthZ = sqrtf((vec.z*vec.z));
-		//		//if (LengthX <= NoDropSize&&
-		//		//	LengthZ <= NoDropSize)
-		//		//{
+		for (int nModel = 0; nModel < nSize; nModel++)
+		{
+			CSingleModel *pSModel = static_cast<CSingleModel*>(Obj[nModel]);
+			for (int nCnt = 0; nCnt < RotColli; nCnt++)
+			{
+				D3DXVECTOR3 pos = m_pColliNoDrop[nCnt]->GetPos();
+				D3DXVECTOR3 ModelPos = pSModel->GetPos();
+				D3DXVECTOR3 vec = ModelPos - pos;
+				float LengthX = sqrtf((vec.x*vec.x));
+				float LengthZ = sqrtf((vec.z*vec.z));
+				if (LengthX <= NoDropSize&&
+					LengthZ <= NoDropSize)
+				{
 
-		//		//	m_bHit[nCnt] = true;
-		//		//	if (m_bHit[m_nFacing])
-		//		//	{
-		//		//		m_bSwing = true;
-		//		//	}
-		//		//}
-		//		if (pSModel->CircleCollision(m_pColliNoDrop[nCnt]->GetPos(), NoDropSize))
-		//		{
-		//			//ドロップしないようにする
-		//				m_bHit[nCnt] = true;
-		//				if (m_bHit[m_nFacing])
-		//				{
-		//					m_bSwing = true;
-		//				}
-		//		}
-		//	}
-		//}
+					m_bHit[nCnt] = true;
+					if (m_bHit[m_nFacing])
+					{
+						m_bSwing = true;
+					}
+				}
+				//if (pSModel->CircleCollision(m_pColliNoDrop[nCnt]->GetPos(), NoDropSize))
+				//{
+				//	//ドロップしないようにする
+				//		m_bHit[nCnt] = true;
+				//		if (m_bHit[m_nFacing])
+				//		{
+				//			m_bSwing = true;
+				//		}
+				//}
+			}
+		}
 		if (m_bSwing)
 		{
 
