@@ -338,9 +338,8 @@ CFileLoad::MODEL_INFO CFileLoad::CreateHierarchyMotion(vector<string> all_file_i
 //=============================================================================
 // ステージ配置情報に分解
 //=============================================================================
-CFileLoad::STAGE_INFO CFileLoad::CreateStageInfo(vector<string> all_file_info)
+CFileLoad::STAGE_MODEL_INFO CFileLoad::CreateStageInfo(vector<string> all_file_info)
 {
-	STAGE_INFO stage_buf;	// ステージ配置情報
 	STAGE_MODEL_INFO mdoel_buf;	// モデルの情報
 	mdoel_buf.all_model = 0;
 
@@ -399,8 +398,139 @@ CFileLoad::STAGE_INFO CFileLoad::CreateStageInfo(vector<string> all_file_info)
 			}
 		}
 	}
+	return mdoel_buf;
+}
 
-	stage_buf.stage_model.push_back(mdoel_buf);
+//=============================================================================
+// スポーン候補情報に分解
+//=============================================================================
+CFileLoad::STAGE_SPAWN_INFO CFileLoad::CreateSpawnInfo(vector<string> all_file_info)
+{
+	STAGE_SPAWN_INFO spawn_info;	// スポーンの情報
+	int file_element;	// テキストファイルの文字列サイズ
 
-	return stage_buf;
+	file_element = all_file_info.size();	// サイズの取得
+
+	// テキストファイルのサイズ分のループ
+	for (int element_count = 0; element_count < file_element; element_count++)
+	{
+		// ENEMYSETを見つけたら
+		if (all_file_info[element_count].find("ENEMYSET") != string::npos)
+		{
+			D3DXVECTOR3 pos_buf;	// posのバッファ
+			D3DXVECTOR3 rot_buf;	// rotのバッファ
+
+			// 無限ループ
+			while (true)
+			{
+				// POSを見つけたら
+				if (all_file_info[element_count].find("POS") != string::npos)
+				{
+					// 保存
+					pos_buf.x = static_cast<float>(atof(all_file_info[element_count + 2].c_str()));
+					pos_buf.y = static_cast<float>(atof(all_file_info[element_count + 3].c_str()));
+					pos_buf.z = static_cast<float>(atof(all_file_info[element_count + 4].c_str()));
+				}
+				// ROTを見つけたら
+				if (all_file_info[element_count].find("ROT") != string::npos)
+				{
+					// 保存
+					rot_buf.x = static_cast<float>(atof(all_file_info[element_count + 2].c_str()));
+					rot_buf.y = static_cast<float>(atof(all_file_info[element_count + 3].c_str()));
+					rot_buf.z = static_cast<float>(atof(all_file_info[element_count + 4].c_str()));
+				}
+				// END_ENEMYSETを見つけたら
+				if (all_file_info[element_count].find("END_ENEMYSET") != string::npos)
+				{
+					// 情報を保存
+					spawn_info.pos["ENEMYSET"].push_back(pos_buf);
+					spawn_info.rot["ENEMYSET"].push_back(rot_buf);
+					spawn_info.spawn_num["ENEMYSET"]++;
+
+					// ループ抜け
+					break;
+				}
+				element_count++;
+			}
+		}
+		// INGREDIENTSSETを見つけたら
+		if (all_file_info[element_count].find("INGREDIENTSSET") != string::npos)
+		{
+			D3DXVECTOR3 pos_buf;	// posのバッファ
+			D3DXVECTOR3 rot_buf;	// rotのバッファ
+
+			// 無限ループ
+			while (true)
+			{
+				// POSを見つけたら
+				if (all_file_info[element_count].find("POS") != string::npos)
+				{
+					// 保存
+					pos_buf.x = static_cast<float>(atof(all_file_info[element_count + 2].c_str()));
+					pos_buf.y = static_cast<float>(atof(all_file_info[element_count + 3].c_str()));
+					pos_buf.z = static_cast<float>(atof(all_file_info[element_count + 4].c_str()));
+				}
+				// ROTを見つけたら
+				if (all_file_info[element_count].find("ROT") != string::npos)
+				{
+					// 保存
+					rot_buf.x = static_cast<float>(atof(all_file_info[element_count + 2].c_str()));
+					rot_buf.y = static_cast<float>(atof(all_file_info[element_count + 3].c_str()));
+					rot_buf.z = static_cast<float>(atof(all_file_info[element_count + 4].c_str()));
+				}
+				// END_ENEMYSETを見つけたら
+				if (all_file_info[element_count].find("END_INGREDIENTSSET") != string::npos)
+				{
+					// 情報を保存
+					spawn_info.pos["END_INGREDIENTSSET"].push_back(pos_buf);
+					spawn_info.rot["END_INGREDIENTSSET"].push_back(rot_buf);
+					spawn_info.spawn_num["END_INGREDIENTSSET"]++;
+
+					// ループ抜け
+					break;
+				}
+				element_count++;
+			}
+		}
+		// ITEMSETを見つけたら
+		if (all_file_info[element_count].find("ITEMSET") != string::npos)
+		{
+			D3DXVECTOR3 pos_buf;	// posのバッファ
+			D3DXVECTOR3 rot_buf;	// rotのバッファ
+
+			// 無限ループ
+			while (true)
+			{
+				// POSを見つけたら
+				if (all_file_info[element_count].find("POS") != string::npos)
+				{
+					// 保存
+					pos_buf.x = static_cast<float>(atof(all_file_info[element_count + 2].c_str()));
+					pos_buf.y = static_cast<float>(atof(all_file_info[element_count + 3].c_str()));
+					pos_buf.z = static_cast<float>(atof(all_file_info[element_count + 4].c_str()));
+				}
+				// ROTを見つけたら
+				if (all_file_info[element_count].find("ROT") != string::npos)
+				{
+					// 保存
+					rot_buf.x = static_cast<float>(atof(all_file_info[element_count + 2].c_str()));
+					rot_buf.y = static_cast<float>(atof(all_file_info[element_count + 3].c_str()));
+					rot_buf.z = static_cast<float>(atof(all_file_info[element_count + 4].c_str()));
+				}
+				// END_ENEMYSETを見つけたら
+				if (all_file_info[element_count].find("END_ITEMSET") != string::npos)
+				{
+					// 情報を保存
+					spawn_info.pos["END_ITEMSET"].push_back(pos_buf);
+					spawn_info.rot["END_ITEMSET"].push_back(rot_buf);
+					spawn_info.spawn_num["END_ITEMSET"]++;
+
+					// ループ抜け
+					break;
+				}
+				element_count++;
+			}
+		}
+	}
+	return spawn_info;
 }

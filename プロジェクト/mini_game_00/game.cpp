@@ -66,12 +66,13 @@ HRESULT CGame::Init(void)
 
 	vector<string> text_element;	// フォルダの保存バッファ
 	CFileLoad::STAGE_INFO stage;
+	CFileLoad::STAGE_SPAWN_INFO spawn;
 
 	// ファイルを読み込む
 	text_element = CFileLoad::LoadTxt("data/Txt/StageData_Type2.txt");
 
 	// パスと名前を取得
-	stage = CFileLoad::CreateStageInfo(text_element);
+	stage.stage_model.push_back(CFileLoad::CreateStageInfo(text_element));
 
 	int stage_size = stage.stage_model.size();
 	for (int count_model_info = 0; count_model_info < stage_size; count_model_info++)
@@ -82,6 +83,23 @@ HRESULT CGame::Init(void)
 		}
 	}
 
+	// ファイルを読み込む
+	text_element = CFileLoad::LoadTxt("data/Txt/SpawnData.txt");
+
+	// パスと名前を取得
+	stage.spawn_info.push_back(CFileLoad::CreateSpawnInfo(text_element));
+/*
+	for (int count_size = 0; count_size < stage.spawn_info[0].spawn_num["ITEMSET"]; count_size++)
+	{
+		stage.spawn_info[0].pos["ITEMSET"][count_size].x;
+		stage.spawn_info[0].pos["ITEMSET"][count_size].y;
+		stage.spawn_info[0].pos["ITEMSET"][count_size].z;
+
+		stage.spawn_info[0].rot["ITEMSET"][count_size].x;
+		stage.spawn_info[0].rot["ITEMSET"][count_size].y;
+		stage.spawn_info[0].rot["ITEMSET"][count_size].z;
+	}
+*/
 	return S_OK;
 }
 
@@ -113,10 +131,10 @@ void CGame::Update(void)
 		int nSize = m_IngredientsSpawnPoint.size();
 		if (nSize != 0)
 		{
-			int nCntMax = randIngredientsCnt(mt);
+			int nCntMax = static_cast<int>(randIngredientsCnt(mt));
 			for (int nCnt = 0; nCnt < nCntMax; nCnt++)
 			{
-				int nType = randIngredientsType(mt);
+				int nType = static_cast<int>(randIngredientsType(mt));
 
 				//CIngredients::Create({ , + 500.0f, }, , { 1.0,1.0,1.0 }, nType);
 			}

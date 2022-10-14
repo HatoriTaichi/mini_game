@@ -143,7 +143,7 @@ void CIngredients::Update(void)
 			m_State = Normal;
 		}
 		break;
-	case CIngredients::IngredientsState::Drop:
+	case CIngredients::IngredientsState::StateDrop:
 		Drop();
 		break;
 	case CIngredients::IngredientsState::Normal:
@@ -347,7 +347,7 @@ CIngredients *CIngredients::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot,
 		Ingredients->m_bDoDrop = bDoDrop;
 		Ingredients->m_nNumDropType = DropNum;
 		Ingredients->m_Type = nType;
-		Ingredients->m_State = CIngredients::IngredientsState::Drop;
+		Ingredients->m_State = CIngredients::IngredientsState::StateDrop;
 		//ƒhƒƒbƒv‚Ìî•ñ‚ð“ü‚ê‚é
 		if (Ingredients->m_bDoDrop)
 		{

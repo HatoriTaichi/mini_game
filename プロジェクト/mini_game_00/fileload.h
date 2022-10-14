@@ -70,6 +70,14 @@ public:
 
 	typedef struct
 	{
+		map<string, vector<D3DXVECTOR3>> pos;	// スポーン位置
+		map<string, vector<D3DXVECTOR3>> rot;	// スポーン向き
+		map<string, int> spawn_num;	// 候補数
+	} STAGE_SPAWN_INFO;
+
+	typedef struct
+	{
+		vector<STAGE_SPAWN_INFO> spawn_info;	// スポーン情報
 		vector<STAGE_MODEL_INFO> stage_model;	// ステージ配置モデル
 	} STAGE_INFO;
 
@@ -79,7 +87,8 @@ public:
 	static vector<string> LoadTxt(string load_file);	// テキストロード
 	static PAS_AND_NAME_DATA CreatePasAndNameElement(vector<string> all_file_info, string load_file);	// パスと名前の取得
 	static MODEL_INFO CreateHierarchyMotion(vector<string> all_file_info, string file_name);	// 階層とモーションのデータ
-	static STAGE_INFO CreateStageInfo(vector<string> all_file_info);	// ステージ配置情報に分解
+	static STAGE_MODEL_INFO CreateStageInfo(vector<string> all_file_info);	// ステージ配置情報に分解
+	static STAGE_SPAWN_INFO CreateSpawnInfo(vector<string> all_file_info);	// ステージ配置情報に分解
 
 private:
 };

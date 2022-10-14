@@ -36,7 +36,7 @@ public:
 	enum IngredientsState
 	{
 		ImmediatelyAfterPop=0,//èoåªíºå„
-		Drop,
+		StateDrop,
 		Normal,
 		StateMax
 	};
