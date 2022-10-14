@@ -33,6 +33,13 @@ public:
 		Salami,//サラミ
 		Max
 	};
+	enum IngredientsState
+	{
+		ImmediatelyAfterPop=0,//出現直後
+		Drop,
+		Normal,
+		StateMax
+	};
 	struct IngredientsData
 	{
 		CModel* m_IngredientModel[IngredientsMax];	// 具材モデル
@@ -64,6 +71,7 @@ private:
 	D3DXMATRIX m_mtx_wold;	// ワールドマトリックス
 	IngredientsType m_Type;//具材の種類
 	IngredientsData m_Data;
+	IngredientsState m_State;
 	int m_nNumDropType;//何番目にドロップしたかを記録
 	float m_fDropMoveSpeed;
 	float m_fUpDown;//上下動く用の増減変数

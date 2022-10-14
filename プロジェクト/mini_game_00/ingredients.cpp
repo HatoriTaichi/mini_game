@@ -134,17 +134,25 @@ void CIngredients::Uninit(void)
 //=============================================================================
 void CIngredients::Update(void)
 {
-	//ドロップするなら
-	if (m_bDoDrop)
+	switch (m_State)
 	{
+	case CIngredients::IngredientsState::ImmediatelyAfterPop:
+		m_pos.y -= FallSpeed;
+		if (m_pos.y <= 0.0f)
+		{
+			m_State = Normal;
+		}
+		break;
+	case CIngredients::IngredientsState::Drop:
 		Drop();
-	}
-	else
-	{
+		break;
+	case CIngredients::IngredientsState::Normal:
 		//ちょっとした動き
 		Motion();
 		ColisionPlayer();
+		break;
 	}
+
 	//当たり判定
 	ColisionWall();
 	if (m_bUninit)
@@ -224,7 +232,7 @@ void CIngredients::Drop(void)
 	m_pos.y += m_fFall;
 	if (m_pos.y <= 0.0f)
 	{
- 		m_bDoDrop = false;
+		m_State = Normal;
 		m_fDropRotY = 0.0f;
 	}
 
@@ -314,6 +322,7 @@ void CIngredients::ColisionPlayer(void)
 		CPlayer *pPlayer = static_cast <CPlayer*> (buf[0]);
 		if (pPlayer->Collision(m_pos, 50.0f))
 		{
+			pPlayer->SetIngredients(m_Type);
 			m_bUninit = true;
 		}
 	}
@@ -338,6 +347,7 @@ CIngredients *CIngredients::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot,
 		Ingredients->m_bDoDrop = bDoDrop;
 		Ingredients->m_nNumDropType = DropNum;
 		Ingredients->m_Type = nType;
+		Ingredients->m_State = CIngredients::IngredientsState::Drop;
 		//ドロップの情報を入れる
 		if (Ingredients->m_bDoDrop)
 		{
@@ -364,6 +374,8 @@ CIngredients *CIngredients::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot,
 		Ingredients->m_rot = rot;
 		Ingredients->m_scale = scale;
 		Ingredients->m_Type = nType;
+		Ingredients->m_State = CIngredients::IngredientsState::ImmediatelyAfterPop;
+
 		// 初期化
 		Ingredients->Init();
 	}

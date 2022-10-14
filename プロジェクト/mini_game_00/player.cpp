@@ -425,11 +425,18 @@ void CPlayer::DropItem()
 			}
 			for (int nCnt = 0; nCnt < 1; nCnt++)
 			{
-				CIngredients::Create({ m_pos.x,m_pos.y + 90.0f,m_pos.z }, { m_rot.x,DropRot ,m_rot.z }, { 1.0,1.0,1.0 }, CIngredients::IngredientsType::Salami, true, nCnt);
+				CIngredients::Create({ m_pos.x,m_pos.y + 90.0f,m_pos.z }, { m_rot.x,DropRot ,m_rot.z }, { 1.0,1.0,1.0 }, (CIngredients::IngredientsType)m_nGetIngredientsType[m_nCntIngredientsType], true, nCnt);
 			}
 		}
 
 	}
+}
+//=============================================================================
+// 取得した具材をスタックする
+//=============================================================================
+void CPlayer::SetIngredients(int nType)
+{
+	m_nGetIngredientsType.push_back(nType);
 }
 //=============================================================================
 // 円の当たり判定

@@ -42,6 +42,8 @@ public:
 	void KeyMove(void);//移動処理
 	void PadMove(void);//ゲームパッドの移動
 	void DropItem();//具材を落とす
+	void SetItem(int nType);//アイテム取得処理
+	void SetIngredients(int nType);//アイテム取得処理
 	bool Collision(const D3DXVECTOR3& pos,float fSize);
 	static CPlayer *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, string motion_pas);	// 生成
 	D3DXVECTOR3 GetPos(void) { return m_pos; }	// ゲッダー
@@ -68,6 +70,7 @@ private:
 	D3DXMATRIX m_mtx_wold;	// ワールドマトリックス
 	int nFacing;//向いてる方向
 	int m_nOperationLockTimer;
+	int m_nCntIngredientsType;
 };
 
 #endif
