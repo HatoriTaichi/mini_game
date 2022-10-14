@@ -100,9 +100,19 @@ void CSingleModel::Draw(void)
 	//--------------------------------------
 	//プレイヤー(原点)のマトリックスの設定
 	//--------------------------------------
-	D3DXMATRIX mtx_rot, mtx_trans;	//計算用マトリックス
+	D3DXMATRIX mtx_scale, mtx_rot, mtx_trans;	//計算用マトリックス
 
 	D3DXMatrixIdentity(&m_mtx_wold);	//マトリックス初期化
+
+	// スケールの設定
+	D3DXMatrixScaling(	&mtx_scale,
+						m_scale.x,
+						m_scale.y,
+						m_scale.z);
+
+	D3DXMatrixMultiply(	&m_mtx_wold,
+						&m_mtx_wold,
+						&mtx_scale);
 
 	//向きの設定
 	D3DXMatrixRotationYawPitchRoll(	&mtx_rot,

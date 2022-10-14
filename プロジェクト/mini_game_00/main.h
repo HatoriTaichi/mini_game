@@ -22,6 +22,7 @@
 #include <map>
 #include <filesystem>
 #include <utility>
+#include <set>
 
 //*****************************************************************************
 // –¼‘O‹óŠÔ
