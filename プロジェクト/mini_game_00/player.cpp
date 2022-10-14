@@ -15,8 +15,13 @@
 #include "keyinput.h"
 #include "ingredients.h"
 #include "singlemodel.h"
+#include "directinput.h"
+#include "enemy.h"
 static const float MoveSpeed = 5.0f;
 static const float NoDropSize = 25.0f;
+static const float DropDistance = 100.0f;
+static const float PlayerHitSize = 50.0f;
+static const int OperationAgainTime = 60;
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -124,58 +129,100 @@ void CPlayer::Update(void)
 	}
 	if (m_pColliNoDrop[RIGHT])
 	{
-		m_pColliNoDrop[RIGHT]->SetPos({ m_pos.x + 100.0f,m_pos.y,m_pos.z });
+		m_pColliNoDrop[RIGHT]->SetPos({ m_pos.x + DropDistance,m_pos.y,m_pos.z });
 	}
 	if (m_pColliNoDrop[LEFT])
 	{
-		m_pColliNoDrop[LEFT]->SetPos({ m_pos.x - 100.0f,m_pos.y,m_pos.z });
+		m_pColliNoDrop[LEFT]->SetPos({ m_pos.x - DropDistance,m_pos.y,m_pos.z });
 	}
 	if (m_pColliNoDrop[UP])
 	{
-		m_pColliNoDrop[UP]->SetPos({ m_pos.x,m_pos.y,m_pos.z + 100.0f });
+		m_pColliNoDrop[UP]->SetPos({ m_pos.x,m_pos.y,m_pos.z + DropDistance });
 	}
 	if (m_pColliNoDrop[DOWN])
 	{
-		m_pColliNoDrop[DOWN]->SetPos({ m_pos.x,m_pos.y,m_pos.z - 100.0f });
+		m_pColliNoDrop[DOWN]->SetPos({ m_pos.x,m_pos.y,m_pos.z - DropDistance });
 	}
 
-
 	m_motion_controller->PlayMotin("NUTLARAL");
-	//移動処理
-	KeyMove();
-	DropItem();
-	// サイズの取得
-	int size = m_model.size();
-	for (int count_model = 0; count_model < size; count_model++)
+
+	//具材ドロップ可能なら
+	if (m_bCanDrop)
 	{
-		m_model[count_model]->Update();
+		DropItem();
+	}
+
+	//敵などに当たったら一定時間操作を聞かないようにする
+	if (m_bOperationLock)
+	{
+		m_nOperationLockTimer++;
+		if (m_nOperationLockTimer >= OperationAgainTime)
+		{
+			m_nOperationLockTimer = 0;
+			m_bOperationLock = false;
+		}
+	}
+	else
+	{
+		//移動処理
+		KeyMove();
+		PadMove();
+		vector<CObject *>ObjEnemy = CObject::GetObjTypeObject(CObject::OBJTYPE::ENEMY);
+		{
+			int nSize = ObjEnemy.size();
+			if (nSize != 0)
+			{
+				for (int nCnt = 0; nCnt < nSize; nCnt++)
+				{
+					CEnemy *pEnemy = static_cast<CEnemy*>(ObjEnemy[nCnt]);
+					if (pEnemy->Collision(m_pos, PlayerHitSize))
+					{
+						//具材ドロップを可能にする
+						m_bCanDrop = true;
+						m_bOperationLock = true;
+					}
+				}
+			}
+		}
+	}
+
+	{
+		// サイズの取得
+		int size = m_model.size();
+		for (int count_model = 0; count_model < size; count_model++)
+		{
+			m_model[count_model]->Update();
+		}
 	}
 	for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
 	{
 		m_bDrop[nCnt] = true;
 	}
 	vector<CObject *>Obj = CObject::GetObjTypeObject(CObject::OBJTYPE::BLOCK);
-	int nSize = Obj.size();
-	if (nSize != 0)
 	{
-		for (int nCnt = 0; nCnt < nSize; nCnt++)
+		int nSize = Obj.size();
+		if (nSize != 0)
 		{
-			CSingleModel *pSModel = static_cast<CSingleModel*>(Obj[nCnt]);
-			for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
+			for (int nCnt = 0; nCnt < nSize; nCnt++)
 			{
-				D3DXVECTOR3 pos = m_pColliNoDrop[nCnt]->GetPos();
-				D3DXVECTOR3 vec = pSModel->GetPos() - pos;
-				float LengthX = sqrtf((vec.x*vec.x));
-				float LengthZ = sqrtf((vec.z*vec.z));
-				if (LengthX <= NoDropSize&&
-					LengthZ <= NoDropSize)
+				CSingleModel *pSModel = static_cast<CSingleModel*>(Obj[nCnt]);
+				for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
 				{
-					//ドロップしないようにする
-					m_bDrop[nCnt] = false;
+					D3DXVECTOR3 pos = m_pColliNoDrop[nCnt]->GetPos();
+					D3DXVECTOR3 vec = pSModel->GetPos() - pos;
+					float LengthX = sqrtf((vec.x*vec.x));
+					float LengthZ = sqrtf((vec.z*vec.z));
+					if (LengthX <= NoDropSize&&
+						LengthZ <= NoDropSize)
+					{
+						//ドロップしないようにする
+						m_bDrop[nCnt] = false;
+					}
 				}
-			}
 
+			}
 		}
+
 	}
 
 }
@@ -269,6 +316,57 @@ void CPlayer::KeyMove(void)
 		nFacing = RIGHT;
 	}
 }
+void CPlayer::PadMove(void)
+{
+	//Xの移動量
+	float fvec_x = 0.0f;
+	//Zの移動量
+	float fvec_z = 0.0f;
+	float fLength = 0.0f;
+	float fRot_Yx = 0.0f;
+	float fRot_Yz = 0.0f;
+	float rot_y = 0.0f;
+	D3DXVECTOR3 pos;
+	//DirectInputのゲームパッドの取得
+	CDirectInput *pGamePad = CManager::GetDirectInput();
+	//ゲームパッドのボタン情報の取得
+	DIJOYSTATE2 GamePad = pGamePad->GetJoyState();
+
+	//前に進む
+
+	if ((float)GamePad.lX >= MAX_DEAD_ZOON || (float)GamePad.lY >= MAX_DEAD_ZOON ||
+		(float)GamePad.lX <= -MAX_DEAD_ZOON || (float)GamePad.lY <= -MAX_DEAD_ZOON)
+	{
+		//移動モーションにする
+		//bMove = true;
+		//スティックの傾きの長さを求める
+		fLength = (float)sqrt(GamePad.lX * GamePad.lX + GamePad.lY * GamePad.lY);
+		fLength = fLength / 1000.f;
+		float fRot = atan2f(-(float)GamePad.lX, (float)GamePad.lY);
+		//float fRot = atan2f(pXInput->GetGamePad()->m_state.Gamepad.sThumbLX, pXInput->GetGamePad()->m_state.Gamepad.sThumbLY);
+		rot_y = fRot;
+		m_pos.x -= (sinf(rot_y)*MoveSpeed)*fLength;
+		m_pos.z -= (cosf(rot_y)*MoveSpeed)*fLength;
+		//m_fSoundInterval += 0.1f;
+		//if (m_fSoundInterval >= 1.3f)
+		//{
+		//	m_fSoundInterval = 0.0f;
+		//	CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL_SE_WALK);
+
+		//}
+
+	}
+	else
+	{
+		////待機モーションに戻る
+		//bMove = false;
+		//m_fSoundInterval = 1.3f;
+
+		//CManager::GetSound()->StopSound(CSound::SOUND_LABEL_SE_WALK);
+
+	}
+
+}
 //=============================================================================
 // 具材を落とす処理
 //=============================================================================
@@ -276,9 +374,9 @@ void CPlayer::DropItem()
 {
 	//具材のクラスにある落とす関数を呼び出す
 	CKey * pKey = CManager::GetKey();
-	if (pKey->GetTrigger(CKey::KEYBIND::SPACE))
+	if (m_bCanDrop)
 	{
-		//int n
+		m_bCanDrop = false;
 		float DropRot = 0.0f;
 		for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
 		{

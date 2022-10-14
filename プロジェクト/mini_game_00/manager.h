@@ -23,6 +23,7 @@ class CCamera;	// カメラクラス
 class CLight;	// ライトクラス
 class CFade;	// フェードクラス
 class CSceneManager;	// シーンマネージャークラス
+class CDirectInput;//ダイレクトインプットクラス
 
 //*****************************************************************************
 // クラス定義
@@ -42,6 +43,7 @@ public:
 	static CSceneManager *GetSceneManager(void) { return m_scene_manager; }	// シーンマネージャークラスの取得
 	static CMouse *GetMouse(void) { return m_mouse; }	// マウスクラスの取得
 	static CKey *GetKey(void) { return m_key; }	// キーボードクラスの取得
+	static CDirectInput *GetDirectInput(void) { return m_directInput; }	// キーボードクラスの取得
 	static HWND GetWindowHandle(void) { return m_hwnd; }	// ウィンドウハンドル取得処理
 	static void SetWindowHandle(HWND hWind) { m_hwnd = hWind; }	// ウィンドウハンドル設定処理
 
@@ -56,6 +58,7 @@ private:
 	static CSceneManager *m_scene_manager;	// シーンマネージャークラス
 	static CMouse *m_mouse;	// マウスクラス
 	static CKey *m_key;	// キーボードクラス
+	static CDirectInput *m_directInput;	// キーボードクラス
 	static CTexture *m_texture;	// テクスチャクラス
 };
 

@@ -40,6 +40,7 @@ public:
 	void Update(void);	// ポリゴンの更新
 	void Draw(void);	// ポリゴンの描画
 	void KeyMove(void);//移動処理
+	void PadMove(void);//ゲームパッドの移動
 	void DropItem();//具材を落とす
 	bool Collision(const D3DXVECTOR3& pos,float fSize);
 	static CPlayer *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, string motion_pas);	// 生成
@@ -51,10 +52,12 @@ private:
 	void CreateModel(void);	// モデルの生成
 	void InitMotionController(void);	// モーションコントローラーの初期化
 	bool m_bDrop[NoDropColli];//ドロップ可能か
+	bool m_bCanDrop;
+	bool m_bOperationLock;
+
 	vector<CModel*> m_model;	// モデル
 	CModel*m_pColliNoDrop[NoDropColli];//ドロップしない場所を検知するための当たり判定
 	CModel*m_pCenter;//ドロップしない場所を検知するための当たり判定
-
 	string m_motion_text_pas;	// モーションテキストのパス
 	CFileLoad::MODEL_INFO m_model_info;	// モデル情報
 	CMotionController *m_motion_controller;	// モーションコントローラー
@@ -64,6 +67,7 @@ private:
 	D3DXVECTOR3 m_scale;	// スケール
 	D3DXMATRIX m_mtx_wold;	// ワールドマトリックス
 	int nFacing;//向いてる方向
+	int m_nOperationLockTimer;
 };
 
 #endif

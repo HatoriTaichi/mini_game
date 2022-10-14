@@ -17,7 +17,7 @@
 #include "camera.h"
 #include "scenemanager.h"
 #include "model.h"
-
+#include "directinput.h"
 //=============================================================================
 // マクロ定義
 //=============================================================================
@@ -42,6 +42,7 @@ CCamera *CManager::m_camera;
 CSceneManager *CManager::m_scene_manager;
 CLight *CManager::m_light[MAX_LIGHT];
 CTexture *CManager::m_texture;
+CDirectInput	*CManager::m_directInput;
 HWND CManager::m_hwnd;
 
 //=============================================================================
@@ -56,6 +57,7 @@ CManager::CManager()
 	m_camera = nullptr;
 	m_scene_manager = nullptr;
 	m_texture = nullptr;
+	m_directInput = nullptr;
 	m_hwnd = NULL;
 	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
 	{
@@ -95,7 +97,12 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	{
 		m_key->Init(hInstance, hWnd);
 	}
-
+	//directinputの生成
+	if (m_directInput == NULL)
+	{
+		m_directInput = new CDirectInput;
+		m_directInput->Init(hInstance, hWnd);
+	}
 	// マウスクラスの生成
 	m_mouse = new CMouse;
 	if (m_mouse != nullptr)
@@ -180,7 +187,13 @@ void CManager::Uninit(void)
 		delete m_key;
 		m_key = nullptr;
 	}
-
+	// ゲームパッドの破棄
+	if (m_directInput != NULL)
+	{
+		m_directInput->Uninit();
+		delete m_directInput;
+		m_directInput = NULL;
+	}
 	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
 	{
 		// ライトクラスの破棄
@@ -248,7 +261,11 @@ void CManager::Update(void)
 	{
 		m_key->Update();
 	}
-
+	//ゲームパッドのクラス
+	if (m_directInput != nullptr)
+	{
+		m_directInput->Update();
+	}
 	// マウスクラス
 	if (m_mouse != nullptr)
 	{

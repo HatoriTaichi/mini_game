@@ -59,7 +59,7 @@ HRESULT CIngredients::Init(void)
 	//‹ïŞ‚Ìƒ‚ƒfƒ‹‚ğ¶¬
 	if (!m_Data.m_BasketModel)
 	{
-		m_Data.m_BasketModel = CModel::Create("player body 1.x");
+		m_Data.m_BasketModel = CModel::Create("basket.x");
 	}
 
 	for (int nCnt = 0; nCnt < IngredientsMax; nCnt++)

@@ -42,7 +42,7 @@ CEnemy::~CEnemy()
 //=============================================================================
 HRESULT CEnemy::Init(void)
 {
-	SetObjType(CObject::OBJTYPE::PLAYER);
+	SetObjType(CObject::OBJTYPE::ENEMY);
 	CreateModel();
 	if (!m_pCenter)
 	{
