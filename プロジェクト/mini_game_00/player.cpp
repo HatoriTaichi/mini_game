@@ -376,54 +376,59 @@ void CPlayer::DropItem()
 	CKey * pKey = CManager::GetKey();
 	if (m_bCanDrop)
 	{
-		m_bCanDrop = false;
-		float DropRot = 0.0f;
-		for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
+		int nSize = m_nGetIngredientsType.size();
+		if (nSize != 0)
 		{
-			//ドロップ方向が可能な範囲なら
-			if (m_bDrop[nFacing])
+			m_bCanDrop = false;
+			float DropRot = 0.0f;
+			for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
 			{
-				switch (nFacing)
+				//ドロップ方向が可能な範囲なら
+				if (m_bDrop[nFacing])
 				{
-				case CPlayer::UP:
-					DropRot = D3DXToRadian(180.0f);
-					break;
-				case CPlayer::DOWN:
-					DropRot = D3DXToRadian(0.0f);
-					break;
-				case CPlayer::RIGHT:
-					DropRot = D3DXToRadian(-90.0f);
-					break;
-				case CPlayer::LEFT:
-					DropRot = D3DXToRadian(90.0f);
+					switch (nFacing)
+					{
+					case CPlayer::UP:
+						DropRot = D3DXToRadian(180.0f);
+						break;
+					case CPlayer::DOWN:
+						DropRot = D3DXToRadian(0.0f);
+						break;
+					case CPlayer::RIGHT:
+						DropRot = D3DXToRadian(-90.0f);
+						break;
+					case CPlayer::LEFT:
+						DropRot = D3DXToRadian(90.0f);
+						break;
+					}
 					break;
 				}
-				break;
-			}
-			else
-			{
-				switch (nCnt)
+				else
 				{
-				case CPlayer::UP:
-					DropRot = D3DXToRadian(180.0f);
-					break;
-				case CPlayer::DOWN:
-					DropRot = D3DXToRadian(0.0f);
-					break;
-				case CPlayer::RIGHT:
-					DropRot = D3DXToRadian(-90.0f);
-					break;
-				case CPlayer::LEFT:
-					DropRot = D3DXToRadian(90.0f);
+					switch (nCnt)
+					{
+					case CPlayer::UP:
+						DropRot = D3DXToRadian(180.0f);
+						break;
+					case CPlayer::DOWN:
+						DropRot = D3DXToRadian(0.0f);
+						break;
+					case CPlayer::RIGHT:
+						DropRot = D3DXToRadian(-90.0f);
+						break;
+					case CPlayer::LEFT:
+						DropRot = D3DXToRadian(90.0f);
+						break;
+					}
 					break;
 				}
-				break;
+			}
+			for (int nCnt = 0; nCnt < 1; nCnt++)
+			{
+				CIngredients::Create({ m_pos.x,m_pos.y + 90.0f,m_pos.z }, { m_rot.x,DropRot ,m_rot.z }, { 1.0,1.0,1.0 }, CIngredients::IngredientsType::Salami, true, nCnt);
 			}
 		}
-		for (int nCnt = 0; nCnt < 1; nCnt++)
-		{
-			CIngredients::Create({ m_pos.x,m_pos.y + 90.0f,m_pos.z }, {m_rot.x,DropRot ,m_rot.z}, { 1.0,1.0,1.0 }, CIngredients::IngredientsType::Salami, true, nCnt);
-		}
+
 	}
 }
 //=============================================================================

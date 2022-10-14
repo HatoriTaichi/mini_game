@@ -54,7 +54,7 @@ private:
 	bool m_bDrop[NoDropColli];//ドロップ可能か
 	bool m_bCanDrop;
 	bool m_bOperationLock;
-
+	vector<int> m_nGetIngredientsType;//取得した具材の種類
 	vector<CModel*> m_model;	// モデル
 	CModel*m_pColliNoDrop[NoDropColli];//ドロップしない場所を検知するための当たり判定
 	CModel*m_pCenter;//ドロップしない場所を検知するための当たり判定

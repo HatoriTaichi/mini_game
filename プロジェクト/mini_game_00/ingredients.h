@@ -55,7 +55,7 @@ public:
 		D3DXVECTOR3 scale, IngredientsType nType);	// 生成（ステージ生成用）
 	D3DXVECTOR3 GetPos(void) { return m_pos; }	// ゲッダー
 	D3DXVECTOR3 GetRot(void) { return m_rot; }	// ゲッダー
-
+	IngredientsType GetType() { return m_Type; }
 private:
 	D3DXVECTOR3 m_pos;	// 位置
 	D3DXVECTOR3 m_oldPos;	// 前回の位置
