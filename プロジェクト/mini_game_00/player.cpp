@@ -18,6 +18,10 @@
 #include "directinput.h"
 #include "enemy.h"
 static const float MoveSpeed = 3.0f;
+static const float SpeedUpDiameter = 1.5f;//スピードアップ倍率
+static const float PossibleAttackSpeedUpDiameter = 1.2f;//攻撃可能時のスピードアップ倍率
+static const int SpeedUpTimeLimit = 60 * (5);//スピードアップ倍率
+static const int PossibleAttackTimeLimit = 60 * (8);//攻撃可能時のスピードアップ倍率
 static const float NoDropSize = 35.0f;
 static const float DropDistance = 100.0f;
 static const float PlayerHitSize = 50.0f;
@@ -30,6 +34,7 @@ CPlayer::CPlayer(LAYER_TYPE layer) : CObject(layer)
 {
 	m_motion_controller = nullptr;
 	memset(m_pColliNoDrop, NULL, sizeof(m_pColliNoDrop));
+	m_Speed = MoveSpeed;
 }
 
 //=============================================================================
@@ -58,7 +63,6 @@ HRESULT CPlayer::Init(void)
 		m_pColliNoDrop[RIGHT]->SetPos({ m_pos.x + 100.0f,m_pos.y,m_pos.z });
 		m_pColliNoDrop[RIGHT]->SetPrent(m_pCenter);
 		m_pColliNoDrop[RIGHT]->SetTransparent(true);
-
 	}
 	if (!m_pColliNoDrop[LEFT])
 	{
@@ -66,8 +70,6 @@ HRESULT CPlayer::Init(void)
 		m_pColliNoDrop[LEFT]->SetPos({ m_pos.x - 100.0f,m_pos.y,m_pos.z });
 		m_pColliNoDrop[LEFT]->SetPrent(m_pCenter);
 		m_pColliNoDrop[LEFT]->SetTransparent(true);
-
-
 	}
 	if (!m_pColliNoDrop[UP])
 	{
@@ -75,8 +77,6 @@ HRESULT CPlayer::Init(void)
 		m_pColliNoDrop[UP]->SetPos({ m_pos.x,m_pos.y,m_pos.z + 100.0f });
 		m_pColliNoDrop[UP]->SetPrent(m_pCenter);
 		m_pColliNoDrop[UP]->SetTransparent(true);
-
-
 	}
 	if (!m_pColliNoDrop[DOWN])
 	{
@@ -84,7 +84,6 @@ HRESULT CPlayer::Init(void)
 		m_pColliNoDrop[DOWN]->SetPos({ m_pos.x,m_pos.y,m_pos.z - 100.0f });
 		m_pColliNoDrop[DOWN]->SetPrent(m_pCenter);
 		m_pColliNoDrop[DOWN]->SetTransparent(true);
-
 	}
 
 	return S_OK;
@@ -316,7 +315,7 @@ void CPlayer::Drawtext(void)
 	//	}
 	//}
 
-	LPD3DXFONT pFont = CManager::GetRenderer()->GetFont();
+	LPD3DXFONT pFont = CManager::GetInstance()->GetRenderer()->GetFont();
 	// テキスト描画
 	pFont->DrawText(NULL, str, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));
 
@@ -328,28 +327,28 @@ void CPlayer::Drawtext(void)
 void CPlayer::KeyMove(void)
 {
 	//キーボード情報取得
-	CKey * pKey = CManager::GetKey();
+	CKey * pKey = CManager::GetInstance()->GetKey();
 	if (pKey->GetPress(CKey::KEYBIND::W))
 	{
-		m_pos.z += MoveSpeed;
+		m_pos.z += m_Speed;
 		m_rot.y = D3DXToRadian(180.0f);
 		nFacing = UP;
 	}
 	else if (pKey->GetPress(CKey::KEYBIND::S))
 	{
-		m_pos.z -= MoveSpeed;
+		m_pos.z -= m_Speed;
 		m_rot.y = D3DXToRadian(0.0f);
 		nFacing = DOWN;
 	}
 	else if (pKey->GetPress(CKey::KEYBIND::A))
 	{
-		m_pos.x -= MoveSpeed;
+		m_pos.x -= m_Speed;
 		m_rot.y = D3DXToRadian(90.0f);
 		nFacing = LEFT;
 	}
 	else if (pKey->GetPress(CKey::KEYBIND::D))
 	{
-		m_pos.x += MoveSpeed;
+		m_pos.x += m_Speed;
 		m_rot.y = D3DXToRadian(-90.0f);
 		nFacing = RIGHT;
 	}
@@ -366,7 +365,7 @@ void CPlayer::PadMove(void)
 	float rot_y = 0.0f;
 	D3DXVECTOR3 pos;
 	//DirectInputのゲームパッドの取得
-	CDirectInput *pGamePad = CManager::GetDirectInput();
+	CDirectInput *pGamePad = CManager::GetInstance()->GetDirectInput();
 	//ゲームパッドのボタン情報の取得
 	DIJOYSTATE2 GamePad = pGamePad->GetJoyState();
 
@@ -383,8 +382,8 @@ void CPlayer::PadMove(void)
 		float fRot = atan2f(-(float)GamePad.lX, (float)GamePad.lY);
 		//float fRot = atan2f(pXInput->GetGamePad()->m_state.Gamepad.sThumbLX, pXInput->GetGamePad()->m_state.Gamepad.sThumbLY);
 		rot_y = fRot;
-		m_pos.x -= (sinf(rot_y)*MoveSpeed)*fLength;
-		m_pos.z -= (cosf(rot_y)*MoveSpeed)*fLength;
+		m_pos.x -= (sinf(rot_y)*m_Speed)*fLength;
+		m_pos.z -= (cosf(rot_y)*m_Speed)*fLength;
 		//m_fSoundInterval += 0.1f;
 		//if (m_fSoundInterval >= 1.3f)
 		//{
@@ -411,7 +410,7 @@ void CPlayer::PadMove(void)
 void CPlayer::DropItem()
 {
 	//具材のクラスにある落とす関数を呼び出す
-	CKey * pKey = CManager::GetKey();
+	CKey * pKey = CManager::GetInstance()->GetKey();
 	if (m_bCanDrop)
 	{
 		int nSize = m_nGetIngredientsType.size();
@@ -472,6 +471,57 @@ void CPlayer::DropItem()
 		}
 
 	}
+}
+//=============================================================================
+// 取得したアイテムの処理
+//=============================================================================
+void CPlayer::Item(void)
+{
+	int SpeedUpSpeed = 0;
+	switch (m_ItemState)
+	{
+	case CPlayer::Nown:
+		m_Speed = MoveSpeed;
+
+		break;
+		//スピードアップ
+	case CPlayer::SpeedUp:
+		m_nItemTimer++;
+		SpeedUpSpeed = MoveSpeed * SpeedUpDiameter;
+		m_Speed = SpeedUpSpeed;
+		//時間になったら終わる
+		if (m_nItemTimer >= SpeedUpTimeLimit)
+		{
+			m_nItemTimer = 0;
+			m_ItemState = Nown;
+		}
+		break;
+		//攻撃可能
+	case CPlayer::PossibleAttack:
+		m_nItemTimer++;
+		SpeedUpSpeed = MoveSpeed * PossibleAttackSpeedUpDiameter;
+		m_Speed = SpeedUpSpeed;
+		//時間になったら終わる
+		if (m_nItemTimer >= PossibleAttackTimeLimit)
+		{
+			m_nItemTimer = 0;
+			m_ItemState = Nown;
+		}
+		//相手プレイヤーに当たったら具材をおとさせる
+
+		break;
+	}
+}
+//=============================================================================
+// アイテムの情報を保存
+//=============================================================================
+void CPlayer::SetItemType(int nType)
+{
+	if (m_ItemState == Nown)
+	{
+		m_ItemState = static_cast <ItemGetState>(nType);
+	}
+
 }
 //=============================================================================
 // 取得した具材をスタックする

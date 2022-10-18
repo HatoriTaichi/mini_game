@@ -35,15 +35,6 @@
 // 静的メンバ変数宣言
 //=============================================================================
 CManager *CManager::m_single_manager;
-CMouse *CManager::m_mouse;
-CKey *CManager::m_key;
-CRenderer *CManager::m_renderer;
-CCamera *CManager::m_camera;
-CSceneManager *CManager::m_scene_manager;
-CLight *CManager::m_light[MAX_LIGHT];
-CTexture *CManager::m_texture;
-CDirectInput	*CManager::m_directInput;
-HWND CManager::m_hwnd;
 
 //=============================================================================
 // デフォルトコンストラクタ

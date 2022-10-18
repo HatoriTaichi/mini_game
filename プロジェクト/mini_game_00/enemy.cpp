@@ -235,7 +235,7 @@ void CEnemy::Drawtxt(void)
 	nNum += sprintf(&str[nNum], "\n\n [m_nFacing] *%d\n", m_nFacing);
 	nNum += sprintf(&str[nNum], " [m_bSwing] *%d\n", m_bSwing);
 
-	LPD3DXFONT pFont = CManager::GetRenderer()->GetFont();
+	LPD3DXFONT pFont = CManager::GetInstance()->GetRenderer()->GetFont();
 	// テキスト描画
 	pFont->DrawText(NULL, str, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));
 
@@ -326,7 +326,7 @@ void CEnemy::KeyMove(void)
 	RayColl();
 
 	//キーボード情報取得
-	CKey * pKey = CManager::GetKey();
+	CKey * pKey = CManager::GetInstance()->GetKey();
 	if (pKey->GetPress(CKey::KEYBIND::W))
 	{
 		m_pos.z += MoveSpeed;

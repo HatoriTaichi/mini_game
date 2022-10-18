@@ -18,7 +18,7 @@ CBillboard::~CBillboard()
 
 void CBillboard::BindTexture(const string &texType)
 {
-	m_pTexture = CManager::GetTexture()->GetTexture(texType);
+	m_pTexture = CManager::GetInstance()->GetTexture()->GetTexture(texType);
 }
 
 //---------------------------------------------------------------
@@ -42,7 +42,7 @@ CBillboard *CBillboard::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, const string &
 
 HRESULT CBillboard::Init()
 {
-	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();//デバイスのポインタ
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();//デバイスのポインタ
 																	 // 頂点情報を設定
 	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * 4,
 		D3DUSAGE_WRITEONLY,
@@ -109,7 +109,7 @@ void CBillboard::Update(void)
 //=======================================================================
 void CBillboard::Draw()
 {
-	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();//デバイスを取得する
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();//デバイスを取得する
 	
 	D3DXMATRIX mtxTrans;				//位置計算用マトリックス
 	D3DXMATRIX mtxScale;				//スケール計算用マトリックス
