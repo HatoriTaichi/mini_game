@@ -17,7 +17,7 @@
 #include "singlemodel.h"
 #include "directinput.h"
 #include "enemy.h"
-static const float MoveSpeed = 5.0f;
+static const float MoveSpeed = 3.0f;
 static const float NoDropSize = 35.0f;
 static const float DropDistance = 100.0f;
 static const float PlayerHitSize = 50.0f;
@@ -206,6 +206,7 @@ void CPlayer::Update(void)
 			for (int nCnt = 0; nCnt < nSize; nCnt++)
 			{
 				CSingleModel *pSModel = static_cast<CSingleModel*>(Obj[nCnt]);
+				pSModel->GetModel()->BoxCollision(&m_pos, m_posold);
 				for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
 				{
 					D3DXVECTOR3 pos = m_pColliNoDrop[nCnt]->GetPos();
@@ -224,7 +225,7 @@ void CPlayer::Update(void)
 		}
 
 	}
-
+	m_posold = m_pos;
 }
 
 //=============================================================================
