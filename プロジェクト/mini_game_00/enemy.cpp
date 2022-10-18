@@ -16,7 +16,7 @@
 #include "ingredients.h"
 #include "singlemodel.h"
 static const float MoveSpeed = 2.0f;
-static const float NoDropSize = 25.0f;
+static const float NoDropSize = 35.0f;
 static const float HitDistance = 50.0f;
 //=============================================================================
 // デフォルトコンストラクタ
@@ -208,7 +208,12 @@ void CEnemy::Draw(void)
 	//		m_pColliNoDrop[nCnt]->SetOldPos(m_pos);
 	//	}
 	//}
-	Drawtxt();
+#ifdef _DEBUG
+	//Drawtxt();
+
+#endif
+
+	//Drawtxt();
 
 }
 void CEnemy::Drawtxt(void)

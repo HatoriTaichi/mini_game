@@ -35,6 +35,11 @@ private:
 	vector<D3DXVECTOR3> m_IngredientsSpawnPoint;//具材のスポーンポイント
 	vector<D3DXVECTOR3> m_ItemSpawnPoint;//アイテムのスポーンポイント
 	GameMode m_Mode;//ゲーム中のモード
+	int *m_NumIngredientsSpawnPoint;
+	int *m_NumItemSpawnPoint;
+	int m_MaxIngredientsSpawn;
+	int m_MaxItemSpawn;
+	int m_MaxEnemySpawn;
 	int m_IngredientsSpawnTimer;//具材の出現タイマー
 	int m_ItemSpawnTimer;//アイテムの出現タイマー
 	int m_ItemSpawnInterval[ModeMax];//アイテムの出現間隔

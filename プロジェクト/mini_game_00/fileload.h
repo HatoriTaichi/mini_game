@@ -91,6 +91,7 @@ public:
 	static STAGE_SPAWN_INFO CreateSpawnInfo(vector<string> all_file_info);	// ステージ配置情報に分解
 
 private:
+
 };
 
 #endif

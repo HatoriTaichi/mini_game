@@ -40,6 +40,7 @@ public:
 		BLOCK,//障害物
 		PLAYER,//プレイヤー
 		ENEMY,	//エネミー
+		INGREDIENTS,
 		MAX,
 	};
 

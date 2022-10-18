@@ -51,6 +51,7 @@ public:
 	void Uninit(void);	// ポリゴンの終了
 	void Update(void);	// ポリゴンの更新
 	void Draw(void);	// ポリゴンの描画
+	void Drawtext(void);
 	void Drop(void);//具材がステージに落ちる処理
 	void DoDrop(bool bDo,float fRotY);
 	void Motion(void);//ちょっとした動きの処理

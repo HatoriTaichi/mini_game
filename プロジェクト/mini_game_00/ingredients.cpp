@@ -18,7 +18,7 @@
 #include"scenemanager.h"
 #include"game.h"
 static float fDropMoveSpeed = 8.0f;
-static const float FallSpeed = 10.0f;
+static const float FallSpeed = 5.0f;
 static const float UpLimit = 2.0f;
 static const float DownLimit = -2.0f;
 static const float UpDownSpeed = 0.1f;
@@ -55,12 +55,15 @@ CIngredients::~CIngredients()
 //=============================================================================
 HRESULT CIngredients::Init(void)
 {
+	SetObjType(CObject::OBJTYPE::INGREDIENTS);
+
 	m_bUninit = false;
 	//ãÔçﬁÇÃÉÇÉfÉãÇê∂ê¨
 	if (!m_Data.m_BasketModel)
 	{
 		m_Data.m_BasketModel = CModel::Create("basket.x");
 	}
+
 
 	for (int nCnt = 0; nCnt < IngredientsMax; nCnt++)
 	{
@@ -144,7 +147,10 @@ void CIngredients::Update(void)
 		}
 		break;
 	case CIngredients::IngredientsState::StateDrop:
+		//ìñÇΩÇËîªíË
 		Drop();
+		ColisionWall();
+
 		break;
 	case CIngredients::IngredientsState::Normal:
 		//ÇøÇÂÇ¡Ç∆ÇµÇΩìÆÇ´
@@ -153,8 +159,6 @@ void CIngredients::Update(void)
 		break;
 	}
 
-	//ìñÇΩÇËîªíË
-	ColisionWall();
 	if (m_bUninit)
 	{
 		Uninit();
@@ -375,7 +379,11 @@ CIngredients *CIngredients::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot,
 		Ingredients->m_scale = scale;
 		Ingredients->m_Type = nType;
 		Ingredients->m_State = CIngredients::IngredientsState::ImmediatelyAfterPop;
-
+		//ãÔçﬁÇÃÉÇÉfÉãÇê∂ê¨
+		if (!Ingredients->m_Data.m_BasketModel)
+		{
+			Ingredients->m_Data.m_BasketModel = CModel::Create("basket.x");
+		}
 		// èâä˙âª
 		Ingredients->Init();
 	}

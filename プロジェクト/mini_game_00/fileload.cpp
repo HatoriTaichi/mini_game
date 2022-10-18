@@ -482,9 +482,9 @@ CFileLoad::STAGE_SPAWN_INFO CFileLoad::CreateSpawnInfo(vector<string> all_file_i
 				if (all_file_info[element_count].find("END_INGREDIENTSSET") != string::npos)
 				{
 					// 情報を保存
-					spawn_info.pos["END_INGREDIENTSSET"].push_back(pos_buf);
-					spawn_info.rot["END_INGREDIENTSSET"].push_back(rot_buf);
-					spawn_info.spawn_num["END_INGREDIENTSSET"]++;
+					spawn_info.pos["INGREDIENTSSET"].push_back(pos_buf);
+					spawn_info.rot["INGREDIENTSSET"].push_back(rot_buf);
+					spawn_info.spawn_num["INGREDIENTSSET"]++;
 
 					// ループ抜け
 					break;
@@ -521,9 +521,9 @@ CFileLoad::STAGE_SPAWN_INFO CFileLoad::CreateSpawnInfo(vector<string> all_file_i
 				if (all_file_info[element_count].find("END_ITEMSET") != string::npos)
 				{
 					// 情報を保存
-					spawn_info.pos["END_ITEMSET"].push_back(pos_buf);
-					spawn_info.rot["END_ITEMSET"].push_back(rot_buf);
-					spawn_info.spawn_num["END_ITEMSET"]++;
+					spawn_info.pos["ITEMSET"].push_back(pos_buf);
+					spawn_info.rot["ITEMSET"].push_back(rot_buf);
+					spawn_info.spawn_num["ITEMSET"]++;
 
 					// ループ抜け
 					break;

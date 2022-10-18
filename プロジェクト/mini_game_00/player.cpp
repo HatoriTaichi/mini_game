@@ -18,7 +18,7 @@
 #include "directinput.h"
 #include "enemy.h"
 static const float MoveSpeed = 5.0f;
-static const float NoDropSize = 25.0f;
+static const float NoDropSize = 35.0f;
 static const float DropDistance = 100.0f;
 static const float PlayerHitSize = 50.0f;
 static const int OperationAgainTime = 60;
@@ -281,6 +281,43 @@ void CPlayer::Draw(void)
 			m_pColliNoDrop[nCnt]->Draw();
 		}
 	}
+#ifdef _DEBUG
+	Drawtext();
+
+#endif
+}
+void CPlayer::Drawtext(void)
+{
+	RECT rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+	char str[3000];
+	int nNum = 0;
+
+	nNum = sprintf(&str[0], "\n\n 情報 \n");
+	int nSize = m_nGetIngredientsType.size();
+	for (int nCnt = 0; nCnt < nSize; nCnt++)
+	{
+		nNum += sprintf(&str[nNum], " [Ingredients%d] %d\n", nCnt, m_nGetIngredientsType[nCnt]);
+
+	}
+	//vector<CObject *>Obj = CObject::GetObjTypeObject(CObject::OBJTYPE::INGREDIENTS);
+	//{
+	//	int nSize = Obj.size();
+	//	if (nSize != 0)
+	//	{
+	//		for (int nCnt = 0; nCnt < nSize; nCnt++)
+	//		{
+	//			CIngredients *pIngredients = static_cast<CIngredients*>(Obj[nCnt]);
+	//			
+	//			nNum += sprintf(&str[nNum], " [Ingredients%d] %.2f,%.2f,%.2f\n", nCnt,
+	//				pIngredients->GetPos().x, pIngredients->GetPos().y, pIngredients->GetPos().z);
+
+	//		}
+	//	}
+	//}
+
+	LPD3DXFONT pFont = CManager::GetRenderer()->GetFont();
+	// テキスト描画
+	pFont->DrawText(NULL, str, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));
 
 
 }
@@ -425,7 +462,11 @@ void CPlayer::DropItem()
 			}
 			for (int nCnt = 0; nCnt < 1; nCnt++)
 			{
-				CIngredients::Create({ m_pos.x,m_pos.y + 90.0f,m_pos.z }, { m_rot.x,DropRot ,m_rot.z }, { 1.0,1.0,1.0 }, (CIngredients::IngredientsType)m_nGetIngredientsType[m_nCntIngredientsType], true, nCnt);
+				
+				CIngredients::Create({ m_pos.x,m_pos.y + 90.0f,m_pos.z },
+				{ m_rot.x,DropRot ,m_rot.z }, { 1.0,1.0,1.0 },
+					(CIngredients::IngredientsType)m_nGetIngredientsType[nSize - 1], true, nCnt);
+				m_nGetIngredientsType.erase(m_nGetIngredientsType.end()-1);
 			}
 		}
 

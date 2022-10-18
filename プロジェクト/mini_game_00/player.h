@@ -39,6 +39,7 @@ public:
 	void Uninit(void);	// ポリゴンの終了
 	void Update(void);	// ポリゴンの更新
 	void Draw(void);	// ポリゴンの描画
+	void Drawtext(void);
 	void KeyMove(void);//移動処理
 	void PadMove(void);//ゲームパッドの移動
 	void DropItem();//具材を落とす
