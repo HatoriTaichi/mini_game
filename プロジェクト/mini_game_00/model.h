@@ -1,7 +1,7 @@
 //=============================================================================
 //
 // Xファイルモデル処理 [model.h]
-// Author : 羽鳥太一&鶴間俊樹
+// Author : 羽鳥太一
 //
 //=============================================================================
 #ifndef _MODEL_H_
@@ -42,21 +42,20 @@ public:
 	void Update(void);	// ポリゴンの更新
 	void Draw(void);	// ポリゴンの描画
 	bool BoxCollision(D3DXVECTOR3 *pos, D3DXVECTOR3 posold);	// 当たり判定
-	void SetPos(D3DXVECTOR3 pos) { m_pos = pos; }	// セッター
-	void SetOldPos(D3DXVECTOR3 pos) { m_oldPos = pos; }	// セッター
-	void SetRot(D3DXVECTOR3 rot) { m_rot = rot; }	// セッター
-	void SetScale(D3DXVECTOR3 scale) { m_scale = scale; }	// セッター
-	void SetMatrix(D3DXMATRIX mtx) { m_mtx_wold = mtx; }	// セッター
-	void SetPrent(CModel *pModel) { m_parent = pModel; }	// セッター
-	void SetTransparent(bool bTransparent) { m_transparent = bTransparent; }	// セッター
-	D3DXVECTOR3 GetPos(void) { return m_pos; }		// ゲッター
-	D3DXVECTOR3 GetOldPos(void) { return m_oldPos; }		// ゲッター
-	D3DXVECTOR3 GetRot(void) { return m_rot; }		// ゲッター
-	D3DXVECTOR3 GetScale(void) { return m_scale; }		// ゲッター
-	D3DXVECTOR3 GetVtx_Max(void) { return m_vtx_max; }		// ゲッター
-
-	D3DXMATRIX GetMatrix(void) { return m_mtx_wold; }	// ゲッター
-	static vector<MODEL_DATA> GetModelData(void) { return m_model_data; }
+	void SetPos(D3DXVECTOR3 pos) { m_pos = pos; }	// 位置の設定
+	void SetOldPos(D3DXVECTOR3 pos) { m_old_pos = pos; }	// 前回の位置の設定
+	void SetRot(D3DXVECTOR3 rot) { m_rot = rot; }	// 向きの設定
+	void SetScale(D3DXVECTOR3 scale) { m_scale = scale; }	// スケールの設定
+	void SetMatrix(D3DXMATRIX mtx) { m_mtx_wold = mtx; }	// マトリックスの設定
+	void SetPrent(CModel *pModel) { m_parent = pModel; }	// 親のマトリックスの設定
+	void SetTransparent(bool bTransparent) { m_transparent = bTransparent; }	// 透明化フラグの設定
+	D3DXVECTOR3 GetPos(void) { return m_pos; }	// 位置の取得
+	D3DXVECTOR3 GetOldPos(void) { return m_old_pos; }	// 前回の位置の取得
+	D3DXVECTOR3 GetRot(void) { return m_rot; }	// 向きの取得
+	D3DXVECTOR3 GetScale(void) { return m_scale; }	// スケールの取得
+	D3DXVECTOR3 GetVtxMax(void) { return m_vtx_max; }	// 最大の頂点の取得
+	D3DXMATRIX GetMatrix(void) { return m_mtx_wold; }	// マトリックスの取得
+	static vector<MODEL_DATA> GetModelData(void) { return m_model_data; }	// モデルデータの取得
 	static HRESULT Load(void);	// モデルデータの読み込み
 	static void UnLoad(void);	// モデルデータの破棄
 	static CModel *Create(string name);	// 生成
@@ -71,7 +70,7 @@ private:
 	CModel *m_parent;	// 親のモデル
 	D3DXMATRIX m_mtx_wold;	// ワールドマトリックス
 	D3DXVECTOR3 m_pos;	// 位置
-	D3DXVECTOR3 m_oldPos;	// 位置
+	D3DXVECTOR3 m_old_pos;	// 位置
 	D3DXVECTOR3 m_scale;	// スケール
 	D3DXVECTOR3 m_rot;	// 向き
 	D3DXVECTOR3 m_vtx_min = D3DXVECTOR3(10000.0f, 10000.0f, 10000.0f);	// 頂点の端情報

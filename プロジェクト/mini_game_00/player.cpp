@@ -487,8 +487,8 @@ void CPlayer::Item(void)
 		//スピードアップ
 	case CPlayer::SpeedUp:
 		m_nItemTimer++;
-		SpeedUpSpeed = MoveSpeed * SpeedUpDiameter;
-		m_Speed = SpeedUpSpeed;
+		SpeedUpSpeed = static_cast<int>(MoveSpeed * SpeedUpDiameter);
+		m_Speed = static_cast<float>(SpeedUpSpeed);
 		//時間になったら終わる
 		if (m_nItemTimer >= SpeedUpTimeLimit)
 		{
@@ -499,8 +499,8 @@ void CPlayer::Item(void)
 		//攻撃可能
 	case CPlayer::PossibleAttack:
 		m_nItemTimer++;
-		SpeedUpSpeed = MoveSpeed * PossibleAttackSpeedUpDiameter;
-		m_Speed = SpeedUpSpeed;
+		SpeedUpSpeed = static_cast<int>(MoveSpeed * PossibleAttackSpeedUpDiameter);
+		m_Speed = static_cast<float>(SpeedUpSpeed);
 		//時間になったら終わる
 		if (m_nItemTimer >= PossibleAttackTimeLimit)
 		{

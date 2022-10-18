@@ -163,7 +163,7 @@ void CGame::Update(void)
 				while (!bHoge)
 				{
 					//ƒ‰ƒ“ƒ_ƒ€‚ÈˆÊ’u‚ðŒˆ‚ß‚é
-					int nCntType = randIngredientsPosType(mt);
+					int nCntType = static_cast<int>(randIngredientsPosType(mt));
 
 					for (int nCntPoint = 0; nCntPoint < nCntMax; nCntPoint++)
 					{
