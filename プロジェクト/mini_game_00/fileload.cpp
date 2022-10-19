@@ -259,7 +259,7 @@ CFileLoad::MODEL_INFO CFileLoad::CreateHierarchyMotion(vector<string> all_file_i
 				if (all_file_info[element_count].find("FRAME") != string::npos)
 				{
 					// ƒtƒŒ[ƒ€”
-					key_info_buf.frame = static_cast<float>(atof(all_file_info[element_count + 2].c_str()));
+					key_info_buf.frame = static_cast<int>(atof(all_file_info[element_count + 2].c_str()));
 				}
 
 				// POS‚ğŒ©‚Â‚¯‚½‚ç

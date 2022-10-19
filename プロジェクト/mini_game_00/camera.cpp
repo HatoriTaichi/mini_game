@@ -105,7 +105,7 @@ void CCamera::Update(void)
 void CCamera::SetCamera(void)
 {
 	LPDIRECT3DDEVICE9 pDevice;	//デバイスのポインタ
-	pDevice = CManager::GetRenderer()->GetDevice();		//デバイスを取得する
+	pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();		//デバイスを取得する
 	//---------------------------
 	//マトリックスの設定
 	//---------------------------

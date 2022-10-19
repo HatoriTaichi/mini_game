@@ -15,7 +15,6 @@
 #include "keyinput.h"
 #include "singlemodel.h"
 #include"player.h"
-#include"scenemanager.h"
 #include"game.h"
 static float fDropMoveSpeed = 8.0f;
 static const float FallSpeed = 5.0f;
