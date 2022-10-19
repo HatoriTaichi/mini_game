@@ -16,6 +16,9 @@
     <Filter Include="ソース ファイル\アイテム">
       <UniqueIdentifier>{f6cf87e5-c742-4aba-ad30-822f222db3a7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\壁">
+      <UniqueIdentifier>{a6cba92b-cefe-4426-9a4e-19ca014fc8e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -105,6 +108,9 @@
     <ClInclude Include="billboard.h">
       <Filter>ソース ファイル\アイテム</Filter>
     </ClInclude>
+    <ClInclude Include="wall.h">
+      <Filter>ソース ファイル\壁</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -193,6 +199,9 @@
     </ClCompile>
     <ClCompile Include="billboard.cpp">
       <Filter>ソース ファイル\アイテム</Filter>
+    </ClCompile>
+    <ClCompile Include="wall.cpp">
+      <Filter>ソース ファイル\壁</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

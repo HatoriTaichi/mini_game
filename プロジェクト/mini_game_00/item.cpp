@@ -12,7 +12,7 @@
 #include "item.h"
 #include "player.h"
 #include "manager.h"
-
+#include "billboard.h"
 static float ItemDropMoveSpeed = 8.0f;
 static const float ItemFallSpeed = 5.0f;
 static const float ItemUpLimit = 2.0f;
@@ -42,7 +42,18 @@ CItem::~CItem()
 HRESULT CItem::Init(void)
 {
 	SetObjType(CObject::OBJTYPE::INGREDIENTS);
+	switch (m_type)
+	{
+	case CItem::Nown:
+		break;
+	case CItem::Speed:
+		m_pItem = CBillboard::Create(m_pos, m_scale, "data\\Texture\\Foods\\dough.jpg");
+		break;
+	case CItem::Attack:
+		m_pItem = CBillboard::Create(m_pos, m_scale, "data\\Texture\\Foods\\tomato.jpg");
+		break;
 
+	}
 
 	return S_OK;
 }
@@ -52,6 +63,11 @@ HRESULT CItem::Init(void)
 //=============================================================================
 void CItem::Uninit(void)
 {
+	if (m_pItem)
+	{
+		m_pItem->Uninit();
+		m_pItem = nullptr;
+	}
 	Release();
 }
 
@@ -63,12 +79,20 @@ void CItem::Update(void)
 	switch (m_state)
 	{
 	case CItem::ImmediatelyAfterPop:
-
+		m_pos.y -= ItemFallSpeed;
+		if (m_pos.y <= 0.0f)
+		{
+			m_state = Normal;
+		}
 		break;
 	case CItem::Normal:
-
+		Motion();
+		ColisionPlayer();
 		break;
-
+	}
+	if (m_pItem)
+	{
+		m_pItem->Setpos(m_pos, m_scale);
 	}
 	if (m_bUninit)
 	{

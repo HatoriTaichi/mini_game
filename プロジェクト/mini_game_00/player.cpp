@@ -145,7 +145,8 @@ void CPlayer::Update(void)
 	}
 	//モーションの処理
 	Motion();
-
+	//アイテム発動時の処理
+	Item();
 	//具材ドロップ可能なら
 	if (m_bCanDrop)
 	{

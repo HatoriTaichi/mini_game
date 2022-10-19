@@ -28,6 +28,7 @@ static const int NormalItemSpawnMin = 2;
 static const int NormalItemSpawnMax = 2;
 static const int ClimaxItemSpawnMin = 2;
 static const int ClimaxItemSpawnMax = 2;
+static const int EnemySpawnMax = 2;
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -47,6 +48,7 @@ CGame::CGame(CObject::LAYER_TYPE layer) :CObject(layer)
 	m_ItemSpawnMax[ClimaxMode] = ClimaxItemSpawnMax;
 	m_NumIngredientsSpawnPoint = nullptr;
 	m_NumItemSpawnPoint = nullptr;
+	m_ItemSpawnTimer = NormalItemSpawnInterval;
 }
 
 //=============================================================================
@@ -66,7 +68,7 @@ HRESULT CGame::Init(void)
 	CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), 
 		D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 		D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt");
-	CEnemy::Create(D3DXVECTOR3(0.0f, 0.0f, 200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/motion.txt");
+	//CEnemy::Create(D3DXVECTOR3(0.0f, 0.0f, 200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/motion.txt");
 
 	vector<string> text_element;	// フォルダの保存バッファ
 	CFileLoad::STAGE_INFO stage;
@@ -112,6 +114,7 @@ HRESULT CGame::Init(void)
 			CSingleModel::Create(stage.stage_model[count_model_info].pos[count_model], stage.stage_model[count_model_info].rot[count_model], D3DXVECTOR3(1.0f, 1.0f, 1.0f), stage.stage_model[count_model_info].type[count_model], CObject::OBJTYPE::BLOCK);
 		}
 	}
+	EnemySpawn();
 	return S_OK;
 }
 
@@ -129,8 +132,147 @@ void CGame::Uninit(void)
 //=============================================================================
 void CGame::Update(void)
 {
-	m_IngredientsSpawnTimer++;
+	ItemSpawn();
+	IngredientsSpawn();
+	CKey *key = CManager::GetInstance()->GetKey();
+
+	//if (key->GetTrigger(CKey::KEYBIND::W) == true)
+	//{
+	//	CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::GAME);
+	//}
+}
+
+//=============================================================================
+// 描画処理
+//=============================================================================
+void CGame::Draw(void)
+{
+
+}
+//=============================================================================
+// アイテム出現処理
+//=============================================================================
+void CGame::ItemSpawn(void)
+{
 	m_ItemSpawnTimer++;
+
+	if (m_ItemSpawnTimer >= m_ItemSpawnInterval[m_Mode])
+	{
+		std::random_device random;	// 非決定的な乱数生成器
+		std::mt19937_64 mt(random());// メルセンヌ・ツイスタの64ビット版、引数は初期シード
+		std::uniform_real_distribution<> randItemType(1, 2);
+		std::uniform_real_distribution<> randItemPosType(0, m_MaxItemSpawn);
+		bool *bOverlapPos = nullptr;
+		bOverlapPos = new bool[m_MaxItemSpawn];
+		for (int nCntNum = 0; nCntNum < m_MaxItemSpawn; nCntNum++)
+		{
+			bOverlapPos[nCntNum] = false;
+		}
+		//具材をスポーン
+		int nSize = m_ItemSpawnPoint.size();
+		if (nSize != 0)
+		{
+			//具材を配置する最大値を決める
+			int nCntMax = NormalItemSpawnMin;
+			//具材の
+			m_NumItemSpawnPoint = new int[nCntMax];
+			//数値の初期化
+			for (int nCntNum = 0; nCntNum < nCntMax; nCntNum++)
+			{
+				m_NumItemSpawnPoint[nCntNum] = -1;
+			}
+			for (int nCnt = 0; nCnt < nCntMax; nCnt++)
+			{
+				bool bHoge = false;
+				while (!bHoge)
+				{
+					//ランダムな位置を決める
+					int nCntType = static_cast<int>(randItemPosType(mt));
+
+					for (int nCntPoint = 0; nCntPoint < nCntMax; nCntPoint++)
+					{
+						if (!bOverlapPos[nCntType])
+						{
+							m_NumItemSpawnPoint[nCnt] = nCntType;
+							bOverlapPos[nCntType] = true;
+							bHoge = true;
+							break;
+						}
+					}
+				}
+				int nType = static_cast<int>(randItemType(mt));
+				//具材を生成
+				CItem::Create({ m_ItemSpawnPoint[m_NumItemSpawnPoint[nCnt]].x ,
+					m_ItemSpawnPoint[m_NumItemSpawnPoint[nCnt]].y + 200.0f,
+					m_ItemSpawnPoint[m_NumItemSpawnPoint[nCnt]].z }, { 7.0f,7.0f,0.0f }, static_cast<CItem::ItemType>(nType));
+				//CIngredients::Create({ 0.0f ,
+				//	0.0f,
+				//	0.0f }, { 0.0f,0.0f,0.0f }, { 1.0f,1.0f,1.0f }, static_cast<CIngredients::IngredientsType>(nType));
+
+			}
+		}
+		//アイテムをスポーン
+		m_ItemSpawnTimer = 0;
+	}
+
+}
+//=============================================================================
+// 敵出現処理
+//=============================================================================
+void CGame::EnemySpawn(void)
+{
+	std::random_device random;	// 非決定的な乱数生成器
+	std::mt19937_64 mt(random());// メルセンヌ・ツイスタの64ビット版、引数は初期シード
+	std::uniform_real_distribution<> randEnemyPosType(0, m_MaxEnemySpawn);
+	bool *bOverlapPos = nullptr;
+	bOverlapPos = new bool[m_MaxEnemySpawn];
+	for (int nCntNum = 0; nCntNum < m_MaxEnemySpawn; nCntNum++)
+	{
+		bOverlapPos[nCntNum] = false;
+	}
+	//具材をスポーン
+	int nSize = m_IngredientsSpawnPoint.size();
+	if (nSize != 0)
+	{
+		//具材を配置する最大値を決める
+		int nCntMax = EnemySpawnMax;
+		//具材の
+		m_NumIngredientsSpawnPoint = new int[nCntMax];
+		//数値の初期化
+		for (int nCntNum = 0; nCntNum < nCntMax; nCntNum++)
+		{
+			m_NumIngredientsSpawnPoint[nCntNum] = -1;
+		}
+		for (int nCnt = 0; nCnt < nCntMax; nCnt++)
+		{
+			bool bHoge = false;
+			while (!bHoge)
+			{
+				//ランダムな位置を決める
+				int nCntType = static_cast<int>(randEnemyPosType(mt));
+
+				for (int nCntPoint = 0; nCntPoint < nCntMax; nCntPoint++)
+				{
+					if (!bOverlapPos[nCntType])
+					{
+						m_NumIngredientsSpawnPoint[nCnt] = nCntType;
+						bOverlapPos[nCntType] = true;
+						bHoge = true;
+						break;
+					}
+				}
+			}
+			CEnemy::Create(m_IngredientsSpawnPoint[m_NumIngredientsSpawnPoint[nCnt]], D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/motion.txt");
+		}
+	}
+
+}
+//=============================================================================
+// 具材出現処理
+//=============================================================================
+void CGame::IngredientsSpawn(void)
+{
+	m_IngredientsSpawnTimer++;
 
 	if (m_IngredientsSpawnTimer >= IngredientsSpawnInterval)
 	{
@@ -168,11 +310,11 @@ void CGame::Update(void)
 
 					for (int nCntPoint = 0; nCntPoint < nCntMax; nCntPoint++)
 					{
-						if (!bOverlapPos[nCntType] )
+						if (!bOverlapPos[nCntType])
 						{
 							m_NumIngredientsSpawnPoint[nCnt] = nCntType;
 							bOverlapPos[nCntType] = true;
-							bHoge=true;
+							bHoge = true;
 							break;
 						}
 					}
@@ -190,77 +332,5 @@ void CGame::Update(void)
 		}
 		m_IngredientsSpawnTimer = 0;
 	}
-	//if (m_ItemSpawnTimer >= m_ItemSpawnInterval[m_Mode])
-	//{
-	//	std::random_device random;	// 非決定的な乱数生成器
-	//	std::mt19937_64 mt(random());// メルセンヌ・ツイスタの64ビット版、引数は初期シード
-	//	std::uniform_real_distribution<> randItemCnt(NormalItemSpawnMin, NormalItemSpawnMax);
-	//	std::uniform_real_distribution<> randItemType(0, 1);
-	//	std::uniform_real_distribution<> randItemPosType(0, m_MaxItemSpawn);
-	//	bool *bOverlapPos = nullptr;
-	//	bOverlapPos = new bool[m_MaxItemSpawn];
-	//	for (int nCntNum = 0; nCntNum < m_MaxItemSpawn; nCntNum++)
-	//	{
-	//		bOverlapPos[nCntNum] = false;
-	//	}
-	//	//具材をスポーン
-	//	int nSize = m_ItemSpawnPoint.size();
-	//	if (nSize != 0)
-	//	{
-	//		//具材を配置する最大値を決める
-	//		int nCntMax = static_cast<int>(randItemCnt(mt));
-	//		//具材の
-	//		m_NumItemSpawnPoint = new int[nCntMax];
-	//		//数値の初期化
-	//		for (int nCntNum = 0; nCntNum < nCntMax; nCntNum++)
-	//		{
-	//			m_NumItemSpawnPoint[nCntNum] = -1;
-	//		}
-	//		for (int nCnt = 0; nCnt < nCntMax; nCnt++)
-	//		{
-	//			bool bHoge = false;
-	//			while (!bHoge)
-	//			{
-	//				//ランダムな位置を決める
-	//				int nCntType = static_cast<int>(randItemPosType(mt));
-
-	//				for (int nCntPoint = 0; nCntPoint < nCntMax; nCntPoint++)
-	//				{
-	//					if (!bOverlapPos[nCntType])
-	//					{
-	//						m_NumItemSpawnPoint[nCnt] = nCntType;
-	//						bOverlapPos[nCntType] = true;
-	//						bHoge = true;
-	//						break;
-	//					}
-	//				}
-	//			}
-	//			int nType = static_cast<int>(randItemType(mt));
-	//			//具材を生成
-	//			CItem::Create({ m_ItemSpawnPoint[m_NumItemSpawnPoint[nCnt]].x ,
-	//				m_ItemSpawnPoint[m_NumItemSpawnPoint[nCnt]].y + 200.0f,
-	//				m_ItemSpawnPoint[m_NumItemSpawnPoint[nCnt]].z }, { 100.0f,100.0f,0.0f }, static_cast<CItem::ItemType>(nType));
-	//			//CIngredients::Create({ 0.0f ,
-	//			//	0.0f,
-	//			//	0.0f }, { 0.0f,0.0f,0.0f }, { 1.0f,1.0f,1.0f }, static_cast<CIngredients::IngredientsType>(nType));
-
-	//		}
-	//	}
-	//	//アイテムをスポーン
-	//	m_ItemSpawnTimer = 0;
-	//}
-	CKey *key = CManager::GetInstance()->GetKey();
-
-	//if (key->GetTrigger(CKey::KEYBIND::W) == true)
-	//{
-	//	CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::GAME);
-	//}
-}
-
-//=============================================================================
-// 描画処理
-//=============================================================================
-void CGame::Draw(void)
-{
 
 }

@@ -30,7 +30,9 @@ public:
 	void Uninit(void);	// 終了
 	void Update(void);	// 更新
 	void Draw(void);	// 描画
-
+	void ItemSpawn(void);
+	void EnemySpawn(void);
+	void IngredientsSpawn(void);
 private:
 	vector<D3DXVECTOR3> m_IngredientsSpawnPoint;//具材のスポーンポイント
 	vector<D3DXVECTOR3> m_ItemSpawnPoint;//アイテムのスポーンポイント
