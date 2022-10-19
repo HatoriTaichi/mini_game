@@ -9,7 +9,7 @@
 //=============================================================================
 #include "motion.h"
 #include "model.h"
-
+#define MOTION_SPEED (0.2f)//モーションの再生速度
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
@@ -51,16 +51,19 @@ bool CMotionController::PlayMotin(string type)
 			rot_difference.x = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count + 1].key[count_model].rot_x - m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_x;
 			rot_difference.y = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count + 1].key[count_model].rot_y - m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_y;
 			rot_difference.z = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count + 1].key[count_model].rot_z - m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_z;
+			float cnt = m_model_info.motion_info[type].frame_count;
+			int frame = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].frame;
+			float cntframe = cnt / frame;
 
 			// 求める位置
-			pos_ask.x = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].pos_x + pos_difference.x * (m_model_info.motion_info[type].frame_count / m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].frame);
-			pos_ask.y = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].pos_y + pos_difference.y * (m_model_info.motion_info[type].frame_count / m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].frame);
-			pos_ask.z = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].pos_z + pos_difference.z * (m_model_info.motion_info[type].frame_count / m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].frame);
+			pos_ask.x = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].pos_x + pos_difference.x * cntframe;
+			pos_ask.y = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].pos_y + pos_difference.y * cntframe;
+			pos_ask.z = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].pos_z + pos_difference.z * cntframe;
 
 			// 求める向き
-			rot_ask.x = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_x + rot_difference.x * (m_model_info.motion_info[type].frame_count / m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].frame);
-			rot_ask.y = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_y + rot_difference.y * (m_model_info.motion_info[type].frame_count / m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].frame);
-			rot_ask.z = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_z + rot_difference.z * (m_model_info.motion_info[type].frame_count / m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].frame);
+			rot_ask.x = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_x + rot_difference.x * cntframe;
+			rot_ask.y = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_y + rot_difference.y * cntframe;
+			rot_ask.z = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_z + rot_difference.z * cntframe;
 
 			// 位置の適用
 			m_model[count_model]->SetPos(pos_ask);
@@ -68,7 +71,8 @@ bool CMotionController::PlayMotin(string type)
 			// 向きの適用
 			m_model[count_model]->SetRot(rot_ask);
 
-			m_model_info.motion_info[type].frame_count += 0.01f;
+
+			m_model_info.motion_info[type].frame_count += MOTION_SPEED;
 
 			// モーションカウンタがフレーム数を超えたら
 			if (m_model_info.motion_info[type].frame_count >= m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].frame)
@@ -77,31 +81,34 @@ bool CMotionController::PlayMotin(string type)
 				m_model_info.motion_info[type].key_count++;
 
 				// モーションカウンタ初期化
-				m_model_info.motion_info[type].frame_count = 0.0f;
+				m_model_info.motion_info[type].frame_count = 0;
 				end = false;
 			}
 		}
 		else if (m_model_info.motion_info[type].key_count == (m_model_info.motion_info[type].num_key - 1))
 		{
 			// 位置の差分
-			pos_difference.x = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count - 1].key[count_model].pos_x - m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].pos_x;
-			pos_difference.y = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count - 1].key[count_model].pos_y - m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].pos_y;
-			pos_difference.z = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count - 1].key[count_model].pos_z - m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].pos_z;
+			pos_difference.x = m_model_info.motion_info[type].key_info[0].key[count_model].pos_x - m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].pos_x;
+			pos_difference.y = m_model_info.motion_info[type].key_info[0].key[count_model].pos_y - m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].pos_y;
+			pos_difference.z = m_model_info.motion_info[type].key_info[0].key[count_model].pos_z - m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].pos_z;
+																	  
+			rot_difference.x = m_model_info.motion_info[type].key_info[0].key[count_model].rot_x - m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_x;
+			rot_difference.y = m_model_info.motion_info[type].key_info[0].key[count_model].rot_y - m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_y;
+			rot_difference.z = m_model_info.motion_info[type].key_info[0].key[count_model].rot_z - m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_z;
 
-			// 向きの差分
-			rot_difference.x = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count - 1].key[count_model].rot_x - m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_x;
-			rot_difference.y = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count - 1].key[count_model].rot_y - m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_y;
-			rot_difference.z = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count - 1].key[count_model].rot_z - m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_z;
+			float cnt = m_model_info.motion_info[type].frame_count;
+			int frame = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].frame;
+			float cntframe = cnt / frame;
 
 			// 求める位置
-			pos_ask.x = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].pos_x + pos_difference.x * (m_model_info.motion_info[type].frame_count / m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].frame);
-			pos_ask.y = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].pos_y + pos_difference.y * (m_model_info.motion_info[type].frame_count / m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].frame);
-			pos_ask.z = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].pos_z + pos_difference.z * (m_model_info.motion_info[type].frame_count / m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].frame);
+			pos_ask.x = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].pos_x + pos_difference.x * cntframe;
+			pos_ask.y = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].pos_y + pos_difference.y * cntframe;
+			pos_ask.z = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].pos_z + pos_difference.z * cntframe;
 
 			// 求める向き
-			rot_ask.x = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_x + rot_difference.x * (m_model_info.motion_info[type].frame_count / m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].frame);
-			rot_ask.y = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_y + rot_difference.y * (m_model_info.motion_info[type].frame_count / m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].frame);
-			rot_ask.z = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_z + rot_difference.z * (m_model_info.motion_info[type].frame_count / m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].frame);
+			rot_ask.x = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_x + rot_difference.x * cntframe;
+			rot_ask.y = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_y + rot_difference.y * cntframe;
+			rot_ask.z = m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].key[count_model].rot_z + rot_difference.z * cntframe;
 
 			// 位置の適用
 			m_model[count_model]->SetPos(pos_ask);
@@ -109,7 +116,7 @@ bool CMotionController::PlayMotin(string type)
 			// 向きの適用
 			m_model[count_model]->SetRot(rot_ask);
 
-			m_model_info.motion_info[type].frame_count += 0.01f;
+			m_model_info.motion_info[type].frame_count += MOTION_SPEED;
 
 			// モーションカウンタがフレーム数を超えたら
 			if (m_model_info.motion_info[type].frame_count >= m_model_info.motion_info[type].key_info[m_model_info.motion_info[type].key_count].frame)
@@ -128,7 +135,7 @@ bool CMotionController::PlayMotin(string type)
 					end = true;
 				}
 				// モーションカウンタ初期化
-				m_model_info.motion_info[type].frame_count = 0.0f;
+				m_model_info.motion_info[type].frame_count = 0;
 			}
 		}
 	}

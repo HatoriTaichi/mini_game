@@ -7,18 +7,18 @@
 //=============================================================================
 // インクルード
 //=============================================================================
-#include "manager.h"
 #include "renderer.h"
-#include"scenemanager.h"
-#include"game.h"
+#include "game.h"
 #include "item.h"
 #include "player.h"
-static float fDropMoveSpeed = 8.0f;
-static const float FallSpeed = 5.0f;
-static const float UpLimit = 2.0f;
-static const float DownLimit = -2.0f;
-static const float UpDownSpeed = 0.1f;
-static const float HitSize = 50.0f;
+#include "manager.h"
+
+static float ItemDropMoveSpeed = 8.0f;
+static const float ItemFallSpeed = 5.0f;
+static const float ItemUpLimit = 2.0f;
+static const float ItemDownLimit = -2.0f;
+static const float ItemUpDownSpeed = 0.1f;
+static const float ItemHitSize = 50.0f;
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -60,7 +60,16 @@ void CItem::Uninit(void)
 //=============================================================================
 void CItem::Update(void)
 {
+	switch (m_state)
+	{
+	case CItem::ImmediatelyAfterPop:
 
+		break;
+	case CItem::Normal:
+
+		break;
+
+	}
 	if (m_bUninit)
 	{
 		Uninit();
@@ -74,9 +83,9 @@ void CItem::Draw(void)
 {
 	LPDIRECT3DDEVICE9 device = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスの取得
 
-																					//--------------------------------------
-																					//プレイヤー(原点)のマトリックスの設定
-																					//--------------------------------------
+	//--------------------------------------
+	//プレイヤー(原点)のマトリックスの設定
+	//--------------------------------------
 	D3DXMATRIX mtx_rot, mtx_trans;	//計算用マトリックス
 
 	D3DXMatrixIdentity(&m_mtx_wold);	//マトリックス初期化
@@ -110,17 +119,17 @@ void CItem::Motion(void)
 {
 	if (m_bUpDown)
 	{
-		m_fUpDown += UpDownSpeed;
+		m_fUpDown += ItemUpDownSpeed;
 	}
 	else
 	{
-		m_fUpDown -= UpDownSpeed;
+		m_fUpDown -= ItemUpDownSpeed;
 	}
-	if (m_fUpDown >= UpLimit)
+	if (m_fUpDown >= ItemUpLimit)
 	{
 		m_bUpDown = false;
 	}
-	else if (m_fUpDown <= DownLimit)
+	else if (m_fUpDown <= ItemDownLimit)
 	{
 		m_bUpDown = true;
 	}
@@ -161,7 +170,6 @@ CItem *CItem::Create(D3DXVECTOR3 pos,D3DXVECTOR3 scale, ItemType type)
 	{
 		// 値を代入
 		Ingredients->m_pos = pos;
-
 		Ingredients->m_scale = scale;
 		Ingredients->m_type = type;
 		Ingredients->m_state = CItem::ItemState::ImmediatelyAfterPop;

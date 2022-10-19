@@ -35,6 +35,7 @@ CPlayer::CPlayer(LAYER_TYPE layer) : CObject(layer)
 	m_motion_controller = nullptr;
 	memset(m_pColliNoDrop, NULL, sizeof(m_pColliNoDrop));
 	m_Speed = MoveSpeed;
+	m_moitonState = MotionState::NUTLARAL;
 }
 
 //=============================================================================
@@ -142,8 +143,8 @@ void CPlayer::Update(void)
 	{
 		m_pColliNoDrop[DOWN]->SetPos({ m_pos.x,m_pos.y,m_pos.z - DropDistance });
 	}
-
-	m_motion_controller->PlayMotin("NUTLARAL");
+	//モーションの処理
+	Motion();
 
 	//具材ドロップ可能なら
 	if (m_bCanDrop)
@@ -286,6 +287,33 @@ void CPlayer::Draw(void)
 
 #endif
 }
+//=============================================================================
+// モーション
+//=============================================================================
+void CPlayer::Motion(void)
+{
+	switch (m_moitonState)
+	{
+	case CPlayer::NUTLARAL:
+		m_motion_controller->PlayMotin("NUTLARAL");
+		break;
+	case CPlayer::RUN:
+		m_motion_controller->PlayMotin("RUN");
+		break;
+	case CPlayer::DIZZY:
+		m_motion_controller->PlayMotin("DIZZY");
+		break;
+	case CPlayer::NECKSWING:
+		m_motion_controller->PlayMotin("NECKSWING");
+		break;
+	case CPlayer::WIN:
+		m_motion_controller->PlayMotin("WIN");
+		break;
+	case CPlayer::LOSE:
+		m_motion_controller->PlayMotin("LOSE");
+		break;
+	}
+}
 void CPlayer::Drawtext(void)
 {
 	RECT rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
@@ -375,8 +403,8 @@ void CPlayer::PadMove(void)
 		(float)GamePad.lX <= -MAX_DEAD_ZOON || (float)GamePad.lY <= -MAX_DEAD_ZOON)
 	{
 		//移動モーションにする
-		//bMove = true;
-		//スティックの傾きの長さを求める
+		m_moitonState = MotionState::RUN;
+			//スティックの傾きの長さを求める
 		fLength = (float)sqrt(GamePad.lX * GamePad.lX + GamePad.lY * GamePad.lY);
 		fLength = fLength / 1000.f;
 		float fRot = atan2f(-(float)GamePad.lX, (float)GamePad.lY);
@@ -396,7 +424,7 @@ void CPlayer::PadMove(void)
 	else
 	{
 		////待機モーションに戻る
-		//bMove = false;
+		m_moitonState = MotionState::NUTLARAL;
 		//m_fSoundInterval = 1.3f;
 
 		//CManager::GetSound()->StopSound(CSound::SOUND_LABEL_SE_WALK);

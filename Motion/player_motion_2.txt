@@ -14,10 +14,10 @@ NUM_MODEL = 4
 #------------------------------------------------------------------------------
 # モデルファイル名
 #------------------------------------------------------------------------------
-MODEL_FILENAME = data/MODEL/player_body_2.x		# [0]体
-MODEL_FILENAME = data/MODEL/player_head_2.x		# [1]頭
-MODEL_FILENAME = data/MODEL/player_right_2.x	# [2]右手
-MODEL_FILENAME = data/MODEL/player_left_2.x		# [3]左手
+MODEL_FILENAME = data/Model/player_body_2.x		# [0]体
+MODEL_FILENAME = data/Model/player_head_2.x		# [1]頭
+MODEL_FILENAME = data/Model/player_right_2.x	# [2]右手
+MODEL_FILENAME = data/Model/player_left_2.x		# [3]左手
 
 #------------------------------------------------------------------------------
 # キャラクター情報

@@ -40,12 +40,22 @@ public:
 		PossibleAttack,
 		ItemGetStateMax
 	};
+	enum MotionState
+	{
+		NUTLARAL = 0,
+		RUN,
+		DIZZY,
+		NECKSWING,
+		WIN,
+		LOSE
+	};
 	CPlayer(LAYER_TYPE Layer = LAYER_TYPE::LAYER_01);	// デフォルトコンストラクタ
 	~CPlayer();	// デフォルトデストラクタ
 	HRESULT Init(void);	// ポリゴンの初期化
 	void Uninit(void);	// ポリゴンの終了
 	void Update(void);	// ポリゴンの更新
 	void Draw(void);	// ポリゴンの描画
+	void Motion(void);
 	void Drawtext(void);
 	void KeyMove(void);//移動処理
 	void PadMove(void);//ゲームパッドの移動
@@ -66,6 +76,7 @@ private:
 	bool m_bCanDrop;
 	bool m_bOperationLock;
 	ItemGetState m_ItemState;//アイテムを取得したときの状態
+	MotionState m_moitonState;
 	vector<int> m_nGetIngredientsType;//取得した具材の種類
 	vector<CModel*> m_model;	// モデル
 	CModel*m_pColliNoDrop[NoDropColli];//ドロップしない場所を検知するための当たり判定

@@ -30,7 +30,7 @@ public:
 
 	typedef struct
 	{
-		float frame;	// 再生フレーム
+		int frame;	// 再生フレーム
 		vector<KEY> key;	// モデル毎のキー要素
 	} KEY_INFO;
 
