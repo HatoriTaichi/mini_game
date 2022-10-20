@@ -274,6 +274,7 @@ void CFbx::Draw(void)
 	{
 		D3DXMATRIX parent, matrix;	// 親、マトリックス
 
+		// マトリックスの初期化
 		D3DXMatrixIdentity(&matrix);
 
 		// アニメーションがあったら
@@ -852,7 +853,8 @@ void CFbx::GetTexture(FbxSurfaceMaterial *material)
 		{
 			FbxFileTexture *texture = FbxCast<FbxFileTexture>(property.GetSrcObject(count_tex));	// テクスチャオブジェクト取得
 			string absolute_file_name = texture->GetFileName();	// テクスチャファイルパスを取得（フルパス）
-			string folder_name = "C:/Users/student/Desktop/Git/mini_game/プロジェクト/mini_game_00/data/Texture/Mesh/";	// パスを消す為の名前
+			//string folder_name = "C:/Users/student/Desktop/Git/mini_game/プロジェクト/mini_game_00/data/Texture/Mesh/";	// パスを消す為の名前
+			string folder_name = "C:\\Users\\student\\Desktop\\blenderモデル\\SDharu_ver1.0\\SDharu_ver1.0\\tex\\";	// パスを消す為の名前
 			int folder_size = folder_name.size();	// パスのサイズ
 			char *file_name;	// 名前のバッファ
 			size_t size = 0;	// サイズ
@@ -1086,11 +1088,11 @@ void CFbx::NoBoneAnim(FbxMesh *mesh)
 //=============================================================================
 void CFbx::BoneAnim(FbxMesh *mesh, int mesh_count)
 {
-	// 位置の計算
-	UpdatePos(mesh, mesh_count);
-
 	// 回転の計算
-	UpdateRotate(mesh, mesh_count);
+	//UpdateRotate(mesh, mesh_count);
+
+	// 位置の計算
+	//UpdatePos(mesh, mesh_count);
 }
 
 //=============================================================================
