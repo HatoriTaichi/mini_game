@@ -123,6 +123,9 @@
     <ClInclude Include="player_ingredient_data.h">
       <Filter>ソース ファイル\プレイヤー</Filter>
     </ClInclude>
+    <ClInclude Include="2d_ingredients.h">
+      <Filter>ソース ファイル\リザルト</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -220,6 +223,9 @@
     </ClCompile>
     <ClCompile Include="player_ingredient_data.cpp">
       <Filter>ソース ファイル\プレイヤー</Filter>
+    </ClCompile>
+    <ClCompile Include="2d_ingredients.cpp">
+      <Filter>ソース ファイル\リザルト</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
