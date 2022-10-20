@@ -18,6 +18,7 @@
 #include "scenemanager.h"
 #include "model.h"
 #include "directinput.h"
+#include "player_ingredient_data.h"
 //=============================================================================
 // マクロ定義
 //=============================================================================
@@ -48,6 +49,7 @@ CManager::CManager()
 	m_camera = nullptr;
 	m_scene_manager = nullptr;
 	m_texture = nullptr;
+	m_player_ingredient_data = nullptr;
 	m_directInput = nullptr;
 	m_hwnd = NULL;
 	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
@@ -106,6 +108,12 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	if (m_texture != nullptr)
 	{
 		m_texture->Init();
+	}
+
+	//プレイヤーの具材情報クラス
+	if (!m_player_ingredient_data)
+	{
+		m_player_ingredient_data = CPlayer_ingredient_data::Create();
 	}
 
 	// シーンマネージャークラスの生成

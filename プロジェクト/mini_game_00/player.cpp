@@ -17,6 +17,7 @@
 #include "singlemodel.h"
 #include "directinput.h"
 #include "enemy.h"
+#include "player_ingredient_data.h"
 static const float MoveSpeed = 3.0f;
 static const float SpeedUpDiameter = 1.5f;//スピードアップ倍率
 static const float PossibleAttackSpeedUpDiameter = 1.2f;//攻撃可能時のスピードアップ倍率
@@ -95,6 +96,8 @@ HRESULT CPlayer::Init(void)
 //=============================================================================
 void CPlayer::Uninit(void)
 {
+	//具材の情報を保存
+	CManager::GetInstance()->GetPlayer_ingredient_data()->SetIngredientsType(m_nGetIngredientsType);
 	// サイズの取得
 	int size = m_model.size();
 	for (int count_model = 0; count_model < size; count_model++)

@@ -24,6 +24,7 @@ class CLight;	// ライトクラス
 class CFade;	// フェードクラス
 class CSceneManager;	// シーンマネージャークラス
 class CDirectInput;//ダイレクトインプットクラス
+class CPlayer_ingredient_data;//プレイヤーの具材情報クラス
 
 //*****************************************************************************
 // クラス定義
@@ -44,6 +45,8 @@ public:
 	CMouse *GetMouse(void) { return m_mouse; }	// マウスクラスの取得
 	CKey *GetKey(void) { return m_key; }	// キーボードクラスの取得
 	CDirectInput *GetDirectInput(void) { return m_directInput; }	// キーボードクラスの取得
+	CPlayer_ingredient_data *GetPlayer_ingredient_data(void) { return m_player_ingredient_data; }	// プレイヤーの具材情報
+
 	HWND GetWindowHandle() { return m_hwnd; }	// ウィンドウハンドル取得処理
 	void SetWindowHandle(HWND hWind) { m_hwnd = hWind; }	// ウィンドウハンドル設定処理
 
@@ -60,6 +63,7 @@ private:
 	CKey *m_key;	// キーボードクラス
 	CDirectInput *m_directInput;	// キーボードクラス
 	CTexture *m_texture;	// テクスチャクラス
+	CPlayer_ingredient_data *m_player_ingredient_data;//プレイヤーの具材情報クラス
 };
 
 
