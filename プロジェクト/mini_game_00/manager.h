@@ -46,7 +46,6 @@ public:
 	CKey *GetKey(void) { return m_key; }	// キーボードクラスの取得
 	CDirectInput *GetDirectInput(void) { return m_directInput; }	// キーボードクラスの取得
 	CPlayer_ingredient_data *GetPlayer_ingredient_data(void) { return m_player_ingredient_data; }	// プレイヤーの具材情報
-
 	HWND GetWindowHandle() { return m_hwnd; }	// ウィンドウハンドル取得処理
 	void SetWindowHandle(HWND hWind) { m_hwnd = hWind; }	// ウィンドウハンドル設定処理
 
