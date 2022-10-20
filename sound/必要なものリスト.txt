@@ -1,29 +1,29 @@
 BGM
 {
-	タイトル
-	ゲーム
-	ゲーム(ラストスパート)
-	リザルト
+	タイトル〇(無理やりループさせたから繋ぎが汚い)title
+	マッチング画面〇matching
+	ゲーム〇game
+	ゲーム(ラストスパート)〇game_lastspurt
+	リザルト〇result
 }
 
 SE
 {
-	タイトルからの遷移
+	タイトルからの遷移〇title_buttonpress
 	
-	開始時カウントダウン
-	足音
-	具材スポーン
-	アイテムスポーン
-	スピードアイテム取得
-	攻撃アイテム取得
-	敵に当たった時のダメ音
-	ラスパ時の音
-	ゲーム終了
+	開始時カウントダウン〇game_start
+	足音〇game_walk
+	具材・アイテムスポーン〇game_spawn
+	スピードアイテム取得〇game_itemspeedup
+	攻撃アイテム取得〇game_itemattack
+	敵に当たった時のダメ音〇game_damage
+	ゲーム終了〇game_end
 	
-	リザルトで具材表示の音
-	コンボの音
-	スコアアップ
-	スコア確定
-	勝利ファンファーレ
+	リザルトで具材表示の音〇result_ingredients
+	コンボの音〇(特定のピザが完成したときの音)result_combo
+	スコアアップ〇(ループさせてスコアアップが終わった時に止める)result_scoreup
+	スコア確定〇result_scoreconfirm
+	勝利ファンファーレ〇resut_win
+	敗北〇result_lose
 }
 
