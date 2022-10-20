@@ -19,6 +19,12 @@
     <Filter Include="ソース ファイル\壁">
       <UniqueIdentifier>{a6cba92b-cefe-4426-9a4e-19ca014fc8e7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\リザルト">
+      <UniqueIdentifier>{fda60ed7-6146-47ef-9c93-1b781c7b73e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\プレイヤー">
+      <UniqueIdentifier>{867e6b9b-eee0-4a9a-b4fe-a0c122a8e113}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -87,9 +93,6 @@
     <ClInclude Include="scenemanager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="player.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="motion.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -110,6 +113,18 @@
     </ClInclude>
     <ClInclude Include="wall.h">
       <Filter>ソース ファイル\壁</Filter>
+    </ClInclude>
+    <ClInclude Include="result.h">
+      <Filter>ソース ファイル\リザルト</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>ソース ファイル\プレイヤー</Filter>
+    </ClInclude>
+    <ClInclude Include="player_ingredient_data.h">
+      <Filter>ソース ファイル\プレイヤー</Filter>
+    </ClInclude>
+    <ClInclude Include="2d_ingredients.h">
+      <Filter>ソース ファイル\リザルト</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -176,9 +191,6 @@
     <ClCompile Include="camera.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="player.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="motion.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -202,6 +214,18 @@
     </ClCompile>
     <ClCompile Include="wall.cpp">
       <Filter>ソース ファイル\壁</Filter>
+    </ClCompile>
+    <ClCompile Include="result.cpp">
+      <Filter>ソース ファイル\リザルト</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>ソース ファイル\プレイヤー</Filter>
+    </ClCompile>
+    <ClCompile Include="player_ingredient_data.cpp">
+      <Filter>ソース ファイル\プレイヤー</Filter>
+    </ClCompile>
+    <ClCompile Include="2d_ingredients.cpp">
+      <Filter>ソース ファイル\リザルト</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

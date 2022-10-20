@@ -1,7 +1,7 @@
 //=============================================================================
 //
 // ゲーム処理(game.cpp)
-// Author : 羽鳥太一
+// Author : 林海斗
 //
 //=============================================================================
 //=============================================================================
@@ -65,9 +65,13 @@ CGame::~CGame()
 HRESULT CGame::Init(void)
 {
 	CMeshsphere::Create(D3DXVECTOR3(0.0f, 10.0f, 0.0f), D3DXVECTOR3(0.0f, 10.0f, 0.0f), 32, 32, 5200, "Sky.jpg");
-	CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), 
-		D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-		D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt");
+	//プレイヤーの生成
+	if (!m_player)
+	{
+		m_player = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+			D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt");
+	}
+		
 	//CEnemy::Create(D3DXVECTOR3(0.0f, 0.0f, 200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/motion.txt");
 
 	vector<string> text_element;	// フォルダの保存バッファ
@@ -123,6 +127,11 @@ HRESULT CGame::Init(void)
 //=============================================================================
 void CGame::Uninit(void)
 {
+	if (m_player)
+	{
+		m_player->Uninit();
+		m_player = nullptr;
+	}
 	//オブジェクトの破棄
 	Release();
 }
@@ -136,10 +145,10 @@ void CGame::Update(void)
 	IngredientsSpawn();
 	CKey *key = CManager::GetInstance()->GetKey();
 
-	//if (key->GetTrigger(CKey::KEYBIND::W) == true)
-	//{
-	//	CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::GAME);
-	//}
+	if (key->GetTrigger(CKey::KEYBIND::W) == true)
+	{
+		CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT);
+	}
 }
 
 //=============================================================================

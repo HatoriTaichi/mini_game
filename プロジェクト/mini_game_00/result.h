@@ -1,37 +1,45 @@
 //=============================================================================
 //
-// モーション処理 [motion.h]
-// Author : 羽鳥太一
+// ゲーム処理(result.h)
+// Author : 林　海斗
 //
 //=============================================================================
-#ifndef _MOTION_H_
-#define _MOTION_H_
+#ifndef _RESULT_H_
+#define _RESULT_H_
 
 //*****************************************************************************
 // ヘッダファイルのインクルード
 //*****************************************************************************
-#include "main.h"
-#include "fileload.h"
-
+#include "object.h"
 //*****************************************************************************
 // 前方宣言
 //*****************************************************************************
-class CModel;	// モデルクラス
-
+class CObject2D;
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class CMotionController
+class CResult : public CObject
 {
 public:
-	CMotionController();	// デフォルトコンストラクタ
-	~CMotionController();	// デフォルトデストラクタ
-	bool PlayMotin(string type);	// モーションのプレイ
-	static CMotionController *Create(CFileLoad::MODEL_INFO motion, vector<CModel*> model);	// 生成
 
+	enum ResultState
+	{
+		State_IngredientSort = 0,
+		State_ComboStaging,
+		State_Max
+	};
+
+	CResult(LAYER_TYPE layer = LAYER_TYPE::LAYER_00);	// デフォルトコンストラクタ
+	~CResult();	// デフォルトデストラクタ
+	HRESULT Init(void);	// 初期化
+	void Uninit(void);	// 終了
+	void Update(void);	// 更新
+	void Draw(void);	// 描画
+	void ComboStaging(void);//コンボの演出
+	void IngredientSort(void);//取得した具材をならbる処理
 private:
-	CFileLoad::MODEL_INFO m_model_info;	// モデル情報
-	vector<CModel*> m_model;	// モデル
+	ResultState m_state;
+	CObject2D *m_Ingredient;
 };
 
-#endif
+#endif // !_TITLE_H_処理

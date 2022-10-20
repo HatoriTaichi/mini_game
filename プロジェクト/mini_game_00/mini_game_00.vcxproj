@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="2d_ingredients.h" />
     <ClInclude Include="billboard.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="counter.h" />
@@ -174,9 +175,11 @@
     <ClInclude Include="mouseinput.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="player_ingredient_data.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="object2D.h" />
     <ClInclude Include="object3D.h" />
+    <ClInclude Include="result.h" />
     <ClInclude Include="scenemanager.h" />
     <ClInclude Include="singlemodel.h" />
     <ClInclude Include="texture.h" />
@@ -184,6 +187,7 @@
     <ClInclude Include="wall.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="2d_ingredients.cpp" />
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="counter.cpp" />
@@ -206,9 +210,11 @@
     <ClCompile Include="mouseinput.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="player_ingredient_data.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="object2D.cpp" />
     <ClCompile Include="object3D.cpp" />
+    <ClCompile Include="result.cpp" />
     <ClCompile Include="scenemanager.cpp" />
     <ClCompile Include="singlemodel.cpp" />
     <ClCompile Include="texture.cpp" />

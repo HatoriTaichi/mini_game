@@ -38,6 +38,9 @@ public:
 		ImmediatelyAfterPop=0,//出現直後
 		StateDrop,
 		Normal,
+		EndType1,
+		EndType2,
+		EndType3,
 		StateMax
 	};
 	struct IngredientsData
@@ -74,6 +77,9 @@ private:
 	IngredientsData m_Data;
 	IngredientsState m_State;
 	int m_nNumDropType;//何番目にドロップしたかを記録
+	int m_nTimer;
+	int m_nFlashingTimer;
+	bool m_bFlash;
 	float m_fDropMoveSpeed;
 	float m_fUpDown;//上下動く用の増減変数
 	bool m_bUpDown;

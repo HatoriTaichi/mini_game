@@ -24,6 +24,13 @@ static const float UpDownSpeed = 0.1f;
 static const D3DXVECTOR3 IngredientsOfSet00 = {0.0f,20.0f,10.0f};
 static const D3DXVECTOR3 IngredientsOfSet01 = { -5.0f,25.0f,-10.0f };
 static const D3DXVECTOR3 IngredientsOfSet02 = { 5.0f,30.0f,-10.0f };
+static const int DeleteTime = 30*60;
+static const int EndTypeTime1 = 17 * 60;
+static const int EndTypeTime2 = 24 * 60;
+static const int EndTypeTime3 = 27 * 60;
+static const int EndTypeFlashTime1 = 15;
+static const int EndTypeFlashTime2 = 8;
+static const int EndTypeFlashTime3 = 4;
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -39,6 +46,9 @@ CIngredients::CIngredients(LAYER_TYPE layer) : CObject(layer)
 	}
 	m_Data.m_BasketModel = nullptr;
 	m_bDoDrop = false;
+	m_nTimer = 0;
+	m_bFlash = false;
+	m_nFlashingTimer = 0;
 }
 
 //=============================================================================
@@ -136,6 +146,8 @@ void CIngredients::Uninit(void)
 //=============================================================================
 void CIngredients::Update(void)
 {
+	m_nTimer++;
+
 	switch (m_State)
 	{
 	case CIngredients::IngredientsState::ImmediatelyAfterPop:
@@ -155,9 +167,39 @@ void CIngredients::Update(void)
 		//ちょっとした動き
 		Motion();
 		ColisionPlayer();
+		if (m_nTimer >= EndTypeTime1)
+		{
+			m_State = EndType1;
+		}
+		break;
+	case CIngredients::IngredientsState::EndType1:
+		//ちょっとした動き
+		Motion();
+		ColisionPlayer();
+		if (m_nTimer >= EndTypeTime2)
+		{
+			m_State = EndType2;
+		}
+		break;
+	case CIngredients::IngredientsState::EndType2:
+		//ちょっとした動き
+		Motion();
+		ColisionPlayer();
+		if (m_nTimer >= EndTypeTime3)
+		{
+			m_State = EndType3;
+		}
+	case CIngredients::IngredientsState::EndType3:
+		//ちょっとした動き
+		Motion();
+		ColisionPlayer();
+
 		break;
 	}
-
+	if (m_nTimer >= DeleteTime)
+	{
+		m_bUninit = true;
+	}
 	if (m_bUninit)
 	{
 		Uninit();
@@ -200,16 +242,50 @@ void CIngredients::Draw(void)
 	device->SetTransform(D3DTS_WORLD,
 		&m_mtx_wold);
 
-	if (m_Data.m_BasketModel)
+	switch (m_State)
 	{
-		m_Data.m_BasketModel->Draw();
-	}
-	for (int nCnt = 0; nCnt < IngredientsMax; nCnt++)
-	{
-		if (m_Data.m_IngredientModel[nCnt])
+	case CIngredients::EndType1:
+		m_nFlashingTimer++;
+
+		if (m_nFlashingTimer >= EndTypeFlashTime1)
 		{
-			m_Data.m_IngredientModel[nCnt]->Draw();
+			m_nFlashingTimer = 0;
+			m_bFlash = !m_bFlash;
 		}
+		break;
+	case CIngredients::EndType2:
+		m_nFlashingTimer++;
+
+		if (m_nFlashingTimer >= EndTypeFlashTime2)
+		{
+			m_nFlashingTimer = 0;
+			m_bFlash = !m_bFlash;
+		}
+		break;
+	case CIngredients::EndType3:
+		m_nFlashingTimer++;
+
+		if (m_nFlashingTimer >= EndTypeFlashTime3)
+		{
+			m_nFlashingTimer = 0;
+			m_bFlash = !m_bFlash;
+		}
+		break;
+	}
+	if (!m_bFlash)
+	{
+		if (m_Data.m_BasketModel)
+		{
+			m_Data.m_BasketModel->Draw();
+		}
+		for (int nCnt = 0; nCnt < IngredientsMax; nCnt++)
+		{
+			if (m_Data.m_IngredientModel[nCnt])
+			{
+				m_Data.m_IngredientModel[nCnt]->Draw();
+			}
+		}
+
 	}
 
 
