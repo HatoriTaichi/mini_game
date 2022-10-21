@@ -33,7 +33,6 @@ CSingleModel::~CSingleModel()
 //=============================================================================
 HRESULT CSingleModel::Init(void)
 {
-
 	m_model = CModel::Create(m_name);
 	m_model->SetScale(m_scale);
 	m_model->SetPrent(nullptr);
@@ -46,6 +45,7 @@ HRESULT CSingleModel::Init(void)
 //=============================================================================
 void CSingleModel::Uninit(void)
 {
+	// ”jŠü
 	m_model->Uninit();
 	delete m_model;
 	m_model = nullptr;
@@ -56,6 +56,7 @@ void CSingleModel::Uninit(void)
 //=============================================================================
 void CSingleModel::Update(void)
 {
+	// XV
 	m_model->Update();
 }
 
@@ -97,16 +98,26 @@ void CSingleModel::Draw(void)
 	m_model->Draw();
 }
 
+//=============================================================================
+// ‘ŠŽè‚Ì‰~‚Æ‚Ì“–‚½‚è”»’è
+//=============================================================================
 bool CSingleModel::CircleCollision(const D3DXVECTOR3 & pos, const float & size)
 {
-	D3DXVECTOR3 vec = pos - m_pos;
-	float LengthX = sqrtf((vec.x*vec.x));
-	float LengthZ = sqrtf((vec.z*vec.z));
-	if (LengthX <= size&&
-		LengthZ <= size)
+	D3DXVECTOR3 vec = pos - m_pos;	// ‘ŠŽè‚ÆŽ©•ª‚Ì·•ª
+
+	// •½•ûª
+	float length_x = sqrtf((vec.x*vec.x));
+	float length_z = sqrtf((vec.z*vec.z));
+
+	// ‰~‚Ì’†‚É“ü‚Á‚Ä‚½‚ç
+	if (length_x <= size &&
+		length_z <= size)
 	{
+		// “–‚½‚Á‚Ä‚é
 		return true;
 	}
+
+	// “–‚½‚Á‚Ä‚È‚¢
 	return false;
 }
 

@@ -36,11 +36,11 @@ public:
 	enum class OBJTYPE
 	{
 		NONE = 0,	// 空のオブジェクト
-		MODEL,		//モデル
-		BLOCK,//障害物
-		PLAYER,//プレイヤー
-		ENEMY,	//エネミー
-		INGREDIENTS,
+		MODEL,	// モデル
+		BLOCK,	// 障害物
+		PLAYER,	// プレイヤー
+		ENEMY,	// 敵
+		INGREDIENTS,	// 具材
 		MAX,
 	};
 

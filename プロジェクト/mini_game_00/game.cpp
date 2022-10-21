@@ -1,7 +1,7 @@
 //=============================================================================
 //
 // ゲーム処理(game.cpp)
-// Author : 羽鳥太一
+// Author : 林海斗
 //
 //=============================================================================
 //=============================================================================
@@ -78,48 +78,48 @@ HRESULT CGame::Init(void)
 	}
 	//CEnemy::Create(D3DXVECTOR3(0.0f, 0.0f, 200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/motion.txt");
 
-	vector<string> text_element;	// フォルダの保存バッファ
-	CFileLoad::STAGE_INFO stage;
-	CFileLoad::STAGE_SPAWN_INFO spawn;
+	vector<string> TextElement;	// フォルダの保存バッファ
+	CFileLoad::STAGE_INFO Stage;
+	CFileLoad::STAGE_SPAWN_INFO Spawn;
 
 	// ファイルを読み込む
-	text_element = CFileLoad::LoadTxt("data/Txt/SpawnData.txt");
+	TextElement = CFileLoad::LoadTxt("data/Txt/SpawnData.txt");
 
 	// パスと名前を取得
-	stage.spawn_info.push_back(CFileLoad::CreateSpawnInfo(text_element));
+	Stage.spawn_info.push_back(CFileLoad::CreateSpawnInfo(TextElement));
 	//具材スポーン位置の最大数を取得
-	m_MaxIngredientsSpawn = stage.spawn_info[0].spawn_num["INGREDIENTSSET"];
+	m_MaxIngredientsSpawn = Stage.spawn_info[0].spawn_num["INGREDIENTSSET"];
 	//アイテムスポーン位置の最大数を取得
-	m_MaxItemSpawn = stage.spawn_info[0].spawn_num["ITEMSET"];
+	m_MaxItemSpawn = Stage.spawn_info[0].spawn_num["ITEMSET"];
 	//敵スポーン位置の最大数を取得
-	m_MaxEnemySpawn = stage.spawn_info[0].spawn_num["ENEMYSET"];
+	m_MaxEnemySpawn = Stage.spawn_info[0].spawn_num["ENEMYSET"];
 
 	//アイテムの位置情報を取得
-	for (int count_size = 0; count_size < stage.spawn_info[0].spawn_num["ITEMSET"]; count_size++)
+	for (int count_size = 0; count_size < Stage.spawn_info[0].spawn_num["ITEMSET"]; count_size++)
 	{
 		D3DXVECTOR3 hoge = { 0.0f,0.0f,0.0f };
 		m_ItemSpawnPoint.push_back(hoge);
-		m_ItemSpawnPoint[count_size] = stage.spawn_info[0].pos["ITEMSET"][count_size];
+		m_ItemSpawnPoint[count_size] = Stage.spawn_info[0].pos["ITEMSET"][count_size];
 	}
 	//具材の位置情報を取得
 	for (int count_size = 0; count_size < m_MaxIngredientsSpawn; count_size++)
 	{
 		D3DXVECTOR3 hoge = { 0.0f,0.0f,0.0f };
 		m_IngredientsSpawnPoint.push_back(hoge);
-		m_IngredientsSpawnPoint[count_size] = stage.spawn_info[0].pos["INGREDIENTSSET"][count_size];
+		m_IngredientsSpawnPoint[count_size] = Stage.spawn_info[0].pos["INGREDIENTSSET"][count_size];
 	}
 	// ファイルを読み込む
-	text_element = CFileLoad::LoadTxt("data/Txt/StageData_Type2.txt");
+	TextElement = CFileLoad::LoadTxt("data/Txt/StageData_Type2.txt");
 
 	// パスと名前を取得
-	stage.stage_model.push_back(CFileLoad::CreateStageInfo(text_element));
+	Stage.stage_model.push_back(CFileLoad::CreateStageModelInfo(TextElement));
 
-	int stage_size = stage.stage_model.size();
-	for (int count_model_info = 0; count_model_info < stage_size; count_model_info++)
+	int StageSize = Stage.stage_model.size();
+	for (int nCountModelInfo = 0; nCountModelInfo < StageSize; nCountModelInfo++)
 	{
-		for (int count_model = 0; count_model < stage.stage_model[count_model_info].all_model; count_model++)
+		for (int nCountModel = 0; nCountModel < Stage.stage_model[nCountModelInfo].all_model; nCountModel++)
 		{
-			CSingleModel::Create(stage.stage_model[count_model_info].pos[count_model], stage.stage_model[count_model_info].rot[count_model], D3DXVECTOR3(1.0f, 1.0f, 1.0f), stage.stage_model[count_model_info].type[count_model], CObject::OBJTYPE::BLOCK);
+			CSingleModel::Create(Stage.stage_model[nCountModelInfo].pos[nCountModel], Stage.stage_model[nCountModelInfo].rot[nCountModel], D3DXVECTOR3(1.0f, 1.0f, 1.0f), Stage.stage_model[nCountModelInfo].type[nCountModel], CObject::OBJTYPE::BLOCK);
 		}
 	}
 	EnemySpawn();
