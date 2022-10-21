@@ -168,15 +168,19 @@ void CItem::ColisionPlayer(void)
 	int nSize = buf.size();
 	if (nSize != 0)
 	{
-		CPlayer *pPlayer = static_cast <CPlayer*> (buf[0]);
-		//プレイヤーがアイテム持っていなかったら
-		if (pPlayer->GetItemState() == Nown)
+		for (int nCnt = 0; nCnt < nSize; nCnt++)
 		{
-			if (pPlayer->Collision(m_pos, 50.0f))
+			CPlayer *pPlayer = static_cast <CPlayer*> (buf[nCnt]);
+			//プレイヤーがアイテム持っていなかったら
+			if (pPlayer->GetItemState() == Nown)
 			{
-				pPlayer->SetItemType(m_type);
-				m_bUninit = true;
+				if (pPlayer->Collision(m_pos, 50.0f))
+				{
+					pPlayer->SetItemType(m_type);
+					m_bUninit = true;
+				}
 			}
+
 		}
 	}
 }

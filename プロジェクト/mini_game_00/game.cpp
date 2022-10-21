@@ -66,12 +66,16 @@ HRESULT CGame::Init(void)
 {
 	CMeshsphere::Create(D3DXVECTOR3(0.0f, 10.0f, 0.0f), D3DXVECTOR3(0.0f, 10.0f, 0.0f), 32, 32, 5200, "Sky.jpg");
 	//プレイヤーの生成
-	if (!m_player)
+	if (!m_player[0])
 	{
-		m_player = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+		m_player[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 			D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt");
 	}
-		
+	if (!m_player[1])
+	{
+		m_player[1] = CPlayer::Create(D3DXVECTOR3(100.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+			D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt");
+	}
 	//CEnemy::Create(D3DXVECTOR3(0.0f, 0.0f, 200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/motion.txt");
 
 	vector<string> text_element;	// フォルダの保存バッファ
@@ -127,10 +131,13 @@ HRESULT CGame::Init(void)
 //=============================================================================
 void CGame::Uninit(void)
 {
-	if (m_player)
+	for (int nPlayer = 0; nPlayer < MaxPlayer; nPlayer++)
 	{
-		m_player->Uninit();
-		m_player = nullptr;
+		if (m_player[nPlayer])
+		{
+			m_player[nPlayer]->Uninit();
+			m_player[nPlayer] = nullptr;
+		}
 	}
 	//オブジェクトの破棄
 	Release();
@@ -145,10 +152,10 @@ void CGame::Update(void)
 	IngredientsSpawn();
 	CKey *key = CManager::GetInstance()->GetKey();
 
-	if (key->GetTrigger(CKey::KEYBIND::W) == true)
-	{
-		CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT);
-	}
+	//if (key->GetTrigger(CKey::KEYBIND::W) == true)
+	//{
+	//	CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT);
+	//}
 }
 
 //=============================================================================

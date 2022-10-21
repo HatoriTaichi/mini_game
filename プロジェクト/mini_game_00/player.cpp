@@ -18,6 +18,7 @@
 #include "directinput.h"
 #include "enemy.h"
 #include "player_ingredient_data.h"
+#include "scenemanager.h"
 static const float MoveSpeed = 3.0f;
 static const float SpeedUpDiameter = 1.5f;//スピードアップ倍率
 static const float PossibleAttackSpeedUpDiameter = 1.2f;//攻撃可能時のスピードアップ倍率
@@ -27,6 +28,7 @@ static const float NoDropSize = 35.0f;
 static const float DropDistance = 100.0f;
 static const float PlayerHitSize = 50.0f;
 static const int OperationAgainTime = 60;
+int CPlayer::m_nNumPlayer;
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -37,6 +39,7 @@ CPlayer::CPlayer(LAYER_TYPE layer) : CObject(layer)
 	memset(m_pColliNoDrop, NULL, sizeof(m_pColliNoDrop));
 	m_Speed = MoveSpeed;
 	m_moitonState = MotionState::NUTLARAL;
+	m_nNumPlayer++;//プレイヤー番号を増やす
 }
 
 //=============================================================================
@@ -97,7 +100,7 @@ HRESULT CPlayer::Init(void)
 void CPlayer::Uninit(void)
 {
 	//具材の情報を保存
-	CManager::GetInstance()->GetPlayer_ingredient_data()->SetIngredientsType(m_nGetIngredientsType);
+	CManager::GetInstance()->GetPlayer_ingredient_data(m_nNumPlayer-1)->SetIngredientsType(m_nGetIngredientsType);
 	// サイズの取得
 	int size = m_model.size();
 	for (int count_model = 0; count_model < size; count_model++)
@@ -118,6 +121,9 @@ void CPlayer::Uninit(void)
 			m_pColliNoDrop[nCnt] = nullptr;
 		}
 	}
+	m_nGetIngredientsType.clear();
+	m_nNumPlayer--;//プレイヤー番号を増やす
+
 	Release();
 }
 
@@ -155,7 +161,8 @@ void CPlayer::Update(void)
 	{
 		DropItem();
 	}
-
+	//テストで取得した具材を増やす処理
+	TestGetIngredients();
 	//敵などに当たったら一定時間操作を聞かないようにする
 	if (m_bOperationLock)
 	{
@@ -169,7 +176,7 @@ void CPlayer::Update(void)
 	else
 	{
 		//移動処理
-		KeyMove();
+		//KeyMove();
 		PadMove();
 		vector<CObject *>ObjEnemy = CObject::GetObjTypeObject(CObject::OBJTYPE::ENEMY);
 		{
@@ -399,7 +406,7 @@ void CPlayer::PadMove(void)
 	//DirectInputのゲームパッドの取得
 	CDirectInput *pGamePad = CManager::GetInstance()->GetDirectInput();
 	//ゲームパッドのボタン情報の取得
-	DIJOYSTATE2 GamePad = pGamePad->GetJoyState();
+	DIJOYSTATE2 GamePad = pGamePad->GetJoyState(m_nNumPlayer-1);
 
 	//前に進む
 
@@ -561,6 +568,31 @@ void CPlayer::SetItemType(int nType)
 void CPlayer::SetIngredients(int nType)
 {
 	m_nGetIngredientsType.push_back(nType);
+}
+//=============================================================================
+// デバッグ用スタック処理
+//=============================================================================
+void CPlayer::TestGetIngredients(void)
+{
+	//キーボード情報取得
+	CKey * pKey = CManager::GetInstance()->GetKey();
+	if (pKey->GetTrigger(CKey::KEYBIND::W))
+	{
+		std::random_device random;	// 非決定的な乱数生成器
+		std::mt19937_64 mt(random());            // メルセンヌ・ツイスタの64ビット版、引数は初期シード
+		std::uniform_real_distribution<> randType(0, 5);
+		std::uniform_real_distribution<> randNum(5, 35);
+		int nMax = randNum(mt);
+		for (int nCnt = 0; nCnt < nMax; nCnt++)
+		{
+			int nType = randType(mt);
+			m_nGetIngredientsType.push_back(nType);
+
+		}
+		CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT);
+
+	}
+
 }
 //=============================================================================
 // 円の当たり判定

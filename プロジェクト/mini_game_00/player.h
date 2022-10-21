@@ -63,6 +63,7 @@ public:
 	void Item(void);//アイテムの処理
 	void SetItemType(int nType);//アイテム取得処理
 	void SetIngredients(int nType);//アイテム取得処理
+	void TestGetIngredients(void);
 	bool Collision(const D3DXVECTOR3& pos,float fSize);
 	static CPlayer *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, string motion_pas);	// 生成
 	D3DXVECTOR3 GetPos(void) { return m_pos; }	// ゲッダー
@@ -93,6 +94,7 @@ private:
 	int m_nOperationLockTimer;
 	int m_nCntIngredientsType;
 	int m_nItemTimer;
+	static int m_nNumPlayer;//プレイヤー番号
 	float m_Speed;//プレイヤーの移動速度
 };
 

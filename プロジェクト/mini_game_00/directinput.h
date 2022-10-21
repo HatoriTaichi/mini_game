@@ -46,23 +46,22 @@ public:
 	HRESULT Init(HINSTANCE hInstance, HWND hWnd);
 	void Uninit(void);
 	void Update(void);
-	bool GetGamepadPress(int nButton);
-	bool GetButtonTrigger(int nButton);
-	bool GetButtonRelease(int nButton);
-	bool GetClossButtonPress(int nButton);
-	bool GetClossButtonTrigger(int nButton);
-	bool GetClossButtonRelease(int nButton);
-
-	DIJOYSTATE2 GetJoyState(void) {return m_aButtonState; }
+	bool GetGamepadPress(int nButton, int nCntPlayer);
+	bool GetButtonTrigger(int nButton, int nCntPlayer);
+	bool GetButtonRelease(int nButton, int nCntPlayer);
+	bool GetClossButtonPress(int nButton, int nCntPlayer);
+	bool GetClossButtonTrigger(int nButton, int nCntPlayer);
+	bool GetClossButtonRelease(int nButton, int nCntPlayer);
+	DIJOYSTATE2 GetJoyState(int nCntPlayer) {return m_aButtonState[nCntPlayer]; }
 	static BOOL CALLBACK EnumJoysticksCallback(const LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef);
 	static BOOL CALLBACK EnumAxesCallback(const DIDEVICEOBJECTINSTANCE *pdidoi, VOID *pContext);
 private:
 	static LPDIDEVICEOBJECTINSTANCE m_Instance;
 	LPDIRECTINPUT8       m_lpDI;
 	DIDEVCAPS            m_diDevCaps;
-	DIJOYSTATE2 m_aButtonState;//キーボードの入力情報（プレス情報）
-	DIJOYSTATE2 m_aButtonStateTrigger;
-	DIJOYSTATE2 m_aButtonStateRelease;
+	DIJOYSTATE2 *m_aButtonState;//キーボードの入力情報（プレス情報）
+	DIJOYSTATE2 *m_aButtonStateTrigger;
+	DIJOYSTATE2 *m_aButtonStateRelease;
 
 };
 #endif _DIRECTINPUT_H_

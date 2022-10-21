@@ -1,7 +1,7 @@
 //=============================================================================
 //
 // ゲーム処理(game.h)
-// Author : 羽鳥太一
+// Author : 林海斗
 //
 //=============================================================================
 #ifndef _GAME_H_
@@ -11,6 +11,7 @@
 // ヘッダファイルのインクルード
 //*****************************************************************************
 #include "object.h"
+static const int MaxPlayer = 2;
 //*****************************************************************************
 // 前方宣言
 //*****************************************************************************
@@ -40,7 +41,7 @@ private:
 	vector<D3DXVECTOR3> m_IngredientsSpawnPoint;//具材のスポーンポイント
 	vector<D3DXVECTOR3> m_ItemSpawnPoint;//アイテムのスポーンポイント
 	GameMode m_Mode;//ゲーム中のモード
-	CPlayer *m_player;
+	CPlayer *m_player[MaxPlayer];
 	int *m_NumIngredientsSpawnPoint;
 	int *m_NumItemSpawnPoint;
 	int m_MaxIngredientsSpawn;

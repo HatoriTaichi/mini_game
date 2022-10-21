@@ -11,10 +11,11 @@
 // ヘッダファイルのインクルード
 //*****************************************************************************
 #include "object.h"
+#include "manager.h"
 //*****************************************************************************
 // 前方宣言
 //*****************************************************************************
-class CObject2D;
+class C2d_ingredients;
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
@@ -39,7 +40,12 @@ public:
 	void IngredientSort(void);//取得した具材をならbる処理
 private:
 	ResultState m_state;
-	CObject2D *m_Ingredient;
+	vector<C2d_ingredients*>m_pIngredient[MAX_PLAYER];
+	int m_nStateTimer[MAX_PLAYER];//状態ごとのタイマー
+	int m_nCntIngredient[MAX_PLAYER];//具材のカウント
+	int m_nCntIngredient_X[MAX_PLAYER];//具材のカウント
+	int m_nCntIngredient_Y[MAX_PLAYER];//具材のカウント
+
 };
 
 #endif // !_TITLE_H_処理

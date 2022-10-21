@@ -38,6 +38,7 @@ HRESULT CPlayer_ingredient_data::Init(void)
 //=============================================================================
 void CPlayer_ingredient_data::Uninit(void)
 {
+	m_nGetIngredientsType.clear();
 
 }
 

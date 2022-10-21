@@ -48,8 +48,6 @@ public:
 	vector<CModel*> GetModel(void) { return m_model; }	// ゲッダー
 
 private:
-	void KeyMove(void);//移動処理
-
 	void Move(void);//移動処理
 	void CreateModel(void);	// モデルの生成
 	void InitMotionController(void);	// モーションコントローラーの初期化

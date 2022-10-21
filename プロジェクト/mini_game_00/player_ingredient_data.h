@@ -28,6 +28,7 @@ public:
 	void Uninit(void);	// ポリゴンの終了
 	static CPlayer_ingredient_data *Create(void);	// 生成
 	void SetIngredientsType(vector<int> nGetIngredientsType);
+	void ResetGetIngredientsType(void) { m_nGetIngredientsType.clear(); }
 	vector<int> GetIngredientsType(void) { return m_nGetIngredientsType; }//具材の情報のゲッター
 private:
 	vector<int> m_nGetIngredientsType;//取得した具材の種類

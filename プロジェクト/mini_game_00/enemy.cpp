@@ -318,40 +318,7 @@ bool CEnemy::RayColl(void)
 	}
 	return false;
 }
-//=============================================================================
-// 移動
-//=============================================================================
-void CEnemy::KeyMove(void)
-{
-	RayColl();
 
-	//キーボード情報取得
-	CKey * pKey = CManager::GetInstance()->GetKey();
-	if (pKey->GetPress(CKey::KEYBIND::W))
-	{
-		m_pos.z += MoveSpeed;
-		m_rot.y = D3DXToRadian(180.0f);
-		//nFacing = UP;
-	}
-	else if (pKey->GetPress(CKey::KEYBIND::S))
-	{
-		m_pos.z -= MoveSpeed;
-		m_rot.y = D3DXToRadian(0.0f);
-		//nFacing = DOWN;
-	}
-	else if (pKey->GetPress(CKey::KEYBIND::A))
-	{
-		m_pos.x -= MoveSpeed;
-		m_rot.y = D3DXToRadian(90.0f);
-		//nFacing = LEFT;
-	}
-	else if (pKey->GetPress(CKey::KEYBIND::D))
-	{
-		m_pos.x += MoveSpeed;
-		m_rot.y = D3DXToRadian(-90.0f);
-		//nFacing = RIGHT;
-	}
-}
 //=============================================================================
 // 自動移動の処理
 //=============================================================================

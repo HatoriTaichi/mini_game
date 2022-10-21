@@ -2,6 +2,7 @@
 //キーボードの入力処理
 //---------------------
 #include "directinput.h"
+#include "game.h"
 
 LPDIDEVICEOBJECTINSTANCE CDirectInput::m_Instance;
 
@@ -11,6 +12,9 @@ LPDIDEVICEOBJECTINSTANCE CDirectInput::m_Instance;
 
 CDirectInput::CDirectInput()
 {
+	m_aButtonState = new DIJOYSTATE2[MaxPlayer];
+	m_aButtonStateTrigger = new DIJOYSTATE2[MaxPlayer];
+	m_aButtonStateRelease = new DIJOYSTATE2[MaxPlayer];
 
 }
 //----------------------------------------
@@ -97,69 +101,74 @@ void CDirectInput::Uninit(void)
 //----------------------------------------
 void CDirectInput::Update(void)
 {
-	DIJOYSTATE2 aButtonState;
-	int nCntKey;
-	DWORD dwObj = NULL;
-	if (m_joy_stick != nullptr)
+	DIJOYSTATE2 aButtonState[MaxPlayer];
+	for (int nCntPlayer = 0; nCntPlayer < MaxPlayer; nCntPlayer++)
 	{
-		m_Instance->dwSize = NULL;
+		int nCntKey;
+		DWORD dwObj = NULL;
 
-		if (m_joy_stick->GetObjectInfo(m_Instance, dwObj, DIPH_BYID) != DIERR_INVALIDPARAM)
+		if (m_joy_stick != nullptr)
 		{
-			m_aButtonState.rglSlider[0] = m_joy_stick->GetObjectInfo(m_Instance, dwObj, DIPH_BYID);
-			m_aButtonState.rglSlider[1] = m_joy_stick->GetObjectInfo(m_Instance, dwObj, DIPH_BYID);
-		}
+			m_Instance->dwSize = NULL;
 
-		//入力デバイスからデータを取得
-		if (SUCCEEDED(m_joy_stick->GetDeviceState(sizeof(aButtonState), &aButtonState)))
-		{
-			for (nCntKey = 0; nCntKey < D_BUTTON_MAX;
-				nCntKey++)
+			if (m_joy_stick->GetObjectInfo(m_Instance, dwObj, DIPH_BYID) != DIERR_INVALIDPARAM)
 			{
-				m_aButtonStateTrigger.rgbButtons[nCntKey] = (m_aButtonState.rgbButtons[nCntKey] ^ aButtonState.rgbButtons[nCntKey])&aButtonState.rgbButtons[nCntKey];
-				m_aButtonStateRelease.rgbButtons[nCntKey] = (m_aButtonState.rgbButtons[nCntKey] ^ aButtonState.rgbButtons[nCntKey])& ~aButtonState.rgbButtons[nCntKey];
+				m_aButtonState[nCntPlayer].rglSlider[0] = m_joy_stick->GetObjectInfo(m_Instance, dwObj, DIPH_BYID);
+				m_aButtonState[nCntPlayer].rglSlider[1] = m_joy_stick->GetObjectInfo(m_Instance, dwObj, DIPH_BYID);
 			}
-			for (nCntKey = 0; nCntKey < MAX_CROSS_BOTTON;
-				nCntKey++)
+
+			//入力デバイスからデータを取得
+			if (SUCCEEDED(m_joy_stick->GetDeviceState(sizeof(aButtonState[nCntPlayer]), &aButtonState[nCntPlayer])))
 			{
-				m_aButtonStateTrigger.rgdwPOV[nCntKey] = (m_aButtonState.rgdwPOV[nCntKey] ^ aButtonState.rgdwPOV[nCntKey])&aButtonState.rgdwPOV[nCntKey];
-				m_aButtonStateRelease.rgdwPOV[nCntKey] = (m_aButtonState.rgdwPOV[nCntKey] ^ aButtonState.rgdwPOV[nCntKey])& ~aButtonState.rgdwPOV[nCntKey];
+				for (nCntKey = 0; nCntKey < D_BUTTON_MAX;
+					nCntKey++)
+				{
+					m_aButtonStateTrigger[nCntPlayer].rgbButtons[nCntKey] = (m_aButtonState[nCntPlayer].rgbButtons[nCntKey] ^ aButtonState[nCntPlayer].rgbButtons[nCntKey])&aButtonState[nCntPlayer].rgbButtons[nCntKey];
+					m_aButtonStateRelease[nCntPlayer].rgbButtons[nCntKey] = (m_aButtonState[nCntPlayer].rgbButtons[nCntKey] ^ aButtonState[nCntPlayer].rgbButtons[nCntKey])& ~aButtonState[nCntPlayer].rgbButtons[nCntKey];
+				}
+				for (nCntKey = 0; nCntKey < MAX_CROSS_BOTTON;
+					nCntKey++)
+				{
+					m_aButtonStateTrigger[nCntPlayer].rgdwPOV[nCntKey] = (m_aButtonState[nCntPlayer].rgdwPOV[nCntKey] ^ aButtonState[nCntPlayer].rgdwPOV[nCntKey])&aButtonState[nCntPlayer].rgdwPOV[nCntKey];
+					m_aButtonStateRelease[nCntPlayer].rgdwPOV[nCntKey] = (m_aButtonState[nCntPlayer].rgdwPOV[nCntKey] ^ aButtonState[nCntPlayer].rgdwPOV[nCntKey])& ~aButtonState[nCntPlayer].rgdwPOV[nCntKey];
+				}
+				m_aButtonState[nCntPlayer] = aButtonState[nCntPlayer];
 			}
-			m_aButtonState = aButtonState;
-		}
-		else
-		{
-			m_joy_stick->Acquire();
+			else
+			{
+				m_joy_stick->Acquire();
+			}
+
 		}
 
 	}
 }
-bool CDirectInput::GetGamepadPress(int nButton)
+bool CDirectInput::GetGamepadPress(int nButton, int nCntPlayer)
 {
-	return(m_aButtonState.rgbButtons[nButton] & 0x80) ? true : false;
+	return(m_aButtonState[nCntPlayer].rgbButtons[nButton] & 0x80) ? true : false;
 }
 
-bool CDirectInput::GetButtonTrigger(int nButton)
+bool CDirectInput::GetButtonTrigger(int nButton, int nCntPlayer)
 {
-	return (m_aButtonStateTrigger.rgbButtons[nButton] & 0x80) ? true : false;
+	return (m_aButtonStateTrigger[nCntPlayer].rgbButtons[nButton] & 0x80) ? true : false;
 }
 
-bool CDirectInput::GetButtonRelease(int nButton)
+bool CDirectInput::GetButtonRelease(int nButton, int nCntPlayer)
 {
-	return (m_aButtonStateRelease.rgbButtons[nButton] & 0x80) ? true : false;
+	return (m_aButtonStateRelease[nCntPlayer].rgbButtons[nButton] & 0x80) ? true : false;
 }
 
-bool CDirectInput::GetClossButtonPress(int nButton)
+bool CDirectInput::GetClossButtonPress(int nButton, int nCntPlayer)
 {
-	return(m_aButtonState.rgdwPOV[nButton] & 0x80) ? true : false;
+	return(m_aButtonState[nCntPlayer].rgdwPOV[nButton] & 0x80) ? true : false;
 }
 
-bool CDirectInput::GetClossButtonTrigger(int nButton)
+bool CDirectInput::GetClossButtonTrigger(int nButton, int nCntPlayer)
 {
-	return(m_aButtonStateTrigger.rgdwPOV[nButton] & 0x80) ? true : false;
+	return(m_aButtonStateTrigger[nCntPlayer].rgdwPOV[nButton] & 0x80) ? true : false;
 }
 
-bool CDirectInput::GetClossButtonRelease(int nButton)
+bool CDirectInput::GetClossButtonRelease(int nButton, int nCntPlayer)
 {
 	return false;
 }
