@@ -102,7 +102,7 @@ HRESULT CFbx::Init(void)
 			vtx[count_vertex].nor = D3DXVECTOR3(m_normal_ary[count_mesh][count_vertex].x, m_normal_ary[count_mesh][count_vertex].y, m_normal_ary[count_mesh][count_vertex].z);
 			if (uv_size > 0)
 			{
-				vtx[count_vertex].tex = D3DXVECTOR2(m_uv_ary[count_mesh][count_vertex].x, m_uv_ary[count_mesh][count_vertex].y);
+				vtx[count_vertex].tex = D3DXVECTOR2(m_uv_ary[count_mesh][count_vertex].x, -m_uv_ary[count_mesh][count_vertex].y);
 			}
 		}
 
@@ -646,7 +646,7 @@ void CFbx::GetUv(FbxMesh *mesh)
 		FbxLayer *layer = mesh->GetLayer(count_layer);	// レイヤーの取得
 		FbxLayerElementUV *uv_elem = layer->GetUVs();	// UV情報の取得
 
-		// 法線無し
+		// UV無し
 		if (uv_elem == nullptr)
 		{
 			m_uv_ary.push_back(vector_buf);
@@ -659,7 +659,7 @@ void CFbx::GetUv(FbxMesh *mesh)
 		int index_num = uv_elem->GetIndexArray().GetCount();	// インデックス
 		int size = uv_num > index_num ? uv_num : index_num;	// サイズの設定
 
-		// 頂点に法線があるなら
+		// 頂点にUVがあるなら
 		if (mapping_mode == FbxLayerElement::eByPolygonVertex)
 		{
 			// 頂点順に格納されていたら
@@ -1089,7 +1089,7 @@ void CFbx::NoBoneAnim(FbxMesh *mesh)
 void CFbx::BoneAnim(FbxMesh *mesh, int mesh_count)
 {
 	// 回転の計算
-	//UpdateRotate(mesh, mesh_count);
+	UpdateRotate(mesh, mesh_count);
 
 	// 位置の計算
 	//UpdatePos(mesh, mesh_count);
