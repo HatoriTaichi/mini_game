@@ -104,8 +104,8 @@ void CCamera::Update(void)
 //=============================================================================
 void CCamera::SetCamera(void)
 {
-	LPDIRECT3DDEVICE9 pDevice;	//デバイスのポインタ
-	pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();		//デバイスを取得する
+	LPDIRECT3DDEVICE9 device;	//デバイスのポインタ
+	device = CManager::GetInstance()->GetRenderer()->GetDevice();		//デバイスを取得する
 	//---------------------------
 	//マトリックスの設定
 	//---------------------------
@@ -119,7 +119,7 @@ void CCamera::SetCamera(void)
 								CAMERA_MAX_RENDERER);	//カメラの最大描画距離
 
 	//プロジェクションマトリックス設定
-	pDevice->SetTransform(	D3DTS_PROJECTION,
+	device->SetTransform(	D3DTS_PROJECTION,
 							&m_mtx_projection);
 
 	//ビューマトリックスの初期化
@@ -132,7 +132,7 @@ void CCamera::SetCamera(void)
 						&m_vec_u);
 
 	//ビューマトリックスの設定
-	pDevice->SetTransform(	D3DTS_VIEW,
+	device->SetTransform(	D3DTS_VIEW,
 							&m_mtx_view);
 }
 

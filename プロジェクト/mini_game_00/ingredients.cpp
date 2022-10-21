@@ -398,12 +398,16 @@ void CIngredients::ColisionPlayer(void)
 	int nSize = buf.size();
 	if (nSize != 0)
 	{
-		CPlayer *pPlayer = static_cast <CPlayer*> (buf[0]);
-		if (pPlayer->Collision(m_pos, 50.0f))
+		for (int nCnt = 0; nCnt < nSize; nCnt++)
 		{
-			pPlayer->SetIngredients(m_Type);
-			m_bUninit = true;
+			CPlayer *pPlayer = static_cast <CPlayer*> (buf[nCnt]);
+			if (pPlayer->Collision(m_pos, 50.0f))
+			{
+				pPlayer->SetIngredients(m_Type);
+				m_bUninit = true;
+			}
 		}
+
 	}
 }
 //=============================================================================

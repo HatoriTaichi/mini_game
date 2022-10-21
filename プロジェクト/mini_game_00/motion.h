@@ -30,7 +30,6 @@ public:
 	static CMotionController *Create(CFileLoad::MODEL_INFO motion, vector<CModel*> model);	// ¶¬
 
 private:
-	void ModifyingInfo(void);	// î•ñ‚ÌC³
 	CFileLoad::MODEL_INFO m_model_info;	// ƒ‚ƒfƒ‹î•ñ
 	vector<CModel*> m_model;	// ƒ‚ƒfƒ‹
 };

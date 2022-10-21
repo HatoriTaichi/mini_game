@@ -25,6 +25,12 @@
     <Filter Include="ソース ファイル\プレイヤー">
       <UniqueIdentifier>{867e6b9b-eee0-4a9a-b4fe-a0c122a8e113}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\敵">
+      <UniqueIdentifier>{31c695c4-fbf1-4d8e-afd9-aa46dda5a75e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\ゲームシーン">
+      <UniqueIdentifier>{3954b7fa-6891-4211-a431-1e7342d2b105}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -81,9 +87,6 @@
     <ClInclude Include="meshfloo.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="game.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="model.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -97,9 +100,6 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="ingredients.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="enemy.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="directinput.h">
@@ -122,6 +122,15 @@
     </ClInclude>
     <ClInclude Include="player_ingredient_data.h">
       <Filter>ソース ファイル\プレイヤー</Filter>
+    </ClInclude>
+    <ClInclude Include="2d_ingredients.h">
+      <Filter>ソース ファイル\リザルト</Filter>
+    </ClInclude>
+    <ClInclude Include="enemy.h">
+      <Filter>ソース ファイル\敵</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>ソース ファイル\ゲームシーン</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -173,9 +182,6 @@
     <ClCompile Include="meshfloo.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="game.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="model.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -192,9 +198,6 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="ingredients.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="enemy.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="texture.cpp">
@@ -220,6 +223,15 @@
     </ClCompile>
     <ClCompile Include="player_ingredient_data.cpp">
       <Filter>ソース ファイル\プレイヤー</Filter>
+    </ClCompile>
+    <ClCompile Include="2d_ingredients.cpp">
+      <Filter>ソース ファイル\リザルト</Filter>
+    </ClCompile>
+    <ClCompile Include="enemy.cpp">
+      <Filter>ソース ファイル\敵</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>ソース ファイル\ゲームシーン</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

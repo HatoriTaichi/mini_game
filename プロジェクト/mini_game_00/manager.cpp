@@ -49,7 +49,11 @@ CManager::CManager()
 	m_camera = nullptr;
 	m_scene_manager = nullptr;
 	m_texture = nullptr;
-	m_player_ingredient_data = nullptr;
+	for (int nPlayer = 0; nPlayer < MAX_PLAYER; nPlayer++)
+	{
+		m_player_ingredient_data[nPlayer] = nullptr;
+
+	}
 	m_directInput = nullptr;
 	m_hwnd = NULL;
 	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
@@ -110,11 +114,15 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 		m_texture->Init();
 	}
 
-	//プレイヤーの具材情報クラス
-	if (!m_player_ingredient_data)
+	for (int nPlayer = 0; nPlayer < MAX_PLAYER; nPlayer++)
 	{
-		m_player_ingredient_data = CPlayer_ingredient_data::Create();
+		//プレイヤーの具材情報クラス
+		if (!m_player_ingredient_data[nPlayer])
+		{
+			m_player_ingredient_data[nPlayer] = CPlayer_ingredient_data::Create();
+		}
 	}
+
 
 	// シーンマネージャークラスの生成
 	m_scene_manager = new CSceneManager;

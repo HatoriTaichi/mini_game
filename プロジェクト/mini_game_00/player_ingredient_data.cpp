@@ -38,6 +38,7 @@ HRESULT CPlayer_ingredient_data::Init(void)
 //=============================================================================
 void CPlayer_ingredient_data::Uninit(void)
 {
+	m_nGetIngredientsType.clear();
 
 }
 
@@ -63,7 +64,7 @@ CPlayer_ingredient_data *CPlayer_ingredient_data::Create(void)
 //=============================================================================
 void CPlayer_ingredient_data::SetIngredientsType(vector<int> nGetIngredientsType)
 {
-	int nSize = nGetIngredientsType.size();
+ 	int nSize = nGetIngredientsType.size();
 	for (int nCnt = 0; nCnt < nSize; nCnt++)
 	{
 		m_nGetIngredientsType.push_back(nGetIngredientsType[nCnt]);

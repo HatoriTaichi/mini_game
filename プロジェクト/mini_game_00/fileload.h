@@ -62,6 +62,17 @@ public:
 
 	typedef struct
 	{
+		vector<D3DXVECTOR3> pos;	// 位置
+		vector<D3DXVECTOR3> rot;	// 回転
+		vector<float> radius_x_or_z;	// 半径XかZ
+		vector<float> radius_y_or_z;	// 半径YかZ
+		vector<int> division_x_or_z;	// 分割数XかZ
+		vector<int> division_y_or_z;	// 分割数YかZ
+		int all_mesh;	// 総数
+	} STAGE_MESH_INFO;
+
+	typedef struct
+	{
 		vector<string> type;	// オブジェクトタイプ
 		vector<D3DXVECTOR3> pos;	// 位置
 		vector<D3DXVECTOR3> rot;	// 回転
@@ -79,6 +90,7 @@ public:
 	{
 		vector<STAGE_SPAWN_INFO> spawn_info;	// スポーン情報
 		vector<STAGE_MODEL_INFO> stage_model;	// ステージ配置モデル
+		vector<STAGE_MESH_INFO> mesh_info;	// メッシュ情報
 	} STAGE_INFO;
 
 	CFileLoad();		//コンストラクタ
@@ -87,8 +99,9 @@ public:
 	static vector<string> LoadTxt(string load_file);	// テキストロード
 	static PAS_AND_NAME_DATA CreatePasAndNameElement(vector<string> all_file_info, string load_file);	// パスと名前の取得
 	static MODEL_INFO CreateHierarchyMotion(vector<string> all_file_info, string file_name);	// 階層とモーションのデータ
-	static STAGE_MODEL_INFO CreateStageInfo(vector<string> all_file_info);	// ステージ配置情報に分解
-	static STAGE_SPAWN_INFO CreateSpawnInfo(vector<string> all_file_info);	// ステージ配置情報に分解
+	static STAGE_MODEL_INFO CreateStageModelInfo(vector<string> all_file_info);	// ステージ配置情報に分解
+	static STAGE_MESH_INFO CreateStageMeshInfo(vector<string> all_file_info);	// メッシュ情報に分解
+	static STAGE_SPAWN_INFO CreateSpawnInfo(vector<string> all_file_info);	// スポーン位置情報に分解
 
 private:
 
