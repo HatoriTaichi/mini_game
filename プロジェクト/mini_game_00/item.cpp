@@ -80,7 +80,7 @@ void CItem::Update(void)
 	{
 	case CItem::ImmediatelyAfterPop:
 		m_pos.y -= ItemFallSpeed;
-		if (m_pos.y <= 0.0f)
+		if (m_pos.y <= 50.0f)
 		{
 			m_state = Normal;
 		}

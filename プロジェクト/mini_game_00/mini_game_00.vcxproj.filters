@@ -31,6 +31,9 @@
     <Filter Include="ソース ファイル\ゲームシーン">
       <UniqueIdentifier>{3954b7fa-6891-4211-a431-1e7342d2b105}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\床">
+      <UniqueIdentifier>{60a6cca4-ded3-43f1-9be4-d147a7fef62b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -132,6 +135,9 @@
     <ClInclude Include="game.h">
       <Filter>ソース ファイル\ゲームシーン</Filter>
     </ClInclude>
+    <ClInclude Include="field.h">
+      <Filter>ソース ファイル\床</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -232,6 +238,9 @@
     </ClCompile>
     <ClCompile Include="game.cpp">
       <Filter>ソース ファイル\ゲームシーン</Filter>
+    </ClCompile>
+    <ClCompile Include="field.cpp">
+      <Filter>ソース ファイル\床</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

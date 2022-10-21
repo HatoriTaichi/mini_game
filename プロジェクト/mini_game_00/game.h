@@ -41,7 +41,7 @@ private:
 	vector<D3DXVECTOR3> m_IngredientsSpawnPoint;//具材のスポーンポイント
 	vector<D3DXVECTOR3> m_ItemSpawnPoint;//アイテムのスポーンポイント
 	GameMode m_Mode;//ゲーム中のモード
-	CPlayer *m_player[MaxPlayer];
+	CPlayer *m_pPlayer[MaxPlayer];
 	int *m_NumIngredientsSpawnPoint;
 	int *m_NumItemSpawnPoint;
 	int m_MaxIngredientsSpawn;

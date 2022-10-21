@@ -8,7 +8,6 @@
 // インクルード
 //=============================================================================
 #include "game.h"
-#include "meshfloo.h"
 #include "keyinput.h"
 #include "fade.h"
 #include "singlemodel.h"
@@ -17,6 +16,8 @@
 #include "enemy.h"
 #include "ingredients.h"
 #include "item.h"
+#include "wall.h"
+#include "field.h"
 static const int IngredientsSpawnInterval = 30 * 60;
 static const int NormalItemSpawnInterval = 17 * 60;
 static const int ClimaxItemSpawnInterval = 12 * 60;
@@ -66,14 +67,14 @@ HRESULT CGame::Init(void)
 {
 	CMeshsphere::Create(D3DXVECTOR3(0.0f, 10.0f, 0.0f), D3DXVECTOR3(0.0f, 10.0f, 0.0f), 32, 32, 5200, "Sky.jpg");
 	//プレイヤーの生成
-	if (!m_player[0])
+	if (!m_pPlayer[0])
 	{
-		m_player[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+		m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 			D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt");
 	}
-	if (!m_player[1])
+	if (!m_pPlayer[1])
 	{
-		m_player[1] = CPlayer::Create(D3DXVECTOR3(100.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+		m_pPlayer[1] = CPlayer::Create(D3DXVECTOR3(100.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 			D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt");
 	}
 	//CEnemy::Create(D3DXVECTOR3(0.0f, 0.0f, 200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/motion.txt");
@@ -122,6 +123,32 @@ HRESULT CGame::Init(void)
 			CSingleModel::Create(Stage.stage_model[nCountModelInfo].pos[nCountModel], Stage.stage_model[nCountModelInfo].rot[nCountModel], D3DXVECTOR3(1.0f, 1.0f, 1.0f), Stage.stage_model[nCountModelInfo].type[nCountModel], CObject::OBJTYPE::BLOCK);
 		}
 	}
+	// パスと名前を取得
+	Stage.mesh_info.push_back(CFileLoad::CreateStageMeshInfo(TextElement));
+
+	int StageWallSize = Stage.mesh_info[0].all_wall_mesh;
+	//壁の生成
+	for (int nWall = 0; nWall < StageWallSize; nWall++)
+	{
+		CWall::Create(Stage.mesh_info[0].pos["WALLSET"][nWall], 
+		{ Stage.mesh_info[0].radius_x_or_z["WALLSET"][nWall],
+			Stage.mesh_info[0].radius_y_or_z["WALLSET"][nWall],0.0f },
+			Stage.mesh_info[0].rot["WALLSET"][nWall],
+			Stage.mesh_info[0].division_x_or_z["WALLSET"][nWall],
+			Stage.mesh_info[0].division_y_or_z["WALLSET"][nWall], "wood_wall.jpg");
+	}
+	int StageFloorSize = Stage.mesh_info[0].all_floor_mesh;
+	//床の生成
+	for (int nFloor = 0; nFloor < StageFloorSize; nFloor++)
+	{
+		CField::Create(Stage.mesh_info[0].pos["FIELDSET"][nFloor], { Stage.mesh_info[0].radius_x_or_z["FIELDSET"][nFloor] ,
+			0.0f,
+			Stage.mesh_info[0].radius_y_or_z["FIELDSET"][nFloor] },
+			{ 0.0f,0.0f,0.0f },
+			Stage.mesh_info[0].division_x_or_z["FIELDSET"][nFloor],
+			Stage.mesh_info[0].division_y_or_z["FIELDSET"][nFloor],
+			"wooden_floor.png");
+	}
 	EnemySpawn();
 	return S_OK;
 }
@@ -133,10 +160,10 @@ void CGame::Uninit(void)
 {
 	for (int nPlayer = 0; nPlayer < MaxPlayer; nPlayer++)
 	{
-		if (m_player[nPlayer])
+		if (m_pPlayer[nPlayer])
 		{
-			m_player[nPlayer]->Uninit();
-			m_player[nPlayer] = nullptr;
+			m_pPlayer[nPlayer]->Uninit();
+			m_pPlayer[nPlayer] = nullptr;
 		}
 	}
 	//オブジェクトの破棄

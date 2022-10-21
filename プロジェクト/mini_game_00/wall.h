@@ -52,6 +52,7 @@ public:
 	void SetSize(D3DXVECTOR3 size);//ì‡ïîÉfÅ[É^ÇæÇØîΩâf
 	void SetPos(D3DXVECTOR3 pos) { m_pos = pos; }
 	bool Collision(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pLastpos, float fRadius);
+	bool Collision2(D3DXVECTOR3 pos, D3DXVECTOR3 lastpos, float fRadius);
 	void SetMoveTex(float fSpeedX, float fSpeedY);
 	void SetCol(float fAlpha);
 	WallData GetWallData() { return m_WallData; }

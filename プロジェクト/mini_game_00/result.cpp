@@ -69,7 +69,7 @@ void CResult::Uninit(void)
 {
 	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
 	{
-		int nIngredientMax = CManager::GetInstance()->GetPlayer_ingredient_data(0)->GetIngredientsType().size();
+		int nIngredientMax = CManager::GetInstance()->GetPlayer_ingredient_data(nCntPlayer)->GetIngredientsType().size();
 		int nSize = m_pIngredient[nCntPlayer].size();
 		if (nIngredientMax != 0&& nSize!=0)
 		{

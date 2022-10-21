@@ -159,6 +159,7 @@
     <ClInclude Include="directinput.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="fade.h" />
+    <ClInclude Include="field.h" />
     <ClInclude Include="fileload.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="ingredients.h" />
@@ -194,6 +195,7 @@
     <ClCompile Include="directinput.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="fade.cpp" />
+    <ClCompile Include="field.cpp" />
     <ClCompile Include="fileload.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="ingredients.cpp" />

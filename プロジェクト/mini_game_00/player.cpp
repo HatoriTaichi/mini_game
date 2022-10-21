@@ -19,6 +19,7 @@
 #include "enemy.h"
 #include "player_ingredient_data.h"
 #include "scenemanager.h"
+#include "wall.h"
 static const float MoveSpeed = 3.0f;
 static const float SpeedUpDiameter = 1.5f;//スピードアップ倍率
 static const float PossibleAttackSpeedUpDiameter = 1.2f;//攻撃可能時のスピードアップ倍率
@@ -205,6 +206,19 @@ void CPlayer::Update(void)
 			m_model[count_model]->Update();
 		}
 	}
+	//壁との当たり判定
+	vector<CObject *>ObjWall = CObject::GetObjTypeObject(CObject::OBJTYPE::WALL);
+	int nWallSize = ObjWall.size();
+	if (nWallSize != 0)
+	{
+		for (int nCntWall = 0; nCntWall < nWallSize; nCntWall++)
+		{
+			CWall *pWall = static_cast<CWall*>(ObjWall[nCntWall]);
+			pWall->Collision(&m_pos, &m_posold, NoDropSize);
+
+		}
+	}
+
 	for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
 	{
 		m_bDrop[nCnt] = true;
