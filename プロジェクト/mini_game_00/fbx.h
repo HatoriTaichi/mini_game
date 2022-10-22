@@ -20,6 +20,39 @@
 class CFbx
 {
 public:
+	struct MESH_INFO
+	{
+		vector<D3DXVECTOR4> vertex_max_ary;
+		vector<D3DXVECTOR4> vertex_min_ary;
+		vector<D3DXVECTOR3> normal_ary;
+		vector<D3DXCOLOR> color_ary;
+		vector<D3DXVECTOR2> uv_ary;
+		vector<int> index_number;
+		vector<D3DXMATERIAL> material;
+		vector<LPDIRECT3DVERTEXBUFFER9> vtx_buff;
+		vector<LPDIRECT3DINDEXBUFFER9> idx_buff;
+		vector<LPDIRECT3DTEXTURE9> tex;
+	};
+	struct ANIMATION_INFO
+	{
+		string anim_name;
+		FbxTime::EMode frame_info;
+		vector<vector<D3DXMATRIX>> frame_mat;
+		int start;
+		int stop;
+	};
+	struct CLUSTER_INFO
+	{
+		FbxCluster *cluster;
+		pair<vector<int>, vector<double>> index_weight;
+	};
+	struct SKIN_INFO
+	{
+		vector<FbxSkin*> skin;
+		vector<CLUSTER_INFO> cluster;
+		vector<ANIMATION_INFO> anim;
+	};
+
 	CFbx();	//コンストラクタ
 	~CFbx();	//デストラクタ
 	HRESULT Init(void);	// テクスチャの生成
@@ -32,15 +65,15 @@ public:
 private:
 	void RecursiveNode(FbxNode *node);
 	void GetMesh(FbxNodeAttribute *attrib);
-	void GetIndex(FbxMesh *mesh);
-	void GetVertex(FbxMesh *mesh);
-	void GetNormal(FbxMesh *mesh);
-	void GetColor(FbxMesh *mesh);
-	void GetUv(FbxMesh *mesh);
-	void GetMaterial(FbxMesh *mesh);
-	void GetTexture(FbxSurfaceMaterial *material);
-	void GetAnimInfo(FbxMesh *mesh);
+	void GetIndex(FbxMesh *mesh, MESH_INFO *mesh_info);
+	void GetVertex(FbxMesh *mesh, MESH_INFO *mesh_info);
+	void GetNormal(FbxMesh *mesh, MESH_INFO *mesh_info);
+	void GetColor(FbxMesh *mesh, MESH_INFO *mesh_info);
+	void GetUv(FbxMesh *mesh, MESH_INFO *mesh_info);
+	void GetMaterial(FbxMesh *mesh, MESH_INFO *mesh_info);
+	void GetTexture(FbxSurfaceMaterial *material, MESH_INFO *mesh_info);
 	void GetBone(FbxMesh *mesh);
+	void GetAnimationInfo(void);
 	void NoBoneAnim(FbxMesh *mesh);
 	void BoneAnim(FbxMesh *mesh, int mesh_count);
 	void UpdateRotate(FbxMesh *mesh, int mesh_count);
@@ -54,18 +87,12 @@ private:
 	FbxManager *m_manager;
 	FbxImporter *m_importer;
 	FbxScene *m_scene;
-	vector<vector<D3DXVECTOR4>> m_vertex_ary;
+	vector<MESH_INFO*> m_mesh_info;
+	SKIN_INFO m_skin_info;
 	vector<vector<D3DXVECTOR4>> m_anim_vertex_ary;
 	vector<vector<D3DXVECTOR4>> m_anim_vertex_init_ary;
-	vector<vector<D3DXVECTOR3>> m_normal_ary;
-	vector<vector<D3DXCOLOR>> m_color_ary;
-	vector<vector<D3DXVECTOR2>> m_uv_ary;
-	vector<vector<D3DXMATERIAL>> m_material;
-	vector<vector<LPDIRECT3DTEXTURE9>> m_tex;
 	vector<vector<vector<FbxAMatrix>>> m_anim_mat;
-	vector<vector<int>> m_index_number;
-	vector<LPDIRECT3DVERTEXBUFFER9> m_vtx_buff;
-	vector<LPDIRECT3DINDEXBUFFER9> m_idx_buff;
+	vector<pair<vector<int>, vector<vector<int>>>> m_index_to_vertex;
 	vector<FbxMesh*> m_mesh;
 	vector<FbxTakeInfo*> m_anim_info;
 	vector<pair<vector<int>, vector<double>>> m_index_weight;
