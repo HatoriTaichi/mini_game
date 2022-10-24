@@ -44,11 +44,11 @@ public:
 	bool Collision(const D3DXVECTOR3& pos, float fSize);
 	static CEnemy *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, string motion_pas);	// 生成
 	D3DXVECTOR3 GetPos(void) { return m_pos; }	// ゲッダー
+	D3DXVECTOR3 GetPosOld(void) { return m_posold; }	// ゲッダー
 	D3DXVECTOR3 GetRot(void) { return m_rot; }	// ゲッダー
 	vector<CModel*> GetModel(void) { return m_model; }	// ゲッダー
 
 private:
-	void KeyMove(void);//移動処理
 
 	void Move(void);//移動処理
 	void CreateModel(void);	// モデルの生成
@@ -68,6 +68,9 @@ private:
 	D3DXVECTOR3 m_scale;	// スケール
 	D3DXMATRIX m_mtx_wold;	// ワールドマトリックス
 	int m_nFacing;//向いてる方向
+	int m_nAutoSwingTimer;
+	int m_nAutoSwingMaxTime;
+
 };
 
 #endif

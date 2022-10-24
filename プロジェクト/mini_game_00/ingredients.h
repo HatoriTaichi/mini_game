@@ -33,6 +33,16 @@ public:
 		Salami,//サラミ
 		Max
 	};
+	enum IngredientsState
+	{
+		ImmediatelyAfterPop=0,//出現直後
+		StateDrop,
+		Normal,
+		EndType1,
+		EndType2,
+		EndType3,
+		StateMax
+	};
 	struct IngredientsData
 	{
 		CModel* m_IngredientModel[IngredientsMax];	// 具材モデル
@@ -44,6 +54,7 @@ public:
 	void Uninit(void);	// ポリゴンの終了
 	void Update(void);	// ポリゴンの更新
 	void Draw(void);	// ポリゴンの描画
+	void Drawtext(void);
 	void Drop(void);//具材がステージに落ちる処理
 	void DoDrop(bool bDo,float fRotY);
 	void Motion(void);//ちょっとした動きの処理
@@ -55,7 +66,7 @@ public:
 		D3DXVECTOR3 scale, IngredientsType nType);	// 生成（ステージ生成用）
 	D3DXVECTOR3 GetPos(void) { return m_pos; }	// ゲッダー
 	D3DXVECTOR3 GetRot(void) { return m_rot; }	// ゲッダー
-
+	IngredientsType GetType() { return m_Type; }
 private:
 	D3DXVECTOR3 m_pos;	// 位置
 	D3DXVECTOR3 m_oldPos;	// 前回の位置
@@ -64,7 +75,11 @@ private:
 	D3DXMATRIX m_mtx_wold;	// ワールドマトリックス
 	IngredientsType m_Type;//具材の種類
 	IngredientsData m_Data;
+	IngredientsState m_State;
 	int m_nNumDropType;//何番目にドロップしたかを記録
+	int m_nTimer;
+	int m_nFlashingTimer;
+	bool m_bFlash;
 	float m_fDropMoveSpeed;
 	float m_fUpDown;//上下動く用の増減変数
 	bool m_bUpDown;

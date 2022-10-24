@@ -17,7 +17,8 @@
 #include "camera.h"
 #include "scenemanager.h"
 #include "model.h"
-
+#include "directinput.h"
+#include "player_ingredient_data.h"
 //=============================================================================
 // マクロ定義
 //=============================================================================
@@ -27,7 +28,7 @@
 #define LIGHT_DIR_00 (D3DXVECTOR3(0.2f, -0.8f, 0.4f))	// ライトの向き
 #define LIGHT_DIR_01 (D3DXVECTOR3(0.0f, -1.0f, 0.0f))	// ライトの向き
 #define LIGHT_DIR_02 (D3DXVECTOR3(-0.2f, 0.8f, -0.4f))	// ライトの向き
-#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 755.0f, 0.0f))	// カメラの位置
+#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 1005.0f, -100.0f))	// カメラの位置
 #define CAMERA_POS_R (D3DXVECTOR3(0.0f, 0.0f, 0.0f))	// カメラの注視点
 #define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(0.0f), D3DXToRadian(180.0f),D3DXToRadian(0.0f)))	// カメラの向き
 
@@ -35,14 +36,6 @@
 // 静的メンバ変数宣言
 //=============================================================================
 CManager *CManager::m_single_manager;
-CMouse *CManager::m_mouse;
-CKey *CManager::m_key;
-CRenderer *CManager::m_renderer;
-CCamera *CManager::m_camera;
-CSceneManager *CManager::m_scene_manager;
-CLight *CManager::m_light[MAX_LIGHT];
-CTexture *CManager::m_texture;
-HWND CManager::m_hwnd;
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -56,6 +49,12 @@ CManager::CManager()
 	m_camera = nullptr;
 	m_scene_manager = nullptr;
 	m_texture = nullptr;
+	for (int nPlayer = 0; nPlayer < MAX_PLAYER; nPlayer++)
+	{
+		m_player_ingredient_data[nPlayer] = nullptr;
+
+	}
+	m_directInput = nullptr;
 	m_hwnd = NULL;
 	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
 	{
@@ -95,7 +94,12 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	{
 		m_key->Init(hInstance, hWnd);
 	}
-
+	//directinputの生成
+	if (m_directInput == NULL)
+	{
+		m_directInput = new CDirectInput;
+		m_directInput->Init(hInstance, hWnd);
+	}
 	// マウスクラスの生成
 	m_mouse = new CMouse;
 	if (m_mouse != nullptr)
@@ -109,6 +113,16 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	{
 		m_texture->Init();
 	}
+
+	for (int nPlayer = 0; nPlayer < MAX_PLAYER; nPlayer++)
+	{
+		//プレイヤーの具材情報クラス
+		if (!m_player_ingredient_data[nPlayer])
+		{
+			m_player_ingredient_data[nPlayer] = CPlayer_ingredient_data::Create();
+		}
+	}
+
 
 	// シーンマネージャークラスの生成
 	m_scene_manager = new CSceneManager;
@@ -132,7 +146,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	m_key->BindKey(CKey::KEYBIND::SPACE, DIK_SPACE);
 
 	// 初期シーン
-	m_scene_manager->SetMode(CSceneManager::MODE::TITLE);
+	m_scene_manager->ChangeScene(CSceneManager::MODE::GAME);
 
 	return S_OK;
 }
@@ -180,7 +194,13 @@ void CManager::Uninit(void)
 		delete m_key;
 		m_key = nullptr;
 	}
-
+	// ゲームパッドの破棄
+	if (m_directInput != NULL)
+	{
+		m_directInput->Uninit();
+		delete m_directInput;
+		m_directInput = NULL;
+	}
 	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
 	{
 		// ライトクラスの破棄
@@ -248,7 +268,11 @@ void CManager::Update(void)
 	{
 		m_key->Update();
 	}
-
+	//ゲームパッドのクラス
+	if (m_directInput != nullptr)
+	{
+		m_directInput->Update();
+	}
 	// マウスクラス
 	if (m_mouse != nullptr)
 	{

@@ -15,16 +15,22 @@
 #include "keyinput.h"
 #include "singlemodel.h"
 #include"player.h"
-#include"scenemanager.h"
 #include"game.h"
 static float fDropMoveSpeed = 8.0f;
-static const float FallSpeed = 10.0f;
+static const float FallSpeed = 5.0f;
 static const float UpLimit = 2.0f;
 static const float DownLimit = -2.0f;
 static const float UpDownSpeed = 0.1f;
 static const D3DXVECTOR3 IngredientsOfSet00 = {0.0f,20.0f,10.0f};
 static const D3DXVECTOR3 IngredientsOfSet01 = { -5.0f,25.0f,-10.0f };
 static const D3DXVECTOR3 IngredientsOfSet02 = { 5.0f,30.0f,-10.0f };
+static const int DeleteTime = 30*60;
+static const int EndTypeTime1 = 17 * 60;
+static const int EndTypeTime2 = 24 * 60;
+static const int EndTypeTime3 = 27 * 60;
+static const int EndTypeFlashTime1 = 15;
+static const int EndTypeFlashTime2 = 8;
+static const int EndTypeFlashTime3 = 4;
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -40,6 +46,9 @@ CIngredients::CIngredients(LAYER_TYPE layer) : CObject(layer)
 	}
 	m_Data.m_BasketModel = nullptr;
 	m_bDoDrop = false;
+	m_nTimer = 0;
+	m_bFlash = false;
+	m_nFlashingTimer = 0;
 }
 
 //=============================================================================
@@ -55,12 +64,15 @@ CIngredients::~CIngredients()
 //=============================================================================
 HRESULT CIngredients::Init(void)
 {
+	SetObjType(CObject::OBJTYPE::INGREDIENTS);
+
 	m_bUninit = false;
 	//具材のモデルを生成
 	if (!m_Data.m_BasketModel)
 	{
-		m_Data.m_BasketModel = CModel::Create("player body 1.x");
+		m_Data.m_BasketModel = CModel::Create("basket.x");
 	}
+
 
 	for (int nCnt = 0; nCnt < IngredientsMax; nCnt++)
 	{
@@ -134,19 +146,60 @@ void CIngredients::Uninit(void)
 //=============================================================================
 void CIngredients::Update(void)
 {
-	//ドロップするなら
-	if (m_bDoDrop)
+	m_nTimer++;
+
+	switch (m_State)
 	{
+	case CIngredients::IngredientsState::ImmediatelyAfterPop:
+		m_pos.y -= FallSpeed;
+		if (m_pos.y <= 0.0f)
+		{
+			m_State = Normal;
+		}
+		break;
+	case CIngredients::IngredientsState::StateDrop:
+		//当たり判定
 		Drop();
-	}
-	else
-	{
+		ColisionWall();
+
+		break;
+	case CIngredients::IngredientsState::Normal:
 		//ちょっとした動き
 		Motion();
 		ColisionPlayer();
+		if (m_nTimer >= EndTypeTime1)
+		{
+			m_State = EndType1;
+		}
+		break;
+	case CIngredients::IngredientsState::EndType1:
+		//ちょっとした動き
+		Motion();
+		ColisionPlayer();
+		if (m_nTimer >= EndTypeTime2)
+		{
+			m_State = EndType2;
+		}
+		break;
+	case CIngredients::IngredientsState::EndType2:
+		//ちょっとした動き
+		Motion();
+		ColisionPlayer();
+		if (m_nTimer >= EndTypeTime3)
+		{
+			m_State = EndType3;
+		}
+	case CIngredients::IngredientsState::EndType3:
+		//ちょっとした動き
+		Motion();
+		ColisionPlayer();
+
+		break;
 	}
-	//当たり判定
-	ColisionWall();
+	if (m_nTimer >= DeleteTime)
+	{
+		m_bUninit = true;
+	}
 	if (m_bUninit)
 	{
 		Uninit();
@@ -189,16 +242,50 @@ void CIngredients::Draw(void)
 	device->SetTransform(D3DTS_WORLD,
 		&m_mtx_wold);
 
-	if (m_Data.m_BasketModel)
+	switch (m_State)
 	{
-		m_Data.m_BasketModel->Draw();
-	}
-	for (int nCnt = 0; nCnt < IngredientsMax; nCnt++)
-	{
-		if (m_Data.m_IngredientModel[nCnt])
+	case CIngredients::EndType1:
+		m_nFlashingTimer++;
+
+		if (m_nFlashingTimer >= EndTypeFlashTime1)
 		{
-			m_Data.m_IngredientModel[nCnt]->Draw();
+			m_nFlashingTimer = 0;
+			m_bFlash = !m_bFlash;
 		}
+		break;
+	case CIngredients::EndType2:
+		m_nFlashingTimer++;
+
+		if (m_nFlashingTimer >= EndTypeFlashTime2)
+		{
+			m_nFlashingTimer = 0;
+			m_bFlash = !m_bFlash;
+		}
+		break;
+	case CIngredients::EndType3:
+		m_nFlashingTimer++;
+
+		if (m_nFlashingTimer >= EndTypeFlashTime3)
+		{
+			m_nFlashingTimer = 0;
+			m_bFlash = !m_bFlash;
+		}
+		break;
+	}
+	if (!m_bFlash)
+	{
+		if (m_Data.m_BasketModel)
+		{
+			m_Data.m_BasketModel->Draw();
+		}
+		for (int nCnt = 0; nCnt < IngredientsMax; nCnt++)
+		{
+			if (m_Data.m_IngredientModel[nCnt])
+			{
+				m_Data.m_IngredientModel[nCnt]->Draw();
+			}
+		}
+
 	}
 
 
@@ -224,7 +311,7 @@ void CIngredients::Drop(void)
 	m_pos.y += m_fFall;
 	if (m_pos.y <= 0.0f)
 	{
- 		m_bDoDrop = false;
+		m_State = Normal;
 		m_fDropRotY = 0.0f;
 	}
 
@@ -311,11 +398,16 @@ void CIngredients::ColisionPlayer(void)
 	int nSize = buf.size();
 	if (nSize != 0)
 	{
-		CPlayer *pPlayer = static_cast <CPlayer*> (buf[0]);
-		if (pPlayer->Collision(m_pos, 50.0f))
+		for (int nCnt = 0; nCnt < nSize; nCnt++)
 		{
-			m_bUninit = true;
+			CPlayer *pPlayer = static_cast <CPlayer*> (buf[nCnt]);
+			if (pPlayer->Collision(m_pos, 50.0f))
+			{
+				pPlayer->SetIngredients(m_Type);
+				m_bUninit = true;
+			}
 		}
+
 	}
 }
 //=============================================================================
@@ -338,6 +430,7 @@ CIngredients *CIngredients::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot,
 		Ingredients->m_bDoDrop = bDoDrop;
 		Ingredients->m_nNumDropType = DropNum;
 		Ingredients->m_Type = nType;
+		Ingredients->m_State = CIngredients::IngredientsState::StateDrop;
 		//ドロップの情報を入れる
 		if (Ingredients->m_bDoDrop)
 		{
@@ -364,6 +457,12 @@ CIngredients *CIngredients::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot,
 		Ingredients->m_rot = rot;
 		Ingredients->m_scale = scale;
 		Ingredients->m_Type = nType;
+		Ingredients->m_State = CIngredients::IngredientsState::ImmediatelyAfterPop;
+		//具材のモデルを生成
+		if (!Ingredients->m_Data.m_BasketModel)
+		{
+			Ingredients->m_Data.m_BasketModel = CModel::Create("basket.x");
+		}
 		// 初期化
 		Ingredients->Init();
 	}

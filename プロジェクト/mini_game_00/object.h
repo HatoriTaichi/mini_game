@@ -36,10 +36,12 @@ public:
 	enum class OBJTYPE
 	{
 		NONE = 0,	// 空のオブジェクト
-		MODEL,		//モデル
-		BLOCK,//障害物
-		PLAYER,//プレイヤー
-		ENEMY,	//エネミー
+		MODEL,	// モデル
+		BLOCK,	// 障害物
+		WALL,	// 障害物
+		PLAYER,	// プレイヤー
+		ENEMY,	// 敵
+		INGREDIENTS,	// 具材
 		MAX,
 	};
 
@@ -54,12 +56,10 @@ public:
 	static void DrawAll(void);	// 全描画
 	bool GetDeath(void) { return m_deth; }	// 死亡フラグのゲッダー
 	OBJTYPE GetObjType(void) { return m_obj_type; }	// オブジェクトタイプのゲッダー
-
-	static vector<CObject*> GetObject(const int &priority) { return m_object[priority]; }	// 全オブジェクトのゲッダー
-	static vector<CObject*> GetObjTypeObject(const OBJTYPE &ObjType);// 全オブジェクトのゲッダー
-
 	void SetObjType(const OBJTYPE &obj_type) { m_obj_type = obj_type; }	// オブジェクトタイプのセッター
 	void ChangeLayer(const int &next_layer);	// レイヤー変更処理
+	static vector<CObject*> GetObject(const int &priority) { return m_object[priority]; }	// 全オブジェクトのゲッダー
+	static vector<CObject*> GetObjTypeObject(const OBJTYPE &ObjType);	// 全オブジェクトのゲッダー
 
 private:
 	static vector<CObject*> m_object[(int)LAYER_TYPE::MAX];	// オブジェクト

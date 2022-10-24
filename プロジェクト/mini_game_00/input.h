@@ -25,9 +25,9 @@ public:
 	virtual void Update(void) = 0;	// 更新
 
 protected:
-	static LPDIRECTINPUT8	m_input;	// directinputデバイス
-	static LPDIRECTINPUTDEVICE8    m_joy_stick;	// ジョイスティック用デバイス
-	LPDIRECTINPUTDEVICE8	m_device;	// 各デバイス
+	static LPDIRECTINPUT8 m_input;	// directinputデバイス
+	static LPDIRECTINPUTDEVICE8 m_joy_stick;	// ジョイスティック用デバイス
+	LPDIRECTINPUTDEVICE8 m_device;	// 各デバイス
 };
 
 #endif

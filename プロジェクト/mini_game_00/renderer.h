@@ -29,11 +29,10 @@ public:
 	void Update(void);	// 更新
 	void Draw(void);	// 描画
 	LPDIRECT3DDEVICE9 GetDevice(void) { return m_pD3DDevice; }	// デバイスの取得
-	LPD3DXFONT GetFont(void) { return m_pFont; }
+	LPD3DXFONT GetFont(void) { return m_pFont; }	// フォント
 private:
 #ifdef _DEBUG
 	void DrawFPS(void);
-	void DrawFrame(void);
 #endif //!_DEBUG
 	LPDIRECT3D9	m_pD3D;	// Direct3Dオブジェクト
 	LPDIRECT3DDEVICE9	m_pD3DDevice;	// Deviceオブジェクト(描画に必要)

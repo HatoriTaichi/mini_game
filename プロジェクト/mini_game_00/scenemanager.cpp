@@ -11,13 +11,14 @@
 #include "title.h"
 #include "game.h"
 #include "fade.h"
-
+#include "result.h"
 //=============================================================================
 // 静的メンバ変数宣言
 //=============================================================================
 CFade *CSceneManager::m_fade;
 CTitle *CSceneManager::m_title;
 CGame *CSceneManager::m_game;
+CResult *CSceneManager::m_result;
 CSceneManager::MODE CSceneManager::m_mode;
 
 //=============================================================================
@@ -27,6 +28,7 @@ CSceneManager::CSceneManager()
 {
 	m_title = nullptr;
 	m_game = nullptr;
+	m_result = nullptr;
 	m_mode = CSceneManager::MODE::TITLE;
 }
 
@@ -61,6 +63,7 @@ void CSceneManager::Uninit(void)
 	// シーンの破棄
 	m_title = nullptr;
 	m_game = nullptr;
+	m_result = nullptr;
 
 	// フェードクラスの破棄
 	if (m_fade != nullptr)
@@ -113,6 +116,13 @@ void CSceneManager::SetMode(MODE mode)
 		}
 		break;
 	case MODE::RESULT:
+		// nullチェック
+		if (m_result != nullptr)
+		{
+			// 終了処理
+			m_result->Uninit();
+			m_result = nullptr;
+		}
 		break;
 	default:
 		break;
@@ -152,6 +162,17 @@ void CSceneManager::SetMode(MODE mode)
 		}
 		break;
 	case MODE::RESULT:
+		// nullチェック
+		if (m_result == nullptr)
+		{
+			m_result = new CResult;
+			// nullチェック
+			if (m_result != nullptr)
+			{
+				// 初期化
+				m_result->Init();
+			}
+		}
 		break;
 	}
 }

@@ -5,5 +5,8 @@
 PLAYERMODEL_FILENAME = data/MODEL/player_body_1.x	# [00]体
 //ステージに配置するモデル
 OBJECTMODEL_FILENAME = data/MODEL/table.x			# [0]チーズタルトの床
+OBJECTMODEL_FILENAME = data/MODEL/basket.x			# [0]チーズタルトの床
+OBJECTMODEL_FILENAME = data/MODEL/crystal.x			# [0]チーズタルトの床
+OBJECTMODEL_FILENAME = data/MODEL/player_body_2.x			# [0]チーズタルトの床
 
 END_SCRIPT
