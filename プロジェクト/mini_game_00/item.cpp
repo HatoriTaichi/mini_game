@@ -19,12 +19,22 @@ static const float ItemUpLimit = 2.0f;
 static const float ItemDownLimit = -2.0f;
 static const float ItemUpDownSpeed = 0.1f;
 static const float ItemHitSize = 50.0f;
+static const int ItemEndTypeTime1 = 8 * 60;
+static const int ItemEndTypeTime2 = 12 * 60;
+static const int ItemEndTypeTime3 = 14 * 60;
+static const int ItemEndTypeFlashTime1 = 15;
+static const int ItemEndTypeFlashTime2 = 8;
+static const int ItemEndTypeFlashTime3 = 4;
+static const int DeleteTime = 17 * 60;
 
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
 CItem::CItem(LAYER_TYPE layer) : CObject(layer)
 {
+	m_nTimer = 0;
+	m_bFlash = false;
+	m_nFlashingTimer = 0;
 
 }
 
@@ -76,6 +86,8 @@ void CItem::Uninit(void)
 //=============================================================================
 void CItem::Update(void)
 {
+	m_nTimer++;
+
 	switch (m_state)
 	{
 	case CItem::ImmediatelyAfterPop:
@@ -88,7 +100,38 @@ void CItem::Update(void)
 	case CItem::Normal:
 		Motion();
 		ColisionPlayer();
+		if (m_nTimer >= ItemEndTypeTime1)
+		{
+			m_state = EndType1;
+		}
 		break;
+	case CItem::EndType1:
+		//ちょっとした動き
+		Motion();
+		ColisionPlayer();
+		if (m_nTimer >= ItemEndTypeTime2)
+		{
+			m_state = EndType2;
+		}
+		break;
+	case CItem::EndType2:
+		//ちょっとした動き
+		Motion();
+		ColisionPlayer();
+		if (m_nTimer >= ItemEndTypeTime3)
+		{
+			m_state = EndType3;
+		}
+	case CItem::EndType3:
+		//ちょっとした動き
+		Motion();
+		ColisionPlayer();
+
+		break;
+	}
+	if (m_nTimer >= DeleteTime)
+	{
+		m_bUninit = true;
 	}
 	if (m_pItem)
 	{
@@ -135,6 +178,40 @@ void CItem::Draw(void)
 	//マトリックスの設定
 	device->SetTransform(D3DTS_WORLD,
 		&m_mtx_wold);
+
+	switch (m_state)
+	{
+	case CItem::EndType1:
+		m_nFlashingTimer++;
+
+		if (m_nFlashingTimer >= ItemEndTypeFlashTime1)
+		{
+			m_nFlashingTimer = 0;
+			m_bFlash = !m_bFlash;
+		}
+		break;
+	case CItem::EndType2:
+		m_nFlashingTimer++;
+
+		if (m_nFlashingTimer >= ItemEndTypeFlashTime2)
+		{
+			m_nFlashingTimer = 0;
+			m_bFlash = !m_bFlash;
+		}
+		break;
+	case CItem::EndType3:
+		m_nFlashingTimer++;
+
+		if (m_nFlashingTimer >= ItemEndTypeFlashTime3)
+		{
+			m_nFlashingTimer = 0;
+			m_bFlash = !m_bFlash;
+		}
+		break;
+	}
+
+	//画像の描画判定を設定
+	m_pItem->SwitchDraw(m_bFlash);
 }
 //=============================================================================
 // ちょっとした動きの処理

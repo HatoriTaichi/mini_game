@@ -34,6 +34,9 @@ public:
 	{
 		ImmediatelyAfterPop = 0,//出現直後
 		Normal,
+		EndType1,
+		EndType2,
+		EndType3,
 		StateMax
 	};
 	CItem(LAYER_TYPE Layer = LAYER_TYPE::LAYER_01);	// デフォルトコンストラクタ
@@ -60,6 +63,9 @@ private:
 	bool m_bUpDown;
 	bool m_bUninit;
 	float m_fFall;
+	int m_nTimer;
+	int m_nFlashingTimer;
+	bool m_bFlash;
 
 };
 
