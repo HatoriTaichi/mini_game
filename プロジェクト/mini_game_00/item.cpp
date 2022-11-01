@@ -57,10 +57,10 @@ HRESULT CItem::Init(void)
 	case CItem::Nown:
 		break;
 	case CItem::Speed:
-		m_pItem = CBillboard::Create(m_pos, m_scale, "data\\Texture\\Foods\\dough.jpg");
+		m_pItem = CBillboard::Create(m_pos, m_scale, "Speed_up000.png");
 		break;
 	case CItem::Attack:
-		m_pItem = CBillboard::Create(m_pos, m_scale, "data\\Texture\\Foods\\tomato.jpg");
+		m_pItem = CBillboard::Create(m_pos, m_scale, "AttackUnLock000.png");
 		break;
 
 	}

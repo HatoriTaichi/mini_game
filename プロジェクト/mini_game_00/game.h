@@ -16,6 +16,8 @@ static const int MaxPlayer = 2;
 // 前方宣言
 //*****************************************************************************
 class CPlayer;
+class CObject2D;
+class CCounter;
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
@@ -42,11 +44,17 @@ private:
 	vector<D3DXVECTOR3> m_ItemSpawnPoint;//アイテムのスポーンポイント
 	GameMode m_Mode;//ゲーム中のモード
 	CPlayer *m_pPlayer[MaxPlayer];
+	CObject2D *m_pBandUI;
+	CObject2D *m_pStartUI;
+	CObject2D *m_pFinishUI;
+	CObject2D *m_pLastSpurtUI;
+	CCounter *m_pGameTimer;//ゲームのたいまー
 	int *m_NumIngredientsSpawnPoint;
 	int *m_NumItemSpawnPoint;
 	int m_MaxIngredientsSpawn;
 	int m_MaxItemSpawn;
 	int m_MaxEnemySpawn;
+	int m_nGameTimeSeconds;//秒数を数えるやつ
 	int m_IngredientsSpawnTimer;//具材の出現タイマー
 	int m_ItemSpawnTimer;//アイテムの出現タイマー
 	int m_ItemSpawnInterval[ModeMax];//アイテムの出現間隔

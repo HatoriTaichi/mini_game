@@ -11,6 +11,7 @@
 // ヘッダファイルのインクルード
 //*****************************************************************************
 #include "main.h"
+#define MAX_INPUT_PLAYER (2)
 
 //*****************************************************************************
 // クラス定義
@@ -26,7 +27,7 @@ public:
 
 protected:
 	static LPDIRECTINPUT8 m_input;	// directinputデバイス
-	static LPDIRECTINPUTDEVICE8 m_joy_stick;	// ジョイスティック用デバイス
+	static LPDIRECTINPUTDEVICE8 m_joy_stick[MAX_INPUT_PLAYER];	// ジョイスティック用デバイス
 	LPDIRECTINPUTDEVICE8 m_device;	// 各デバイス
 };
 

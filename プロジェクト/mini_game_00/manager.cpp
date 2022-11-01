@@ -19,6 +19,7 @@
 #include "model.h"
 #include "directinput.h"
 #include "player_ingredient_data.h"
+#include "XInput.h"
 //=============================================================================
 // マクロ定義
 //=============================================================================
@@ -28,7 +29,7 @@
 #define LIGHT_DIR_00 (D3DXVECTOR3(0.2f, -0.8f, 0.4f))	// ライトの向き
 #define LIGHT_DIR_01 (D3DXVECTOR3(0.0f, -1.0f, 0.0f))	// ライトの向き
 #define LIGHT_DIR_02 (D3DXVECTOR3(-0.2f, 0.8f, -0.4f))	// ライトの向き
-#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 1005.0f, -100.0f))	// カメラの位置
+#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 1105.0f, -100.0f))	// カメラの位置
 #define CAMERA_POS_R (D3DXVECTOR3(0.0f, 0.0f, 0.0f))	// カメラの注視点
 #define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(0.0f), D3DXToRadian(180.0f),D3DXToRadian(0.0f)))	// カメラの向き
 
@@ -54,6 +55,7 @@ CManager::CManager()
 		m_player_ingredient_data[nPlayer] = nullptr;
 
 	}
+	m_xinput = nullptr;
 	m_directInput = nullptr;
 	m_hwnd = NULL;
 	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
@@ -99,6 +101,11 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	{
 		m_directInput = new CDirectInput;
 		m_directInput->Init(hInstance, hWnd);
+	}
+	//Xinput
+	if (!m_xinput)
+	{
+		m_xinput = new CXInput;
 	}
 	// マウスクラスの生成
 	m_mouse = new CMouse;
@@ -201,6 +208,11 @@ void CManager::Uninit(void)
 		delete m_directInput;
 		m_directInput = NULL;
 	}
+	if (m_xinput != nullptr) 
+	{
+		delete m_xinput;
+		m_xinput = nullptr;
+	}
 	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
 	{
 		// ライトクラスの破棄
@@ -272,6 +284,10 @@ void CManager::Update(void)
 	if (m_directInput != nullptr)
 	{
 		m_directInput->Update();
+	}
+	if (m_xinput != nullptr)
+	{
+		m_xinput->UpdateGamepad();
 	}
 	// マウスクラス
 	if (m_mouse != nullptr)

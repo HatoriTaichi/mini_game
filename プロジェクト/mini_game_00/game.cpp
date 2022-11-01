@@ -18,6 +18,8 @@
 #include "item.h"
 #include "wall.h"
 #include "field.h"
+#include "object2D.h"
+#include "counter.h"
 static const int IngredientsSpawnInterval = 30 * 60;
 static const int NormalItemSpawnInterval = 17 * 60;
 static const int ClimaxItemSpawnInterval = 12 * 60;
@@ -30,6 +32,16 @@ static const int NormalItemSpawnMax = 2;
 static const int ClimaxItemSpawnMin = 2;
 static const int ClimaxItemSpawnMax = 2;
 static const int EnemySpawnMax = 2;
+static const D3DXVECTOR3 BandUIPos = {SCREEN_WIDTH/2.0f,50.0f,0.0f};//ゲーム画面上部にある帯みたいなやつ
+static const D3DXVECTOR3 BandUISize = { SCREEN_WIDTH / 2.0f,50.0f,0.0f };//ゲーム画面上部にある帯みたいなやつ
+static const D3DXVECTOR3 GameTimerSize = { 35.0f,40.0f,0.0f };//ゲーム画面上部にある帯みたいなやつ
+static const D3DXVECTOR3 GameTimerPos = { SCREEN_WIDTH / 2.0f - 35.0f,50.0f,0.0f };//ゲーム画面上部にある帯みたいなやつ
+static const D3DXVECTOR3 StartSize = { 100.0f,40.0f,0.0f };//スタートUI
+static const D3DXVECTOR3 StartPos = { SCREEN_WIDTH / 2.0f,SCREEN_HEIGHT/2.0f,0.0f };//スタートUI
+static const D3DXVECTOR3 FinishSize = { 120.0f,40.0f,0.0f };//終了UI
+static const D3DXVECTOR3 FinishPos = { SCREEN_WIDTH / 2.0f,SCREEN_HEIGHT / 2.0f,0.0f };//終了UI
+static const D3DXVECTOR3 LastSpurtSize = { 150.0f,40.0f,0.0f };//ラストスパートUI
+static const D3DXVECTOR3 LastSpurtPos = { SCREEN_WIDTH+150.0f ,SCREEN_HEIGHT / 2.0f,0.0f };//ラストスパートUI
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -50,6 +62,12 @@ CGame::CGame(CObject::LAYER_TYPE layer) :CObject(layer)
 	m_NumIngredientsSpawnPoint = nullptr;
 	m_NumItemSpawnPoint = nullptr;
 	m_ItemSpawnTimer = NormalItemSpawnInterval;
+	m_pBandUI = nullptr;
+	m_pGameTimer = nullptr;
+	m_nGameTimeSeconds = 0;
+	m_pStartUI = nullptr;
+	m_pFinishUI = nullptr;
+	m_pLastSpurtUI = nullptr;
 }
 
 //=============================================================================
@@ -70,15 +88,42 @@ HRESULT CGame::Init(void)
 	if (!m_pPlayer[0])
 	{
 		m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-			D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt");
+			D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt",0);
 	}
 	if (!m_pPlayer[1])
 	{
 		m_pPlayer[1] = CPlayer::Create(D3DXVECTOR3(100.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-			D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt");
+			D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_2.txt",1);
 	}
 	//CEnemy::Create(D3DXVECTOR3(0.0f, 0.0f, 200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/motion.txt");
-
+	if (!m_pBandUI)
+	{
+		m_pBandUI = CObject2D::Create(BandUIPos, BandUISize, "national_flag.png");
+	}
+	//タイマー生成
+	if (!m_pGameTimer)
+	{
+		m_pGameTimer = CCounter::Create(GameTimerPos, GameTimerSize, 2, "Number000.png");
+		m_pGameTimer->SetCounterNum(90);
+	}
+	////スタートUIを生成
+	//if (!m_pStartUI)
+	//{
+	//	m_pStartUI = CObject2D::Create(StartPos, StartSize, "Start000.png");
+	//	m_pStartUI->SetCol({ 1.0,1.0,1.0,0.0 });
+	//}
+	////フィニッシュUIを生成
+	//if (!m_pFinishUI)
+	//{
+	//	m_pFinishUI = CObject2D::Create(FinishPos, FinishSize, "Finish000.png");
+	//	m_pFinishUI->SetCol({ 1.0,1.0,1.0,0.0 });
+	//}
+	//ラストスパートUIUIを生成
+	if (!m_pLastSpurtUI)
+	{
+		//m_pLastSpurtUI = CObject2D::Create(LastSpurtPos, LastSpurtSize, "lastspurt000.png");
+		//m_pLastSpurtUI
+	}
 	vector<string> TextElement;	// フォルダの保存バッファ
 	CFileLoad::STAGE_INFO Stage;
 	CFileLoad::STAGE_SPAWN_INFO Spawn;
@@ -178,7 +223,12 @@ void CGame::Update(void)
 	ItemSpawn();
 	IngredientsSpawn();
 	CKey *key = CManager::GetInstance()->GetKey();
-
+	m_nGameTimeSeconds++;
+	if (m_nGameTimeSeconds >= 60)
+	{
+		m_nGameTimeSeconds = 0;
+		m_pGameTimer->AddCounter(-1);
+	}
 	//if (key->GetTrigger(CKey::KEYBIND::W) == true)
 	//{
 	//	CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT);
@@ -203,7 +253,7 @@ void CGame::ItemSpawn(void)
 	{
 		std::random_device random;	// 非決定的な乱数生成器
 		std::mt19937_64 mt(random());// メルセンヌ・ツイスタの64ビット版、引数は初期シード
-		std::uniform_real_distribution<> randItemType(1, 2);
+		std::uniform_real_distribution<> randItemType(1, 3);
 		std::uniform_real_distribution<> randItemPosType(0, m_MaxItemSpawn);
 		bool *bOverlapPos = nullptr;
 		bOverlapPos = new bool[m_MaxItemSpawn];

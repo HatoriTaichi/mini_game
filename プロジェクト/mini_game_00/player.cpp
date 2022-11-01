@@ -15,12 +15,12 @@
 #include "keyinput.h"
 #include "ingredients.h"
 #include "singlemodel.h"
-#include "directinput.h"
+#include "XInput.h"
 #include "enemy.h"
 #include "player_ingredient_data.h"
 #include "scenemanager.h"
 #include "wall.h"
-static const float MoveSpeed = 3.0f;
+static const float MoveSpeed = 5.0f;
 static const float SpeedUpDiameter = 1.5f;//スピードアップ倍率
 static const float PossibleAttackSpeedUpDiameter = 1.2f;//攻撃可能時のスピードアップ倍率
 static const int SpeedUpTimeLimit = 60 * (5);//スピードアップ倍率
@@ -29,7 +29,6 @@ static const float NoDropSize = 35.0f;
 static const float DropDistance = 100.0f;
 static const float PlayerHitSize = 50.0f;
 static const int OperationAgainTime = 60;
-int CPlayer::m_nNumPlayer;
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -40,7 +39,6 @@ CPlayer::CPlayer(LAYER_TYPE layer) : CObject(layer)
 	memset(m_pColliNoDrop, NULL, sizeof(m_pColliNoDrop));
 	m_Speed = MoveSpeed;
 	m_moitonState = MotionState::NUTLARAL;
-	m_nNumPlayer++;//プレイヤー番号を増やす
 }
 
 //=============================================================================
@@ -101,7 +99,7 @@ HRESULT CPlayer::Init(void)
 void CPlayer::Uninit(void)
 {
 	//具材の情報を保存
-	CManager::GetInstance()->GetPlayer_ingredient_data(m_nNumPlayer-1)->SetIngredientsType(m_nGetIngredientsType);
+	CManager::GetInstance()->GetPlayer_ingredient_data(m_nNumPlayer)->SetIngredientsType(m_nGetIngredientsType);
 	// サイズの取得
 	int size = m_model.size();
 	for (int count_model = 0; count_model < size; count_model++)
@@ -163,7 +161,7 @@ void CPlayer::Update(void)
 		DropItem();
 	}
 	//テストで取得した具材を増やす処理
-	TestGetIngredients();
+	//TestGetIngredients();
 	//敵などに当たったら一定時間操作を聞かないようにする
 	if (m_bOperationLock)
 	{
@@ -177,7 +175,7 @@ void CPlayer::Update(void)
 	else
 	{
 		//移動処理
-		//KeyMove();
+		KeyMove();
 		PadMove();
 		vector<CObject *>ObjEnemy = CObject::GetObjTypeObject(CObject::OBJTYPE::ENEMY);
 		{
@@ -192,6 +190,30 @@ void CPlayer::Update(void)
 						//具材ドロップを可能にする
 						m_bCanDrop = true;
 						m_bOperationLock = true;
+					}
+				}
+			}
+		}
+		//攻撃可能な状態で相手プレイヤーに当たると具材を落とす
+		if (m_ItemState == PossibleAttack)
+		{
+			vector<CObject *>ObjPlayer = CObject::GetObjTypeObject(CObject::OBJTYPE::PLAYER);
+			{
+				int nSize = ObjPlayer.size();
+				if (nSize != 0)
+				{
+					for (int nCnt = 0; nCnt < nSize; nCnt++)
+					{
+						CPlayer *pPlayer = static_cast<CPlayer*>(ObjPlayer[nCnt]);
+						//取得したプレイヤー番号が自分と違ったら
+						if (pPlayer->GetPlayerNum() != m_nNumPlayer)
+						{
+							if (pPlayer->Collision(m_pos, PlayerHitSize))
+							{
+								pPlayer->SetDropState();
+							}
+						}
+					
 					}
 				}
 			}
@@ -345,13 +367,30 @@ void CPlayer::Drawtext(void)
 	char str[3000];
 	int nNum = 0;
 
+	CXInput *pXinput = CManager::GetInstance()->GetXInput();
+	CXInput::GAMEPAD *GamePad = pXinput->GetGamePad();
+	D3DXVECTOR2 ThumbLNor = { (float)GamePad->m_state[m_nNumPlayer].Gamepad.sThumbLX ,(float)GamePad->m_state[m_nNumPlayer].Gamepad.sThumbLY };
+
+	D3DXVECTOR2 ThumbL = { (float)GamePad->m_state[m_nNumPlayer].Gamepad.sThumbLX ,(float)GamePad->m_state[m_nNumPlayer].Gamepad.sThumbLY };
+
+	D3DXVec2Normalize(&ThumbL, &ThumbL);
+
+	float fLength = (float)sqrt(ThumbL.x  * ThumbL.x +
+		ThumbL.y * ThumbL.y);
+
 	nNum = sprintf(&str[0], "\n\n 情報 \n");
 	int nSize = m_nGetIngredientsType.size();
 	for (int nCnt = 0; nCnt < nSize; nCnt++)
 	{
 		nNum += sprintf(&str[nNum], " [Ingredients%d] %d\n", nCnt, m_nGetIngredientsType[nCnt]);
-
 	}
+	nNum += sprintf(&str[nNum], " [numPlayer] %d\n",m_nNumPlayer);
+	nNum += sprintf(&str[nNum], " [fLength] %.6f\n", fLength);
+	nNum += sprintf(&str[nNum], " [sThumbLY] %.2f\n", ThumbL.y);
+	nNum += sprintf(&str[nNum], " [sThumbLX] %.2f\n", ThumbL.x);
+	nNum += sprintf(&str[nNum], " [sThumbLYNor] %.6f\n", ThumbLNor.y);
+	nNum += sprintf(&str[nNum], " [sThumbLXNor] %.6f\n", ThumbLNor.x);
+
 	//vector<CObject *>Obj = CObject::GetObjTypeObject(CObject::OBJTYPE::INGREDIENTS);
 	//{
 	//	int nSize = Obj.size();
@@ -416,25 +455,24 @@ void CPlayer::PadMove(void)
 	float fRot_Yx = 0.0f;
 	float fRot_Yz = 0.0f;
 	float rot_y = 0.0f;
+
 	D3DXVECTOR3 pos;
-	//DirectInputのゲームパッドの取得
-	CDirectInput *pGamePad = CManager::GetInstance()->GetDirectInput();
-	//ゲームパッドのボタン情報の取得
-	DIJOYSTATE2 GamePad = pGamePad->GetJoyState(m_nNumPlayer-1);
-
-	//前に進む
-
-	if ((float)GamePad.lX >= MAX_DEAD_ZOON || (float)GamePad.lY >= MAX_DEAD_ZOON ||
-		(float)GamePad.lX <= -MAX_DEAD_ZOON || (float)GamePad.lY <= -MAX_DEAD_ZOON)
+	
+	CXInput *pXinput = CManager::GetInstance()->GetXInput();
+	CXInput::GAMEPAD *GamePad = pXinput->GetGamePad();
+		if ((float)GamePad->m_state[m_nNumPlayer].Gamepad.sThumbLX >= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE || (float)GamePad->m_state[m_nNumPlayer].Gamepad.sThumbLY >= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ||
+		(float)GamePad->m_state[m_nNumPlayer].Gamepad.sThumbLX <= -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE || (float)GamePad->m_state[m_nNumPlayer].Gamepad.sThumbLY <= -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 	{
 		//移動モーションにする
 		m_moitonState = MotionState::RUN;
 			//スティックの傾きの長さを求める
-		fLength = (float)sqrt(GamePad.lX * GamePad.lX + GamePad.lY * GamePad.lY);
-		fLength = fLength / 1000.f;
-		float fRot = atan2f(-(float)GamePad.lX, (float)GamePad.lY);
-		//float fRot = atan2f(pXInput->GetGamePad()->m_state.Gamepad.sThumbLX, pXInput->GetGamePad()->m_state.Gamepad.sThumbLY);
+		D3DXVECTOR2 ThumbL = { (float)GamePad->m_state[m_nNumPlayer].Gamepad.sThumbLX ,(float)GamePad->m_state[m_nNumPlayer].Gamepad.sThumbLY };
+		D3DXVec2Normalize(&ThumbL, &ThumbL);
+		float fLength = (float)sqrt(ThumbL.x  * ThumbL.x +
+			ThumbL.y * ThumbL.y);
+		float fRot = atan2f(-(float)ThumbL.x, -(float)ThumbL.y);
 		rot_y = fRot;
+		m_rot.y = fRot;
 		m_pos.x -= (sinf(rot_y)*m_Speed)*fLength;
 		m_pos.z -= (cosf(rot_y)*m_Speed)*fLength;
 		//m_fSoundInterval += 0.1f;
@@ -584,6 +622,16 @@ void CPlayer::SetIngredients(int nType)
 	m_nGetIngredientsType.push_back(nType);
 }
 //=============================================================================
+// 具材を落とす状態にする
+//=============================================================================
+void CPlayer::SetDropState(void)
+{
+	//具材ドロップを可能にする
+	m_bCanDrop = true;
+	m_bOperationLock = true;
+
+}
+//=============================================================================
 // デバッグ用スタック処理
 //=============================================================================
 void CPlayer::TestGetIngredients(void)
@@ -628,7 +676,7 @@ bool CPlayer::Collision(const D3DXVECTOR3 & pos, float fSize)
 //=============================================================================
 // モデルの生成
 //=============================================================================
-CPlayer *CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, string motion_pas)
+CPlayer *CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, string motion_pas, int nNumPlayer)
 {
 	// モデルのポインタ
 	CPlayer *player = nullptr;
@@ -642,7 +690,7 @@ CPlayer *CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, st
 		player->m_rot = rot;
 		player->m_scale = scale;
 		player->m_motion_text_pas = motion_pas;
-
+		player->m_nNumPlayer = nNumPlayer;
 		// 初期化
 		player->Init();
 	}

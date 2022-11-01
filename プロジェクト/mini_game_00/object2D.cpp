@@ -125,15 +125,18 @@ void CObject2D::Draw(void)
 //=============================================================================
 void CObject2D::SetCol(D3DXCOLOR col)
 {
+	//色を代入
+	m_col = col;
+
 	VERTEX_2D *vtx;	// 頂点情報
 
 	//頂点バッファをロックし、頂点データへのポインタを取得
 	m_vtx_buff->Lock(0, 0, (void**)&vtx, 0);
 
-	vtx[0].col = col;
-	vtx[1].col = col;
-	vtx[2].col = col;
-	vtx[3].col = col;
+	vtx[0].col = m_col;
+	vtx[1].col = m_col;
+	vtx[2].col = m_col;
+	vtx[3].col = m_col;
 
 	//頂点バッファをアンロックする
 	m_vtx_buff->Unlock();

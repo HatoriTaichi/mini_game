@@ -88,6 +88,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ソース ファイル\UI">
+      <UniqueIdentifier>{c06133b6-3f9d-4399-bfe0-d687e99b91ca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="item.h">
@@ -107,9 +110,6 @@
     </ClInclude>
     <ClInclude Include="player_ingredient_data.h">
       <Filter>ソース ファイル\プレイヤー</Filter>
-    </ClInclude>
-    <ClInclude Include="2d_ingredients.h">
-      <Filter>ソース ファイル\リザルト</Filter>
     </ClInclude>
     <ClInclude Include="enemy.h">
       <Filter>ソース ファイル\敵</Filter>
@@ -192,6 +192,15 @@
     <ClInclude Include="title.h">
       <Filter>ソース ファイル\タイトル</Filter>
     </ClInclude>
+    <ClInclude Include="move_ui.h">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="2d_ingredients.h">
+      <Filter>ソース ファイル\具材</Filter>
+    </ClInclude>
+    <ClInclude Include="XInput.h">
+      <Filter>ソース ファイル\入力系</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="item.cpp">
@@ -211,9 +220,6 @@
     </ClCompile>
     <ClCompile Include="player_ingredient_data.cpp">
       <Filter>ソース ファイル\プレイヤー</Filter>
-    </ClCompile>
-    <ClCompile Include="2d_ingredients.cpp">
-      <Filter>ソース ファイル\リザルト</Filter>
     </ClCompile>
     <ClCompile Include="enemy.cpp">
       <Filter>ソース ファイル\敵</Filter>
@@ -295,6 +301,15 @@
     </ClCompile>
     <ClCompile Include="title.cpp">
       <Filter>ソース ファイル\タイトル</Filter>
+    </ClCompile>
+    <ClCompile Include="move_ui.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="2d_ingredients.cpp">
+      <Filter>ソース ファイル\具材</Filter>
+    </ClCompile>
+    <ClCompile Include="XInput.cpp">
+      <Filter>ソース ファイル\入力系</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -63,13 +63,15 @@ public:
 	void Item(void);//アイテムの処理
 	void SetItemType(int nType);//アイテム取得処理
 	void SetIngredients(int nType);//アイテム取得処理
+	void SetDropState(void);//具材を落とす状態にする
 	void TestGetIngredients(void);
 	bool Collision(const D3DXVECTOR3& pos,float fSize);
-	static CPlayer *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, string motion_pas);	// 生成
+	static CPlayer *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, string motion_pas,int nNumPlayer);	// 生成
 	D3DXVECTOR3 GetPos(void) { return m_pos; }	// ゲッダー
 	D3DXVECTOR3 GetRot(void) { return m_rot; }	// ゲッダー
 	vector<CModel*> GetModel(void) { return m_model; }	// ゲッダー
-	ItemGetState GetItemState() { return m_ItemState; }
+	ItemGetState GetItemState() { return m_ItemState; }//ゲッター
+	int GetPlayerNum(void) { return m_nNumPlayer; }//ゲッター
 private:
 	void CreateModel(void);	// モデルの生成
 	void InitMotionController(void);	// モーションコントローラーの初期化
@@ -94,7 +96,7 @@ private:
 	int m_nOperationLockTimer;
 	int m_nCntIngredientsType;
 	int m_nItemTimer;
-	static int m_nNumPlayer;//プレイヤー番号
+	int m_nNumPlayer;//プレイヤー番号
 	float m_Speed;//プレイヤーの移動速度
 };
 
