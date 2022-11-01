@@ -12,6 +12,8 @@
 //*****************************************************************************
 #include "object.h"
 static const int MaxPlayer = 2;
+static const int MaxIngredients = 5;
+
 //*****************************************************************************
 // 前方宣言
 //*****************************************************************************
@@ -39,6 +41,7 @@ public:
 	void ItemSpawn(void);
 	void EnemySpawn(void);
 	void IngredientsSpawn(void);
+	void AddIngredientsCnt(int nNumAdd,int nIngredients, int nPlayer);//具材の加算
 private:
 	vector<D3DXVECTOR3> m_IngredientsSpawnPoint;//具材のスポーンポイント
 	vector<D3DXVECTOR3> m_ItemSpawnPoint;//アイテムのスポーンポイント
@@ -48,6 +51,9 @@ private:
 	CObject2D *m_pStartUI;
 	CObject2D *m_pFinishUI;
 	CObject2D *m_pLastSpurtUI;
+	CObject2D *m_pIngredientsUI[MaxIngredients][MaxPlayer];//具材のUI 
+	CCounter *m_pIngredientsCnt[MaxIngredients][MaxPlayer];//具材のカウント
+
 	CCounter *m_pGameTimer;//ゲームのたいまー
 	int *m_NumIngredientsSpawnPoint;
 	int *m_NumItemSpawnPoint;

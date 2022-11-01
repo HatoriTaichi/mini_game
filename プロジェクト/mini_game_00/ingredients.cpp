@@ -16,6 +16,7 @@
 #include "singlemodel.h"
 #include"player.h"
 #include"game.h"
+#include "scenemanager.h"
 static float fDropMoveSpeed = 8.0f;
 static const float FallSpeed = 5.0f;
 static const float UpLimit = 2.0f;
@@ -404,6 +405,7 @@ void CIngredients::ColisionPlayer(void)
 			if (pPlayer->Collision(m_pos, 50.0f))
 			{
 				pPlayer->SetIngredients(m_Type);
+				CManager::GetInstance()->GetSceneManager()->GetGame()->AddIngredientsCnt(1, m_Type, nCnt);
 				m_bUninit = true;
 			}
 		}

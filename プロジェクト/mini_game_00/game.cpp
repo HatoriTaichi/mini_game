@@ -42,6 +42,12 @@ static const D3DXVECTOR3 FinishSize = { 120.0f,40.0f,0.0f };//終了UI
 static const D3DXVECTOR3 FinishPos = { SCREEN_WIDTH / 2.0f,SCREEN_HEIGHT / 2.0f,0.0f };//終了UI
 static const D3DXVECTOR3 LastSpurtSize = { 150.0f,40.0f,0.0f };//ラストスパートUI
 static const D3DXVECTOR3 LastSpurtPos = { SCREEN_WIDTH+150.0f ,SCREEN_HEIGHT / 2.0f,0.0f };//ラストスパートUI
+static const D3DXVECTOR3 IngredientsSize = { 50.0f,50.0f,0.0f };//ラストスパートUI
+static const D3DXVECTOR3 IngredientsPos = { 60.0f ,40.0f ,0.0f };//ラストスパートUI
+static const D3DXVECTOR3 IngredientsPos2 = { 820.0f ,40.0f ,0.0f };//ラストスパートUI
+static const D3DXVECTOR3 NumberSize = { 15.0f ,20.0f ,0.0f };//ラストスパートUI
+static const D3DXVECTOR3 NumberPos = { 45.0f ,40.0f ,0.0f };//ラストスパートUI
+static const D3DXVECTOR3 NumberPos2 = { 805.0f ,40.0f ,0.0f };//ラストスパートUI
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -68,6 +74,7 @@ CGame::CGame(CObject::LAYER_TYPE layer) :CObject(layer)
 	m_pStartUI = nullptr;
 	m_pFinishUI = nullptr;
 	m_pLastSpurtUI = nullptr;
+	memset(m_pIngredientsUI, NULL, sizeof(m_pIngredientsUI));
 }
 
 //=============================================================================
@@ -88,12 +95,12 @@ HRESULT CGame::Init(void)
 	if (!m_pPlayer[0])
 	{
 		m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-			D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt",0);
+			D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_2.txt",0);
 	}
 	if (!m_pPlayer[1])
 	{
 		m_pPlayer[1] = CPlayer::Create(D3DXVECTOR3(100.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-			D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_2.txt",1);
+			D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt",1);
 	}
 	//CEnemy::Create(D3DXVECTOR3(0.0f, 0.0f, 200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/motion.txt");
 	if (!m_pBandUI)
@@ -105,6 +112,48 @@ HRESULT CGame::Init(void)
 	{
 		m_pGameTimer = CCounter::Create(GameTimerPos, GameTimerSize, 2, "Number000.png");
 		m_pGameTimer->SetCounterNum(90);
+	}
+	//具材のUI生成
+	for (int nCnt = 0;  nCnt < MaxIngredients;  nCnt++)
+	{
+		string TexName;
+		switch (nCnt)
+		{
+		case CIngredients::IngredientsType::Basil:
+			TexName = "basil.png";
+			break;
+		case CIngredients::IngredientsType::Tomato:
+			TexName = "cut_tomato.png";
+			break;
+		case CIngredients::IngredientsType::Cheese:
+			TexName = "mozzarella_chaeese.png";
+			break;
+		case CIngredients::IngredientsType::Mushroom:
+			TexName = "mushroom.png";
+			break;
+		case CIngredients::IngredientsType::Salami:
+			TexName = "salami.png";
+			break;
+		}
+		if (!m_pIngredientsUI[nCnt][0])
+		{
+			m_pIngredientsUI[nCnt][0] = CObject2D::Create({ IngredientsPos.x + (IngredientsSize.x * 2 * nCnt),IngredientsPos.y,0.0f }, IngredientsSize, TexName);
+		}
+		if (!m_pIngredientsCnt[nCnt][0])
+		{
+			m_pIngredientsCnt[nCnt][0] = CCounter::Create({ NumberPos.x + (IngredientsSize.x * 2 * nCnt),
+				NumberPos.y + 40.0f,0.0f }, NumberSize,2, "Number000.png");
+		}
+		if (!m_pIngredientsCnt[nCnt][1])
+		{
+			m_pIngredientsCnt[nCnt][1] = CCounter::Create({ NumberPos2.x + (IngredientsSize.x * 2 * nCnt),
+				NumberPos.y + 40.0f,0.0f }, NumberSize, 2, "Number000.png");
+		}
+
+		if (!m_pIngredientsUI[nCnt][1])
+		{
+			m_pIngredientsUI[nCnt][1] = CObject2D::Create({ IngredientsPos2.x + (IngredientsSize.x * 2 * nCnt),IngredientsPos2.y,0.0f }, IngredientsSize, TexName);
+		}
 	}
 	////スタートUIを生成
 	//if (!m_pStartUI)
@@ -228,6 +277,10 @@ void CGame::Update(void)
 	{
 		m_nGameTimeSeconds = 0;
 		m_pGameTimer->AddCounter(-1);
+	}
+	if (m_pGameTimer->GetCounter() <= 0)
+	{
+		CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT);
 	}
 	//if (key->GetTrigger(CKey::KEYBIND::W) == true)
 	//{
@@ -426,4 +479,12 @@ void CGame::IngredientsSpawn(void)
 		m_IngredientsSpawnTimer = 0;
 	}
 
+}
+//=============================================================================
+// 具材の加算
+//=============================================================================
+
+void CGame::AddIngredientsCnt(int nNumAdd, int nIngredients, int nPlayer)
+{
+	m_pIngredientsCnt[nIngredients][nPlayer]->AddCounter(nNumAdd);
 }

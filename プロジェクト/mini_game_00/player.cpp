@@ -17,6 +17,7 @@
 #include "singlemodel.h"
 #include "XInput.h"
 #include "enemy.h"
+#include "game.h"
 #include "player_ingredient_data.h"
 #include "scenemanager.h"
 #include "wall.h"
@@ -553,7 +554,7 @@ void CPlayer::DropItem()
 			}
 			for (int nCnt = 0; nCnt < 1; nCnt++)
 			{
-				
+				CManager::GetInstance()->GetSceneManager()->GetGame()->AddIngredientsCnt(-1, m_nGetIngredientsType[nSize - 1], nCnt);
 				CIngredients::Create({ m_pos.x,m_pos.y + 90.0f,m_pos.z },
 				{ m_rot.x,DropRot ,m_rot.z }, { 1.0,1.0,1.0 },
 					(CIngredients::IngredientsType)m_nGetIngredientsType[nSize - 1], true, nCnt);
