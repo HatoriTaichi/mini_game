@@ -557,7 +557,7 @@ void CPlayer::DropItem()
 			}
 			for (int nCnt = 0; nCnt < 1; nCnt++)
 			{
-				CManager::GetInstance()->GetSceneManager()->GetGame()->AddIngredientsCnt(-1, m_nGetIngredientsType[nSize - 1], nCnt);
+				CManager::GetInstance()->GetSceneManager()->GetGame()->AddIngredientsCnt(-1, m_nGetIngredientsType[nSize - 1], m_nNumPlayer);
 				CIngredients::Create({ m_pos.x,m_pos.y + 90.0f,m_pos.z },
 				{ m_rot.x,DropRot ,m_rot.z }, { 1.0,1.0,1.0 },
 					(CIngredients::IngredientsType)m_nGetIngredientsType[nSize - 1], true, nCnt);

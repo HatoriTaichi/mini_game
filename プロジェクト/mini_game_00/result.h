@@ -45,7 +45,7 @@ private:
 	int m_nCntIngredient[MAX_PLAYER];//具材のカウント
 	int m_nCntIngredient_X[MAX_PLAYER];//具材のカウント
 	int m_nCntIngredient_Y[MAX_PLAYER];//具材のカウント
-
+	bool m_bNext;
 };
 
 #endif // !_TITLE_H_処理

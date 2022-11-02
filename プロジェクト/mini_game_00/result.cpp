@@ -19,6 +19,8 @@
 #include "item.h"
 #include "player_ingredient_data.h"
 #include "2d_ingredients.h"
+#include "XInput.h"
+
 static const int IngredientNumX = 5;
 static const int IngredientNumY = 10;
 static const int IngredientPopTime = 5;
@@ -43,7 +45,7 @@ CResult::CResult(CObject::LAYER_TYPE layer) :CObject(layer)
 	}
 	memset(m_nStateTimer, NULL, sizeof(m_nStateTimer));
 	memset(m_nCntIngredient, NULL, sizeof(m_nCntIngredient));
-
+	m_bNext = false;
 }
 
 //=============================================================================
@@ -73,7 +75,7 @@ void CResult::Uninit(void)
 		int nSize = m_pIngredient[nCntPlayer].size();
 		if (nIngredientMax != 0&& nSize!=0)
 		{
-			for (int nCnt = 0; nCnt < nIngredientMax; nCnt++)
+			for (int nCnt = 0; nCnt < nSize; nCnt++)
 			{
 				if (m_pIngredient[nCntPlayer][nCnt])
 				{
@@ -106,6 +108,17 @@ void CResult::Update(void)
 
 		break;
 
+	}
+	CXInput *pXinput = CManager::GetInstance()->GetXInput();
+	CXInput::GAMEPAD *GamePad = pXinput->GetGamePad();
+	for (int nPlayer = 0; nPlayer < 2; nPlayer++)
+	{
+		if (pXinput->GetButtonTrigger(XINPUT_GAMEPAD_A, nPlayer)&& !m_bNext)
+		{
+			m_bNext = true;
+
+			CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::GAME);
+		}
 	}
 	//キーボード情報取得
 	CKey * pKey = CManager::GetInstance()->GetKey();
