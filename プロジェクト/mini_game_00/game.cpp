@@ -90,7 +90,7 @@ CGame::~CGame()
 //=============================================================================
 HRESULT CGame::Init(void)
 {
-	CMeshsphere::Create(D3DXVECTOR3(0.0f, 10.0f, 0.0f), D3DXVECTOR3(0.0f, 10.0f, 0.0f), 32, 32, 5200, "Sky.jpg");
+	//CMeshsphere::Create(D3DXVECTOR3(0.0f, 10.0f, 0.0f), D3DXVECTOR3(0.0f, 10.0f, 0.0f), 32, 32, 5200, "Sky.jpg");
 	//ÉvÉåÉCÉÑÅ[ÇÃê∂ê¨
 	if (!m_pPlayer[0])
 	{

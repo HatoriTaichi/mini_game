@@ -166,6 +166,7 @@ void CPlayer::Update(void)
 	//敵などに当たったら一定時間操作を聞かないようにする
 	if (m_bOperationLock)
 	{
+		m_moitonState = DIZZY;
 		m_nOperationLockTimer++;
 		if (m_nOperationLockTimer >= OperationAgainTime)
 		{
@@ -209,6 +210,7 @@ void CPlayer::Update(void)
 						//取得したプレイヤー番号が自分と違ったら
 						if (pPlayer->GetPlayerNum() != m_nNumPlayer)
 						{
+							m_ItemState = Nown;
 							if (pPlayer->Collision(m_pos, PlayerHitSize))
 							{
 								pPlayer->SetDropState();
@@ -232,7 +234,7 @@ void CPlayer::Update(void)
 	//壁との当たり判定
 	vector<CObject *>ObjWall = CObject::GetObjTypeObject(CObject::OBJTYPE::WALL);
 	int nWallSize = ObjWall.size();
-	if (nWallSize != 0)
+	; if (nWallSize != 0)
 	{
 		for (int nCntWall = 0; nCntWall < nWallSize; nCntWall++)
 		{
@@ -645,10 +647,10 @@ void CPlayer::TestGetIngredients(void)
 		std::mt19937_64 mt(random());            // メルセンヌ・ツイスタの64ビット版、引数は初期シード
 		std::uniform_real_distribution<> randType(0, 5);
 		std::uniform_real_distribution<> randNum(5, 35);
-		int nMax = randNum(mt);
+		int nMax = static_cast <int>(randNum(mt));
 		for (int nCnt = 0; nCnt < nMax; nCnt++)
 		{
-			int nType = randType(mt);
+			int nType = static_cast <int>(randType(mt));
 			m_nGetIngredientsType.push_back(nType);
 
 		}

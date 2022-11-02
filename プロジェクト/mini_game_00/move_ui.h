@@ -42,7 +42,7 @@ public:
 	void Motion(void);//ちょっとした動きの処理
 	void FadeIn(void);//画像のフェードイン
 	void FadeOut(void);//画像のフェードアウト
-	static CMove_UI *Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale,int nPopTime,int nFadeTime);	// 生成(位置、サイズ、出現持続時間、フェードインアウトの時間)
+	static CMove_UI *Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale,int nPopTime,int nFadeTime, string TexType);	// 生成(位置、サイズ、出現持続時間、フェードインアウトの時間)
 	D3DXVECTOR3 GetPos(void) { return m_pos; }	// ゲッダー
 	D3DXVECTOR3 GetRot(void) { return m_rot; }	// ゲッダー
 

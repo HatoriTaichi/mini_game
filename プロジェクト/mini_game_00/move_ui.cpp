@@ -131,7 +131,7 @@ void CMove_UI::FadeOut(void)
 //=============================================================================
 // モデルの生成
 //=============================================================================
-CMove_UI *CMove_UI::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, int nPopTime, int nFadeTime)
+CMove_UI *CMove_UI::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, int nPopTime, int nFadeTime, string TexType)
 {
 	// モデルのポインタ
 	CMove_UI *Ingredients = nullptr;
@@ -145,6 +145,10 @@ CMove_UI *CMove_UI::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, int nPopTime, int
 		Ingredients->m_scale = scale;
 		Ingredients->m_nMaxPopTime = nPopTime;
 		Ingredients->m_nMaxFadeTime = nFadeTime;
+		if (!Ingredients->m_pUI)
+		{
+			Ingredients->m_pUI = CObject2D::Create(pos, scale, TexType);
+		}
 		Ingredients->m_state = CMove_UI::State::ImmediatelyAfterPop;
 
 		// 初期化

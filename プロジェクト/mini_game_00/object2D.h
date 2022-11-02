@@ -38,7 +38,7 @@ typedef struct
 class CObject2D : public CObject
 {
 public:
-	CObject2D(LAYER_TYPE Layer = LAYER_TYPE::LAYER_01);	// デフォルトコンストラクタ
+	CObject2D(LAYER_TYPE Layer = LAYER_TYPE::LAYER_00);	// デフォルトコンストラクタ
 	~CObject2D();	// デフォルトデストラクタ
 	virtual HRESULT Init(void);	// ポリゴンの初期化
 	virtual void Uninit(void);	// ポリゴンの終了
