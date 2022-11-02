@@ -210,9 +210,10 @@ void CPlayer::Update(void)
 						//Žæ“¾‚µ‚½ƒvƒŒƒCƒ„[”Ô†‚ªŽ©•ª‚Æˆá‚Á‚½‚ç
 						if (pPlayer->GetPlayerNum() != m_nNumPlayer)
 						{
-							m_ItemState = Nown;
 							if (pPlayer->Collision(m_pos, PlayerHitSize))
 							{
+								m_ItemState = Nown;
+
 								pPlayer->SetDropState();
 							}
 						}
