@@ -11,10 +11,7 @@
 #include "manager.h"
 #include "renderer.h"
 
-//=============================================================================
-// 静的メンバ変数宣言
-//=============================================================================
-bool CFbx::m_is_bone = false;
+#define ANIM_SPEED (1)
 
 //=============================================================================
 // コンストラクタ
@@ -27,6 +24,7 @@ CFbx::CFbx()
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_is_bone = false;
+	m_is_anim_countup = false;
 }
 
 //=============================================================================
@@ -105,7 +103,7 @@ HRESULT CFbx::Init(void)
 		buf->Unlock();
 
 		// 頂点バッファの保存
-		m_mesh_info[count_mesh]->vtx_buff.push_back(buf);
+		m_mesh_info[count_mesh]->vtx_buff = buf;
 	}
 
 	// メッシュ分のループ
@@ -137,7 +135,7 @@ HRESULT CFbx::Init(void)
 		buf->Unlock();
 
 		// インデックスバッファの保存
-		m_mesh_info[count_mesh]->idx_buff.push_back(buf);
+		m_mesh_info[count_mesh]->idx_buff = buf;
 	}
 
 	return S_OK;
@@ -153,32 +151,18 @@ void CFbx::Uninit(void)
 	// メッシュ分のループ
 	for (int count_mesh = 0; count_mesh < mesh_max; count_mesh++)
 	{
-		// 頂点バッファサイズを取得
-		int vtx_max = m_mesh_info[count_mesh]->vtx_buff.size();
-
-		// 頂点バッファ数分のループ
-		for (int count_tvx = 0; count_tvx < vtx_max; count_tvx++)
+		//頂点バッファの破棄
+		if (m_mesh_info[count_mesh]->vtx_buff != nullptr)
 		{
-			//頂点バッファの破棄
-			if (m_mesh_info[count_mesh]->vtx_buff[count_tvx] != nullptr)
-			{
-				m_mesh_info[count_mesh]->vtx_buff[count_tvx]->Release();
-				m_mesh_info[count_mesh]->vtx_buff[count_tvx] = nullptr;
-			}
+			m_mesh_info[count_mesh]->vtx_buff->Release();
+			m_mesh_info[count_mesh]->vtx_buff = nullptr;
 		}
 
-		// インデックスバッファサイズを取得
-		int index_max = m_mesh_info[count_mesh]->idx_buff.size();
-
-		// インデックスバッファ数分のループ
-		for (int count_index = 0; count_index < index_max; count_index++)
+		//インデックスバッファの破棄
+		if (m_mesh_info[count_mesh]->idx_buff != nullptr)
 		{
-			//インデックスバッファの破棄
-			if (m_mesh_info[count_mesh]->idx_buff[count_index] != nullptr)
-			{
-				m_mesh_info[count_mesh]->idx_buff[count_index]->Release();
-				m_mesh_info[count_mesh]->idx_buff[count_index] = nullptr;
-			}
+			m_mesh_info[count_mesh]->idx_buff->Release();
+			m_mesh_info[count_mesh]->idx_buff = nullptr;
 		}
 	}
 
@@ -201,11 +185,12 @@ void CFbx::Update(void)
 {
 	// カウントアップ
 	m_count++;
-	if (m_count >= 1)
+	if (m_count >= ANIM_SPEED)
 	{
 		m_frame_count_old = m_frame_count;
 		m_frame_count++;
 		m_count = 0;
+		m_is_anim_countup = true;
 	}
 }
 
@@ -271,12 +256,12 @@ void CFbx::Draw(void)
 		D3DXMatrixIdentity(&matrix);
 
 		// アニメーションがあったら
-		if (m_anim_num > 0)
+		if (m_skin_info.anim_max > 0)
 		{
 			// ボーンがあったら
 			if (m_is_bone)
 			{
-				BoneAnim(m_mesh[count_mesh], count_mesh);
+				BoneAnim(count_mesh, 0);
 			}
 			// それ以外
 			else
@@ -309,11 +294,11 @@ void CFbx::Draw(void)
 		}
 		// 頂点バッファをデータストリームに設定
 		pDevice->SetStreamSource(	0,
-									m_mesh_info[count_mesh]->vtx_buff[count_mesh],
+									m_mesh_info[count_mesh]->vtx_buff,
 									0,
 									sizeof(VERTEX_3D));
 		// インデックスバッファをデータストリームに設定
-		pDevice->SetIndices(m_mesh_info[count_mesh]->idx_buff[count_mesh]);
+		pDevice->SetIndices(m_mesh_info[count_mesh]->idx_buff);
 
 		int vtx_num = m_mesh_info[count_mesh]->vertex_max_ary.size();	// 頂点数
 		int polygon_num = m_mesh_info[count_mesh]->index_number.size();	// ポリゴン数
@@ -337,7 +322,7 @@ CFbx *CFbx::Create(string pas)
 	CFbx *buf;
 	buf = new CFbx;
 
-	// new出来てたら
+	// 生成出来てたら
 	if (buf != nullptr)
 	{
 		// 引数の代入
@@ -468,72 +453,6 @@ void CFbx::GetMesh(FbxNodeAttribute *attrib)
 }
 
 //=============================================================================
-// インデックス情報の取得
-//=============================================================================
-void CFbx::GetIndex(FbxMesh *mesh, MESH_INFO *mesh_info)
-{
-	int polygon_num = mesh->GetPolygonCount();	// ポリゴン数の取得
-	vector<int> vetor_buf;	// vector配列のバッファ
-	pair<vector<int>, vector<vector<int>>> index_to_vertex;
-
-	// ポリゴン数分のループ
-	for (int count_polygon = 0; count_polygon < polygon_num; count_polygon++)
-	{
-		// インデックス情報の保存
-		mesh_info->index_number.push_back(count_polygon * 3 + 2);
-		mesh_info->index_number.push_back(count_polygon * 3 + 1);
-		mesh_info->index_number.push_back(count_polygon * 3);
-	}
-
-	int indexCount = mesh->GetPolygonVertexCount();
-	int *indexBuffer = new int[indexCount];
-	int *index = mesh->GetPolygonVertices();
-
-	for (int i = 0; indexCount > i; i++)
-	{
-		indexBuffer[i] = index[i];
-
-		index_to_vertex.first.push_back(indexBuffer[i]);
-	}
-
-	int polygon_vertex_num = mesh->GetPolygonVertexCount();	// ポリゴンの頂上数の取得
-	int *index_ary = mesh->GetPolygonVertices();	// ポリゴンのインデックスの取得
-	int control_num = mesh->GetControlPointsCount();	// 頂点数の取得
-	FbxVector4 *src = mesh->GetControlPoints();	// 頂点座標の取得
-	D3DXVECTOR4 *control_ary = new D3DXVECTOR4[control_num];	// 配列を生成
-
-	for (int count_index = 0; count_index < control_num; count_index++)
-	{
-		vector<int> vertex;
-
-		control_ary[count_index].x = src[count_index][0];
-		control_ary[count_index].y = src[count_index][1];
-		control_ary[count_index].z = src[count_index][2];
-		control_ary[count_index].w = src[count_index][3];
-
-		for (int count_vertex = 0; count_vertex < polygon_vertex_num; count_vertex++)
-		{
-			D3DXVECTOR4 buf;	// 頂点のバッファ
-			int index = index_ary[count_vertex];	// インデックスから配列を取得
-
-			// 頂点情報の保存
-			buf.x = static_cast<float>(-src[index][0]);
-			buf.y = static_cast<float>(src[index][1]);
-			buf.z = static_cast<float>(src[index][2]);
-			buf.w = static_cast<float>(src[index][3]);
-
-			if (control_ary[count_index] == buf)
-			{
-				vertex.push_back(count_vertex);
-			}
-		}
-		index_to_vertex.second.push_back(vertex);
-	}
-
-	m_index_to_vertex.push_back(index_to_vertex);
-}
-
-//=============================================================================
 // 頂点情報の取得
 //=============================================================================
 void CFbx::GetVertex(FbxMesh *mesh, MESH_INFO *mesh_info)
@@ -552,7 +471,7 @@ void CFbx::GetVertex(FbxMesh *mesh, MESH_INFO *mesh_info)
 		int index = index_ary[count_control];	// インデックスから配列を取得
 
 		// 頂点情報の保存
-		buf.x = static_cast<float>(-src[index][0]);
+		buf.x = static_cast<float>(src[index][0]);
 		buf.y = static_cast<float>(src[index][1]);
 		buf.z = static_cast<float>(src[index][2]);
 		buf.w = static_cast<float>(src[index][3]);
@@ -568,19 +487,75 @@ void CFbx::GetVertex(FbxMesh *mesh, MESH_INFO *mesh_info)
 	for (int count_control = 0; count_control < control_num; count_control++)
 	{
 		// 頂点情報の保存
-		control_ary[count_control].x = src[count_control][0];
-		control_ary[count_control].y = src[count_control][1];
-		control_ary[count_control].z = src[count_control][2];
-		control_ary[count_control].w = src[count_control][3];
+		control_ary[count_control].x = static_cast<float>(src[count_control][0]);
+		control_ary[count_control].y = static_cast<float>(src[count_control][1]);
+		control_ary[count_control].z = static_cast<float>(src[count_control][2]);
+		control_ary[count_control].w = static_cast<float>(src[count_control][3]);
 
 		// 頂点情報の保存
 		mesh_info->vertex_min_ary.push_back(control_ary[count_control]);
 	}
-	// 頂点情報の保存
-	m_anim_vertex_ary.push_back(vetor_buf);
+}
 
-	// 頂点情報の保存
-	m_anim_vertex_init_ary = m_anim_vertex_ary;
+//=============================================================================
+// インデックス情報の取得
+//=============================================================================
+void CFbx::GetIndex(FbxMesh *mesh, MESH_INFO *mesh_info)
+{
+	vector<int> vetor_buf;	// vector配列のバッファ
+	vector<int> vec_index;	// 重なり頂点カウント
+	pair<vector<int>, vector<vector<int>>> index_to_vertex;	// 関連頂点のペア
+	FbxVector4 *src = mesh->GetControlPoints();	// 頂点座標の取得
+	int index_max = mesh->GetPolygonVertexCount();	// インデックス数を取得
+	int polygon_max = mesh->GetPolygonCount();	// ポリゴン数の取得
+	int *index_ary = mesh->GetPolygonVertices();	// ポリゴンのインデックスの取得
+	int control_max = mesh_info->vertex_min_ary.size();	// 頂点数の取得
+
+	// インデックス数分のループ
+	for (int count_index = 0; count_index < index_max; count_index++)
+	{
+		// インデックスを保存
+		index_to_vertex.first.push_back(index_ary[count_index]);
+	}
+
+	// 頂点数分のループ
+	for (int count_vertex = 0; count_vertex < control_max; count_vertex++)
+	{
+		vector<int> vertex;	// 関連頂点の配列
+
+		// インデックス数分のループ
+		for (int count_index = 0; count_index < index_max; count_index++)
+		{
+			// 位置が一致していたら
+			if (mesh_info->vertex_min_ary[count_vertex] == mesh_info->vertex_max_ary[count_index])
+			{
+				// 頂点番号を保存
+				vertex.push_back(count_index);
+			}
+		}
+		// 保存
+		index_to_vertex.second.push_back(vertex);
+	}
+
+	// 保存
+	mesh_info->index_to_vertex.first = index_to_vertex.first;
+	mesh_info->index_to_vertex.second = index_to_vertex.second;
+
+	// 頂点数分のループ
+	for (int count_index = 0; count_index < control_max; count_index++)
+	{
+		int buf = 0;
+		vec_index.push_back(buf);
+	}
+
+	// インデックス数分のループ
+	for (int count_index = 0; count_index < index_max; count_index++)
+	{
+		// インデックスを設定
+		mesh_info->index_number.push_back(mesh_info->index_to_vertex.second[mesh_info->index_to_vertex.first[count_index]][vec_index[mesh_info->index_to_vertex.first[count_index]]]);
+
+		vec_index[mesh_info->index_to_vertex.first[count_index]]++;
+	}
 }
 
 //=============================================================================
@@ -882,7 +857,8 @@ void CFbx::GetTexture(FbxSurfaceMaterial *material, MESH_INFO *mesh_info)
 			FbxFileTexture *texture = FbxCast<FbxFileTexture>(property.GetSrcObject(count_tex));	// テクスチャオブジェクト取得
 			string absolute_file_name = texture->GetFileName();	// テクスチャファイルパスを取得（フルパス）
 			//string folder_name = "C:/Users/student/Desktop/Git/mini_game/プロジェクト/mini_game_00/data/Texture/Mesh/";	// パスを消す為の名前
-			string folder_name = "C:\\Users\\student\\Desktop\\blenderモデル\\SDharu_ver1.0\\SDharu_ver1.0\\tex\\";	// パスを消す為の名前
+			//string folder_name = "C:\\Users\\student\\Desktop\\blenderモデル\\SDharu_ver1.0\\SDharu_ver1.0\\tex\\";	// パスを消す為の名前
+			string folder_name = "C:\\Users\\student\\Desktop\\blenderモデル\\Loika_v1.0\\Loika_v1.0\\tex\\";	// パスを消す為の名前
 			int folder_size = folder_name.size();	// パスのサイズ
 			char *file_name;	// 名前のバッファ
 			size_t size = 0;	// サイズ
@@ -920,106 +896,6 @@ void CFbx::GetTexture(FbxSurfaceMaterial *material, MESH_INFO *mesh_info)
 //=============================================================================
 void CFbx::GetBone(FbxMesh *mesh)
 {
-/*	int skin_num = mesh->GetDeformerCount(FbxDeformer::eSkin);	// スキンの数を取得
-	vector<FbxCluster*> vector_cluster;	// クラスターのバッファ
-	vector<vector<FbxAMatrix>> cluster_frame_mat;	// クラスターの毎フレームマトリッックス
-
-	// スキン数分のループ
-	for (int count_skin = 0; count_skin < skin_num; count_skin++)
-	{
-		// ボーン付きアニメーション
-		m_is_bone = true;
-
-		// スキンを取得
-		FbxSkin *skin = static_cast<FbxSkin*>(mesh->GetDeformer(count_skin, FbxDeformer::eSkin));
-
-		// クラスターの数を取得
-		int cluster_num = skin->GetClusterCount();
-
-		// クラスター数分のループ
-		for (int count_cluster = 0; count_cluster < cluster_num; count_cluster++)
-		{
-			FbxCluster *cluster;	// クラスターのポインタ
-
-			// クラスタを取得
-			cluster = skin->GetCluster(count_cluster);
-
-			FbxGlobalSettings &global_settings = m_scene->GetGlobalSettings();	// 時間設定の設定を取得
-			FbxTime::EMode time_mode = global_settings.GetTimeMode();	// 時間設定の取得
-			FbxAMatrix frame_mat_buf;	// フレームのマトリックス
-			FbxTime start, stop, period, time;	// スタート、終了、1フレーム時間、時間
-			FbxArray<FbxString*> take_name_ary;	// テイク名前
-			pair<vector<int>, vector<double>> pair_index_weight;	// インデックスとウェイト
-			vector<FbxAMatrix> frame_mat;	// フレームのマトリッックス	
-			int num_take = 0;	// テイク数
-			int start_frame = 0;	// 初期フレーム
-			int stop_frame = 0;	// 終了フレーム
-			int point_num = cluster->GetControlPointIndicesCount();	// ウェイトがかけられている頂点数
-			int *point_ary = cluster->GetControlPointIndices();	// 頂点インデックス
-			double *weight_ary = cluster->GetControlPointWeights();	// ウェイト
-
-			// ウェイトがかけられている頂点数分のループ
-			for (int count_point = 0; count_point < point_num; count_point++)
-			{
-				// 頂点インデックスとウェイトを取得
-				int index = point_ary[count_point];
-				double weight = weight_ary[count_point];
-
-				// 情報の保存
-				pair_index_weight.first.push_back(index);
-				pair_index_weight.second.push_back(weight);
-			}
-
-			// 頂点インデックスとウェイトを保存
-			m_index_weight.push_back(pair_index_weight);
-
-			// 1フレーム設定
-			period.SetTime(0, 0, 0, 1, 0, time_mode);
-
-			// テイク名の取得
-			m_scene->FillAnimStackNameArray(take_name_ary);
-
-			// テイク数の取得
-			num_take = take_name_ary.GetCount();
-
-			// テイク数分のループ
-			for (int count_take = 0; count_take < num_take; count_take++)
-			{
-				// テイク名からテイク情報を取得
-				FbxTakeInfo *current_take_info = m_scene->GetTakeInfo(*(take_name_ary[count_take]));
-				if (current_take_info != nullptr)
-				{
-					// スタートフレームと終了フレームの取得
-					start = current_take_info->mLocalTimeSpan.GetStart();
-					stop = current_take_info->mLocalTimeSpan.GetStop();
-					break;
-				}
-			}
-
-			// スタートフレームと終了フレームの計算
-			start_frame = (int)(start.Get() / period.Get());
-			stop_frame = (int)(stop.Get() / period.Get());
-
-			// フレーム数分のループ
-			for (int count_frame = start_frame; count_frame < stop_frame; count_frame++)
-			{
-				// フレーム時間の計算
-				time = (start + period) * count_frame;
-
-				// フレームのマトリックスの取得
-				frame_mat_buf = cluster->GetLink()->EvaluateGlobalTransform(time);
-
-				// フレームのマトリッックスを保存
-				frame_mat.push_back(frame_mat_buf);
-			}
-
-			// 1アニメーションのマトリッックスを保存
-			cluster_frame_mat.push_back(frame_mat);
-		}
-	}
-	// 1アニメーションのマトリッックスを保存
-	m_anim_mat.push_back(cluster_frame_mat);*/
-
 	int skin_num = mesh->GetDeformerCount(FbxDeformer::eSkin);	// スキンの数を取得
 
 	// スキン数分のループ
@@ -1057,7 +933,9 @@ void CFbx::GetBone(FbxMesh *mesh)
 void CFbx::GetAnimationInfo(void)
 {
 	int anim_max = m_importer->GetAnimStackCount();	// アニメーション数を取得
-	int cluster_max = m_skin_info.cluster.size();	// スキン数を取得
+	int cluster_max = m_skin_info.cluster.size();	// クラスター数を取得
+	int skin_max = m_skin_info.skin.size();	// スキン数を取得
+	m_skin_info.anim_max = anim_max;	// アニメーション数を保存
 
 	// アニメーション数分のループ
 	for (int count_anim = 0; count_anim < anim_max; count_anim++)
@@ -1090,43 +968,104 @@ void CFbx::GetAnimationInfo(void)
 		anim_info.start = static_cast<int>(start.Get() / period.Get());
 		anim_info.stop = static_cast<int>(stop.Get() / period.Get());
 
-		// クラスター数分のループ
-		for (int count_cluster = 0; count_cluster < cluster_max; count_cluster++)
+		// スキン数分のループ
+		for (int count_skin = 0; count_skin < skin_max; count_skin++)
 		{
-			vector<D3DXMATRIX> mat;	// マトリックス
-			int point_num = m_skin_info.cluster[count_cluster].cluster->GetControlPointIndicesCount();	// ウェイトがかけられている頂点数
-			int *point_ary = m_skin_info.cluster[count_cluster].cluster->GetControlPointIndices();	// 頂点インデックス
-			double *weight_ary = m_skin_info.cluster[count_cluster].cluster->GetControlPointWeights();	// ウェイト
-
-			// ウェイトがかけられている頂点数分のループ
-			for (int count_point = 0; count_point < point_num; count_point++)
+			// クラスター数分のループ
+			for (int count_cluster = 0; count_cluster < cluster_max; count_cluster++)
 			{
-				// 頂点インデックスとウェイトを取得
-				int index = point_ary[count_point];
-				double weight = weight_ary[count_point];
+				vector<vector<D3DXVECTOR3>> frame_vec;	// フレームのベクトル
+				vector<D3DXMATRIX> mat;	// マトリックス
+				vector<vector<D3DXVECTOR3>> vec_ary_mat;	// ベクトル配列
+				D3DXVECTOR3 pos, init_vec;;	// 位置、初期姿勢ベクトル
+				D3DXQUATERNION quaterniom;	// クォータニオン
+				D3DXMATRIX rot_mat, init_mat;	// 現在の回転行列、初期姿勢ベ
+				FbxAMatrix fbx_init_mat;	// 初期姿勢(fbx用)
+				int point_num = m_skin_info.cluster[count_cluster].cluster->GetControlPointIndicesCount();	// ウェイトがかけられている頂点数
+				int *point_ary = m_skin_info.cluster[count_cluster].cluster->GetControlPointIndices();	// 頂点インデックス
+				double *weight_ary = m_skin_info.cluster[count_cluster].cluster->GetControlPointWeights();	// ウェイト
 
-				// 情報の保存
-				m_skin_info.cluster[count_cluster].index_weight.first.push_back(index);
-				m_skin_info.cluster[count_cluster].index_weight.second.push_back(weight);
+				// ウェイトがかけられている頂点数分のループ
+				for (int count_point = 0; count_point < point_num; count_point++)
+				{
+					// 頂点インデックスとウェイトを取得
+					int index = point_ary[count_point];
+					double weight = weight_ary[count_point];
+
+					// 情報の保存
+					m_skin_info.cluster[count_cluster].index_weight.first.push_back(index);
+					m_skin_info.cluster[count_cluster].index_weight.second.push_back(weight);
+				}
+
+				// フレーム数分のループ
+				for (int count_frame = anim_info.start; count_frame < anim_info.stop; count_frame++)
+				{
+					FbxAMatrix fbx_mat;	// FBX規格のマトリッックス
+					FbxTime time;	// 時間
+
+					// フレーム時間の計算
+					time = (start + period) * count_frame;
+
+					// 1フレームのマトリックスの取得
+					fbx_mat = m_skin_info.cluster[count_cluster].cluster->GetLink()->EvaluateGlobalTransform(time);
+
+					// マトリッックスを保存
+					mat.push_back(FbxAMatToD3dxmat(fbx_mat));
+				}
+
+				// 初期姿勢マトリックスの取得
+				m_skin_info.cluster[count_cluster].cluster->GetTransformLinkMatrix(fbx_init_mat);
+
+				// DirectX用に変換
+				init_mat = FbxAMatToD3dxmat(fbx_init_mat);
+
+				// ウェイトがかけられている頂点数分のループ
+				for (int count_point = 0; count_point < point_num; count_point++)
+				{
+					vector<D3DXVECTOR3> vec_ary;	// ベクトル配列
+
+					// ベクトルを出す
+					init_vec.x = m_mesh_info[count_skin]->vertex_min_ary[m_skin_info.cluster[count_cluster].index_weight.first[count_point]].x - init_mat._41;
+					init_vec.y = m_mesh_info[count_skin]->vertex_min_ary[m_skin_info.cluster[count_cluster].index_weight.first[count_point]].y - init_mat._42;
+					init_vec.z = m_mesh_info[count_skin]->vertex_min_ary[m_skin_info.cluster[count_cluster].index_weight.first[count_point]].z - init_mat._43;
+
+					// フレーム分のループ
+					for (int count_frame = anim_info.start; count_frame < anim_info.stop; count_frame++)
+					{
+						pos = D3DXVECTOR3(mat[count_frame]._41, mat[count_frame]._42, mat[count_frame]._43);	// 現在の位置を取得
+						D3DXVECTOR3 vec, ask_pos, rotate;	// ベクトル、目標の位置、軸
+						float angle;	// 角度
+
+						// マトリックスから回転行列のみにする
+						rot_mat = PopMatRotate(mat[count_frame]);
+
+						// クォータニオンを抽出
+						D3DXQuaternionRotationMatrix(&quaterniom, &rot_mat);
+
+						// 角度と軸を取り出す
+						D3DXQuaternionToAxisAngle(&quaterniom, &rotate, &angle);
+
+						// ウェイト分の計算
+						angle *= m_skin_info.cluster[count_cluster].index_weight.second[count_point];
+
+						// 計算した角度でクォータニオンを生成
+						D3DXQuaternionRotationAxis(&quaterniom, &rotate, angle);
+
+						// ベクトルを回転
+						QuaternionVec3Rotate(&ask_pos, quaterniom, &init_vec);
+
+						// ベクトルを保存
+						vec_ary.push_back(pos + ask_pos);
+					}
+					// ベクトルを保存
+					vec_ary_mat.push_back(vec_ary);
+				}
+				// ベクトルを保存
+				anim_info.anim_vtx_pos.push_back(vec_ary_mat);
+
+				// マトリックスを保存
+				anim_info.frame_mat.push_back(mat);
 			}
-
-			// アニメーション分のループ
-			for (int count_anim = anim_info.start; count_anim < anim_info.stop; count_anim++)
-			{
-				FbxAMatrix fbx_mat;	// FBX規格のマトリッックス
-				FbxTime time;	// 時間
-
-				// フレーム時間の計算
-				time = (start + period) * count_anim;
-
-				// フレームのマトリックスの取得
-				fbx_mat = m_skin_info.cluster[count_cluster].cluster->GetLink()->EvaluateGlobalTransform(time);
-
-				// マトリッックスを保存
-				mat.push_back(FbxAMatToD3dxmat(fbx_mat));
-			}
-			// マトリッックスを保存
-			anim_info.frame_mat.push_back(mat);
 		}
 		// アニメーションを保存
 		m_skin_info.anim.push_back(anim_info);
@@ -1215,10 +1154,10 @@ void CFbx::NoBoneAnim(FbxMesh *mesh)
 //=============================================================================
 // アニメーションの更新
 //=============================================================================
-void CFbx::BoneAnim(FbxMesh *mesh, int mesh_count)
+void CFbx::BoneAnim(int mesh_count, int anim_type)
 {
 	// 回転の計算
-	//UpdateRotate(mesh, mesh_count);
+	UpdateRotate(mesh_count, anim_type);
 
 	// 位置の計算
 	//UpdatePos(mesh, mesh_count);
@@ -1227,179 +1166,49 @@ void CFbx::BoneAnim(FbxMesh *mesh, int mesh_count)
 //=============================================================================
 // 頂点の回転更新
 //=============================================================================
-void CFbx::UpdateRotate(FbxMesh *mesh, int mesh_count)
+void CFbx::UpdateRotate(int mesh_count, int anim_type)
 {
-	int cluster_num = m_anim_mat[mesh_count].size();	// クラスターのサイズの取得
+	int cluster_max = m_skin_info.cluster.size();	// クラスター数を取得
 	VERTEX_3D *vtx;	// 頂点情報
 
-	// クラスター数分のループ
-	for (int count_cluster = 0; count_cluster < cluster_num; count_cluster++)
-	{
-		D3DXVECTOR3 pos;	// 位置
-		D3DXQUATERNION quaterniom;	// クォータニオン
-		D3DXMATRIX rot_mat;	// 現在の回転行列
+	// 頂点バッファをロックし、頂点データへのポインタを取得
+	m_mesh_info[mesh_count]->vtx_buff->Lock(0, 0, (void**)&vtx, 0);
 
-		if (m_frame_count >= 1)
+	// フレームが進んでいたら
+	if (m_is_anim_countup == true)
+	{
+		// フレームが最後までいったら
+		if (m_frame_count >= m_skin_info.anim[anim_type].stop)
 		{
-			m_frame_count = 0;
+			m_frame_count = m_skin_info.anim[anim_type].start;
 		}
 
-		// 現在の位置と前回の位置を取得
-		pos = D3DXVECTOR3(m_anim_mat[mesh_count][count_cluster][m_frame_count].mData[3].mData[0], m_anim_mat[mesh_count][count_cluster][m_frame_count].mData[3].mData[1], m_anim_mat[mesh_count][count_cluster][m_frame_count].mData[3].mData[2]);
-
-		// FBXMatrixをD3DXMATRIXに変換
-		rot_mat = FbxAMatToD3dxmat(m_anim_mat[mesh_count][count_cluster][m_frame_count]);
-
-		// マトリックスから回転行列のみにする
-		rot_mat = PopMatRotate(rot_mat);
-
-		// クォータニオンを抽出
-		D3DXQuaternionRotationMatrix(&quaterniom, &rot_mat);
-
-		// ウェイトがかけられている数
-		int weight_num = m_index_weight[count_cluster].first.size();
-
-		// 頂点バッファをロックし、頂点データへのポインタを取得
-		//m_vtx_buff[mesh_count]->Lock(0, 0, (void**)&vtx, 0);
-
-		// ウェイト数分のループ
-		for (int count_weight = 0; count_weight < weight_num; count_weight++)
+		// クラスター数分のループ
+		for (int count_cluster = 0; count_cluster < cluster_max; count_cluster++)
 		{
-			/*			// 頂点数
-			int vtx_num = m_vertex_ary[mesh_count].size();
+			// ウェイトがかけられている数
+			int weight_num = m_skin_info.cluster[count_cluster].index_weight.first.size();
 
-			// 頂点数分のループ
-			for (int count_vtx = 0; count_vtx < vtx_num; count_vtx++)
+			// ウェイト数分のループ
+			for (int count_weight = 0; count_weight < weight_num; count_weight++)
 			{
-				// 確認用頂上とおんなじだったら
-				if (m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].x == vtx[count_vtx].pos.x &&
-					m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].y == vtx[count_vtx].pos.y &&
-					m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].z == vtx[count_vtx].pos.z)
+				int weight_vtx_num = m_skin_info.cluster[count_cluster].index_weight.first[count_weight];	// ウェイト頂点の取得
+				int index_max = m_mesh_info[mesh_count]->index_to_vertex.second[weight_vtx_num].size();	// 関連頂上数を取得
+
+				// 関連頂点分のループ
+				for (int count_index = 0; count_index < index_max; count_index++)
 				{
-					D3DXVECTOR3 ask_pos, vertex_vec, rotate;	// 目標の位置、ベクトル、回転軸
-					float angle;	// 回転角度
-					ask_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 初期化
-					rotate = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 初期化
-
-					// ベクトルを出す
-					vertex_vec.x = m_vertex_ary[mesh_count][count_vtx].x - pos.x;
-					vertex_vec.y = m_vertex_ary[mesh_count][count_vtx].y - pos.y;
-					vertex_vec.z = m_vertex_ary[mesh_count][count_vtx].z - pos.z;
-
-					// クォータニオンから軸と角度を抽出
-					D3DXQuaternionToAxisAngle(&quaterniom, &rotate, &angle);
-
-					// ベクトルを回転
-					QuaternionVec3Rotate(&ask_pos, &rotate, angle, &vertex_vec);
-
-					// 頂点の更新
-					vtx[count_vtx].pos = pos + ask_pos;
+					// 頂上情報を設定
+					vtx[m_mesh_info[mesh_count]->index_to_vertex.second[weight_vtx_num][count_index]].pos = m_skin_info.anim[anim_type].anim_vtx_pos[count_cluster][count_weight][m_frame_count];
 				}
 			}
-			// ウェイトが1.0以下だったら
-			if (m_index_weight[count_cluster].second[count_weight] < 1.0f)
-			{
-				D3DXVECTOR3 ask_pos, vertex_vec, rotate;	// 目標の位置、ベクトル、回転軸
-				float angle;	// 回転角度
-				ask_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 初期化
-				rotate = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 初期化
-
-				// ベクトルを出す
-				vertex_vec.x = m_anim_vertex_init_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].x - pos.x;
-				vertex_vec.y = m_anim_vertex_init_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].y - pos.y;
-				vertex_vec.z = m_anim_vertex_init_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].z - pos.z;
-
-				// クォータニオンから軸と角度を抽出
-				D3DXQuaternionToAxisAngle(&quaterniom, &rotate, &angle);
-
-				// ベクトルを回転
-				QuaternionVec3Rotate(&ask_pos, &rotate, angle, &vertex_vec);
-
-				// 確認用頂点の更新
-				m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].x = pos.x + ask_pos.x;
-				m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].y = pos.y + ask_pos.y;
-				m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].z = pos.z + ask_pos.z;
-			}*/
-
-			int vertex_element = m_index_to_vertex[mesh_count].second[m_index_weight[count_cluster].first[count_weight]].size();
-
-			for (int count_vtx = 0; count_vtx < vertex_element; count_vtx++)
-			{
-				D3DXVECTOR3 ask_pos, vertex_vec, rotate;	// 目標の位置、ベクトル、回転軸
-				float angle;	// 回転角度
-				ask_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 初期化
-				rotate = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 初期化
-
-				// ベクトルを出す
-				//vertex_vec.x = m_vertex_ary[mesh_count][m_index_to_vertex[mesh_count].second[m_index_weight[count_cluster].first[count_weight]][count_vtx]].x - pos.x;
-				//vertex_vec.y = m_vertex_ary[mesh_count][m_index_to_vertex[mesh_count].second[m_index_weight[count_cluster].first[count_weight]][count_vtx]].y - pos.y;
-				//vertex_vec.z = m_vertex_ary[mesh_count][m_index_to_vertex[mesh_count].second[m_index_weight[count_cluster].first[count_weight]][count_vtx]].z - pos.z;
-
-				// クォータニオンから軸と角度を抽出
-				D3DXQuaternionToAxisAngle(&quaterniom, &rotate, &angle);
-
-				// ベクトルを回転
-				QuaternionVec3Rotate(&ask_pos, &rotate, angle, &vertex_vec);
-
-				// 頂点の更新
-				//vtx[m_index_to_vertex[mesh_count].second[m_index_weight[count_cluster].first[count_weight]][count_vtx]].pos = pos + ask_pos;
-			}
 		}
-
 		// 頂点バッファをアンロックする
-	//	m_vtx_buff[mesh_count]->Unlock();
+		m_mesh_info[mesh_count]->vtx_buff->Unlock();
+
+		// カウントアップした時の処理を終える
+		m_is_anim_countup = false;
 	}
-	/*	// クラスター数分のループ
-	for (int count_cluster = 0; count_cluster < cluster_num; count_cluster++)
-	{
-		D3DXVECTOR3 pos;	// 位置
-		D3DXQUATERNION quaterniom;	// クォータニオン
-		D3DXMATRIX rot_mat;	// 現在の回転行列
-
-		// 現在の位置と前回の位置を取得
-		pos = D3DXVECTOR3(m_anim_mat[mesh_count][count_cluster][m_frame_count].mData[3].mData[0], m_anim_mat[mesh_count][count_cluster][m_frame_count].mData[3].mData[1], m_anim_mat[mesh_count][count_cluster][m_frame_count].mData[3].mData[2]);
-
-		// FBXMatrixをD3DXMATRIXに変換
-		rot_mat = FbxAMatToD3dxmat(m_anim_mat[mesh_count][count_cluster][m_frame_count]);
-
-		// マトリックスから回転行列のみにする
-		rot_mat = PopMatRotate(rot_mat);
-
-		// クォータニオンを抽出
-		D3DXQuaternionRotationMatrix(&quaterniom, &rot_mat);
-
-		// ウェイトがかけられている数
-		int weight_num = m_index_weight[count_cluster].first.size();
-
-		// ウェイト数分のループ
-		for (int count_weight = 0; count_weight < weight_num; count_weight++)
-		{
-			// ウェイトが1.0以上だったら
-			if (m_index_weight[count_cluster].second[count_weight] >= 1.0f)
-			{
-				D3DXVECTOR3 ask_pos, vertex_vec, rotate;	// 目標の位置、ベクトル、回転軸
-				float angle;	// 回転角度
-				ask_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 初期化
-				rotate = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 初期化
-
-				// ベクトルを出す
-				vertex_vec.x = m_anim_vertex_init_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].x - pos.x;
-				vertex_vec.y = m_anim_vertex_init_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].y - pos.y;
-				vertex_vec.z = m_anim_vertex_init_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].z - pos.z;
-
-				// クォータニオンから軸と角度を抽出
-				D3DXQuaternionToAxisAngle(&quaterniom, &rotate, &angle);
-
-				// ベクトルを回転
-				QuaternionVec3Rotate(&ask_pos, &rotate, angle, &vertex_vec);
-
-				// 確認用頂点の更新
-				m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].x = pos.x + ask_pos.x;
-				m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].y = pos.y + ask_pos.y;
-				m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].z = pos.z + ask_pos.z;
-			}
-		}
-	}*/
 }
 
 //=============================================================================
@@ -1407,99 +1216,99 @@ void CFbx::UpdateRotate(FbxMesh *mesh, int mesh_count)
 //=============================================================================
 void CFbx::UpdatePos(FbxMesh *mesh, int mesh_count)
 {
-	int cluster_num = m_anim_mat[mesh_count].size();	// クラスターのサイズの取得
-	VERTEX_3D *vtx = nullptr;	// 頂点情報
+	//int cluster_num = m_anim_mat[mesh_count].size();	// クラスターのサイズの取得
+	//VERTEX_3D *vtx = nullptr;	// 頂点情報
 
-	// クラスター数分のループ
-	for (int count_cluster = 0; count_cluster < cluster_num; count_cluster++)
-	{
-		D3DXVECTOR3 pos, pos_old, difference_pos;	// 位置、前回の位置、差分の位置
+	//// クラスター数分のループ
+	//for (int count_cluster = 0; count_cluster < cluster_num; count_cluster++)
+	//{
+	//	D3DXVECTOR3 pos, pos_old, difference_pos;	// 位置、前回の位置、差分の位置
 
-		if (m_frame_count >= 150)
-		{
-			m_frame_count = 0;
-		}
+	//	if (m_frame_count >= 150)
+	//	{
+	//		m_frame_count = 0;
+	//	}
 
-		// 現在の位置と前回の位置を取得
-		pos = D3DXVECTOR3(m_anim_mat[mesh_count][count_cluster][m_frame_count].mData[3].mData[0], m_anim_mat[mesh_count][count_cluster][m_frame_count].mData[3].mData[1], m_anim_mat[mesh_count][count_cluster][m_frame_count].mData[3].mData[2]);
-		pos_old = D3DXVECTOR3(m_anim_mat[mesh_count][count_cluster][m_frame_count_old].mData[3].mData[0], m_anim_mat[mesh_count][count_cluster][m_frame_count_old].mData[3].mData[1], m_anim_mat[mesh_count][count_cluster][m_frame_count_old].mData[3].mData[2]);
+	//	// 現在の位置と前回の位置を取得
+	//	pos = D3DXVECTOR3(m_anim_mat[mesh_count][count_cluster][m_frame_count].mData[3].mData[0], m_anim_mat[mesh_count][count_cluster][m_frame_count].mData[3].mData[1], m_anim_mat[mesh_count][count_cluster][m_frame_count].mData[3].mData[2]);
+	//	pos_old = D3DXVECTOR3(m_anim_mat[mesh_count][count_cluster][m_frame_count_old].mData[3].mData[0], m_anim_mat[mesh_count][count_cluster][m_frame_count_old].mData[3].mData[1], m_anim_mat[mesh_count][count_cluster][m_frame_count_old].mData[3].mData[2]);
 
-		// ウェイトがかけられている数
-		int weight_num = m_index_weight[count_cluster].first.size();
+	//	// ウェイトがかけられている数
+	//	int weight_num = m_index_weight[count_cluster].first.size();
 
-		// 頂点バッファをロックし、頂点データへのポインタを取得
-	//	m_vtx_buff[mesh_count]->Lock(0, 0, (void**)&vtx, 0);
+	//	// 頂点バッファをロックし、頂点データへのポインタを取得
+	////	m_vtx_buff[mesh_count]->Lock(0, 0, (void**)&vtx, 0);
 
-		// ウェイト数分のループ
-		for (int count_weight = 0; count_weight < weight_num; count_weight++)
-		{
-			// 位置の差分
-			difference_pos = pos - pos_old;
+	//	// ウェイト数分のループ
+	//	for (int count_weight = 0; count_weight < weight_num; count_weight++)
+	//	{
+	//		// 位置の差分
+	//		difference_pos = pos - pos_old;
 
-			// 差分をウェイト分計算する
-			difference_pos = difference_pos * m_index_weight[count_cluster].second[count_weight];
+	//		// 差分をウェイト分計算する
+	//		difference_pos = difference_pos * m_index_weight[count_cluster].second[count_weight];
 
-			// 頂点数
-			int vtx_num = 0;// m_vertex_ary[mesh_count].size();
+	//		// 頂点数
+	//		int vtx_num = 0;// m_vertex_ary[mesh_count].size();
 
-			// 頂点数分のループ
-			for (int count_vtx = 0; count_vtx < vtx_num; count_vtx++)
-			{
-				// 確認用頂上とおんなじだったら
-				if (m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].x == vtx[count_vtx].pos.x &&
-					m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].y == vtx[count_vtx].pos.y &&
-					m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].z == vtx[count_vtx].pos.z)
-				{
-					// 頂上情報を設定
-					vtx[count_vtx].pos.x += difference_pos.x;
-					vtx[count_vtx].pos.y += difference_pos.y;
-					vtx[count_vtx].pos.z += difference_pos.z;
-				}
-			}
-			// ウェイトが1.0以下だったら
-			if (m_index_weight[count_cluster].second[count_weight] < 1.0f)
-			{
-				// 確認頂点を更新
-				m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].x += difference_pos.x;
-				m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].y += difference_pos.y;
-				m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].z += difference_pos.z;
-			}
-		}
+	//		// 頂点数分のループ
+	//		for (int count_vtx = 0; count_vtx < vtx_num; count_vtx++)
+	//		{
+	//			// 確認用頂上とおんなじだったら
+	//			if (m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].x == vtx[count_vtx].pos.x &&
+	//				m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].y == vtx[count_vtx].pos.y &&
+	//				m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].z == vtx[count_vtx].pos.z)
+	//			{
+	//				// 頂上情報を設定
+	//				vtx[count_vtx].pos.x += difference_pos.x;
+	//				vtx[count_vtx].pos.y += difference_pos.y;
+	//				vtx[count_vtx].pos.z += difference_pos.z;
+	//			}
+	//		}
+	//		// ウェイトが1.0以下だったら
+	//		if (m_index_weight[count_cluster].second[count_weight] < 1.0f)
+	//		{
+	//			// 確認頂点を更新
+	//			m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].x += difference_pos.x;
+	//			m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].y += difference_pos.y;
+	//			m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].z += difference_pos.z;
+	//		}
+	//	}
 
-		// 頂点バッファをアンロックする
-		//m_vtx_buff[mesh_count]->Unlock();
-	}
-	// クラスター数分のループ
-	for (int count_cluster = 0; count_cluster < cluster_num; count_cluster++)
-	{
-		D3DXVECTOR3 pos, pos_old, difference_pos;	// 位置、前回の位置、差分の位置
+	//	// 頂点バッファをアンロックする
+	//	//m_vtx_buff[mesh_count]->Unlock();
+	//}
+	//// クラスター数分のループ
+	//for (int count_cluster = 0; count_cluster < cluster_num; count_cluster++)
+	//{
+	//	D3DXVECTOR3 pos, pos_old, difference_pos;	// 位置、前回の位置、差分の位置
 
-		// 現在の位置と前回の位置を取得
-		pos = D3DXVECTOR3(m_anim_mat[mesh_count][count_cluster][m_frame_count].mData[3].mData[0], m_anim_mat[mesh_count][count_cluster][m_frame_count].mData[3].mData[1], m_anim_mat[mesh_count][count_cluster][m_frame_count].mData[3].mData[2]);
-		pos_old = D3DXVECTOR3(m_anim_mat[mesh_count][count_cluster][m_frame_count_old].mData[3].mData[0], m_anim_mat[mesh_count][count_cluster][m_frame_count_old].mData[3].mData[1], m_anim_mat[mesh_count][count_cluster][m_frame_count_old].mData[3].mData[2]);
+	//	// 現在の位置と前回の位置を取得
+	//	pos = D3DXVECTOR3(m_anim_mat[mesh_count][count_cluster][m_frame_count].mData[3].mData[0], m_anim_mat[mesh_count][count_cluster][m_frame_count].mData[3].mData[1], m_anim_mat[mesh_count][count_cluster][m_frame_count].mData[3].mData[2]);
+	//	pos_old = D3DXVECTOR3(m_anim_mat[mesh_count][count_cluster][m_frame_count_old].mData[3].mData[0], m_anim_mat[mesh_count][count_cluster][m_frame_count_old].mData[3].mData[1], m_anim_mat[mesh_count][count_cluster][m_frame_count_old].mData[3].mData[2]);
 
-		// ウェイトがかけられている数
-		int weight_num = m_index_weight[count_cluster].first.size();
+	//	// ウェイトがかけられている数
+	//	int weight_num = m_index_weight[count_cluster].first.size();
 
-		// ウェイト数分のループ
-		for (int count_weight = 0; count_weight < weight_num; count_weight++)
-		{
-			// 位置の差分
-			difference_pos = pos - pos_old;
+	//	// ウェイト数分のループ
+	//	for (int count_weight = 0; count_weight < weight_num; count_weight++)
+	//	{
+	//		// 位置の差分
+	//		difference_pos = pos - pos_old;
 
-			// 差分をウェイト分計算する
-			difference_pos = difference_pos * m_index_weight[count_cluster].second[count_weight];
+	//		// 差分をウェイト分計算する
+	//		difference_pos = difference_pos * m_index_weight[count_cluster].second[count_weight];
 
-			// ウェイトが1.0以上だったら
-			if (m_index_weight[count_cluster].second[count_weight] >= 1.0f)
-			{
-				// 確認頂点を更新
-				m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].x += difference_pos.x;
-				m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].y += difference_pos.y;
-				m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].z += difference_pos.z;
-			}
-		}
-	}
+	//		// ウェイトが1.0以上だったら
+	//		if (m_index_weight[count_cluster].second[count_weight] >= 1.0f)
+	//		{
+	//			// 確認頂点を更新
+	//			m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].x += difference_pos.x;
+	//			m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].y += difference_pos.y;
+	//			m_anim_vertex_ary[mesh_count][m_index_weight[count_cluster].first[count_weight]].z += difference_pos.z;
+	//		}
+	//	}
+	//}
 }
 
 
@@ -1526,7 +1335,7 @@ D3DXMATRIX CFbx::PopMatPos(D3DXMATRIX mat)
 {
 	D3DXMATRIX pos_buf;	// 位置バッファ
 
-						// 初期化
+	// 初期化
 	D3DXMatrixIdentity(&pos_buf);
 
 	// 位置を取得
@@ -1582,16 +1391,14 @@ D3DXMATRIX CFbx::PopMatRotate(D3DXMATRIX mat)
 //=============================================================================
 // クォータニオンでベクトルの回転
 //=============================================================================
-D3DXVECTOR3 *CFbx::QuaternionVec3Rotate(D3DXVECTOR3 *out, D3DXVECTOR3 *axis, float angle, D3DXVECTOR3 *vec)
+D3DXVECTOR3 *CFbx::QuaternionVec3Rotate(D3DXVECTOR3 *out, D3DXQUATERNION quaternoin, D3DXVECTOR3 *vec)
 {
-	D3DXQUATERNION quaternion, quaternion_revers, quaternion_vec;	// クォータニオン、逆クォータニオン、正規化クォータニオン
-
-	// 回転軸と角度からクォータニオンを作成
-	D3DXQuaternionRotationAxis(&quaternion, axis, angle);
+	D3DXQUATERNION quaternion_revers, quaternion_vec;	// 逆クォータニオン、正規化クォータニオン
 
 	// 逆クォータニオンを生成
-	D3DXQuaternionConjugate(&quaternion_revers, &quaternion);
+	D3DXQuaternionConjugate(&quaternion_revers, &quaternoin);
 
+	// ベクトル回転
 	D3DXVECTOR3 vec_buf;	// ベクトルの正規化バッファ
 	float length = D3DXVec3Length(vec);	// ベクトルの長さ
 	D3DXVec3Normalize(&vec_buf, vec);	// 回転させるベクトルの正規化
@@ -1604,7 +1411,7 @@ D3DXVECTOR3 *CFbx::QuaternionVec3Rotate(D3DXVECTOR3 *out, D3DXVECTOR3 *axis, flo
 
 	// クォータニオンを掛け合わせる
 	D3DXQuaternionMultiply(&quaternion_vec, &quaternion_revers, &quaternion_vec);
-	D3DXQuaternionMultiply(&quaternion_vec, &quaternion_vec, &quaternion);
+	D3DXQuaternionMultiply(&quaternion_vec, &quaternion_vec, &quaternoin);
 
 	// 掛け合わせたクォータニオンに長さをかける
 	out->x = quaternion_vec.x * length;

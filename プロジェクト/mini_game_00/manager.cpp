@@ -27,7 +27,9 @@
 #define LIGHT_DIR_00 (D3DXVECTOR3(0.2f, -0.8f, 0.4f))	// ライトの向き
 #define LIGHT_DIR_01 (D3DXVECTOR3(0.0f, -1.0f, 0.0f))	// ライトの向き
 #define LIGHT_DIR_02 (D3DXVECTOR3(-0.2f, 0.8f, -0.4f))	// ライトの向き
-#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 50.0f, 50.0f))	// カメラの位置
+//#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 50.0f, 50.0f))	// カメラの位置
+#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 100.0f, 25.0f))	// カメラの位置
+//#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 1500.0f, -1500.0f))	// カメラの位置
 //#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 800.0f, 800.0f))	// カメラの位置
 #define CAMERA_POS_R (D3DXVECTOR3(0.0f, 0.0f, 500.0f))	// カメラの注視点
 #define CAMERA_ROT (D3DXVECTOR3(0.0f, 0.0f, 0.0f))	// カメラの向き
