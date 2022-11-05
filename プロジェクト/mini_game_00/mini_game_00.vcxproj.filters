@@ -91,6 +91,9 @@
     <Filter Include="ソース ファイル\UI">
       <UniqueIdentifier>{c06133b6-3f9d-4399-bfe0-d687e99b91ca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\ネットワーク">
+      <UniqueIdentifier>{bbe261db-4926-4fe4-9cfc-52eef6d814fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="item.h">
@@ -201,6 +204,15 @@
     <ClInclude Include="XInput.h">
       <Filter>ソース ファイル\入力系</Filter>
     </ClInclude>
+    <ClInclude Include="networkmanager.h">
+      <Filter>ソース ファイル\ネットワーク</Filter>
+    </ClInclude>
+    <ClInclude Include="tcp_client.h">
+      <Filter>ソース ファイル\ネットワーク</Filter>
+    </ClInclude>
+    <ClInclude Include="communicationdata.h">
+      <Filter>ソース ファイル\ネットワーク</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="item.cpp">
@@ -310,6 +322,15 @@
     </ClCompile>
     <ClCompile Include="XInput.cpp">
       <Filter>ソース ファイル\入力系</Filter>
+    </ClCompile>
+    <ClCompile Include="networkmanager.cpp">
+      <Filter>ソース ファイル\ネットワーク</Filter>
+    </ClCompile>
+    <ClCompile Include="tcp_client.cpp">
+      <Filter>ソース ファイル\ネットワーク</Filter>
+    </ClCompile>
+    <ClCompile Include="communicationdata.cpp">
+      <Filter>ソース ファイル\ネットワーク</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

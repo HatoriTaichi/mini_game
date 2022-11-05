@@ -155,6 +155,7 @@
     <ClInclude Include="2d_ingredients.h" />
     <ClInclude Include="billboard.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="communicationdata.h" />
     <ClInclude Include="counter.h" />
     <ClInclude Include="directinput.h" />
     <ClInclude Include="enemy.h" />
@@ -175,6 +176,7 @@
     <ClInclude Include="motion.h" />
     <ClInclude Include="mouseinput.h" />
     <ClInclude Include="move_ui.h" />
+    <ClInclude Include="networkmanager.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="player_ingredient_data.h" />
@@ -184,6 +186,7 @@
     <ClInclude Include="result.h" />
     <ClInclude Include="scenemanager.h" />
     <ClInclude Include="singlemodel.h" />
+    <ClInclude Include="tcp_client.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="title.h" />
     <ClInclude Include="wall.h" />
@@ -193,6 +196,7 @@
     <ClCompile Include="2d_ingredients.cpp" />
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="communicationdata.cpp" />
     <ClCompile Include="counter.cpp" />
     <ClCompile Include="directinput.cpp" />
     <ClCompile Include="enemy.cpp" />
@@ -213,6 +217,7 @@
     <ClCompile Include="motion.cpp" />
     <ClCompile Include="mouseinput.cpp" />
     <ClCompile Include="move_ui.cpp" />
+    <ClCompile Include="networkmanager.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="player_ingredient_data.cpp" />
@@ -222,6 +227,7 @@
     <ClCompile Include="result.cpp" />
     <ClCompile Include="scenemanager.cpp" />
     <ClCompile Include="singlemodel.cpp" />
+    <ClCompile Include="tcp_client.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="title.cpp" />
     <ClCompile Include="wall.cpp" />
