@@ -20,6 +20,8 @@
 #include "directinput.h"
 #include "player_ingredient_data.h"
 #include "XInput.h"
+#include "networkmanager.h"
+
 //=============================================================================
 // マクロ定義
 //=============================================================================
@@ -50,14 +52,14 @@ CManager::CManager()
 	m_camera = nullptr;
 	m_scene_manager = nullptr;
 	m_texture = nullptr;
-	for (int nPlayer = 0; nPlayer < MAX_PLAYER; nPlayer++)
-	{
-		m_player_ingredient_data[nPlayer] = nullptr;
-
-	}
 	m_xinput = nullptr;
+	m_net_work_manager = nullptr;
 	m_directInput = nullptr;
 	m_hwnd = NULL;
+	for (int count_player = 0; count_player < MAX_PLAYER; count_player++)
+	{
+		m_player_ingredient_data[count_player] = nullptr;
+	}
 	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
 	{
 		m_light[count_liht] = NULL;
@@ -121,6 +123,14 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 		m_texture->Init();
 	}
 
+	// ネットワークマネージャーの生成
+	m_net_work_manager = new CNetWorkManager;
+	if (m_net_work_manager != nullptr)
+	{
+		m_net_work_manager->Init();
+	}
+
+
 	for (int nPlayer = 0; nPlayer < MAX_PLAYER; nPlayer++)
 	{
 		//プレイヤーの具材情報クラス
@@ -130,7 +140,6 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 		}
 	}
 
-
 	// シーンマネージャークラスの生成
 	m_scene_manager = new CSceneManager;
 	if (m_scene_manager != nullptr)
@@ -139,7 +148,6 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	}
 
 	// ライトとカメラの生成
-
 	m_camera = CCamera::Create(CAMERA_POS_V, CAMERA_POS_R, CAMERA_ROT);
 	m_light[0] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_00, LIGHT_DIR_00);
 	m_light[1] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_01, LIGHT_DIR_01);
@@ -201,6 +209,7 @@ void CManager::Uninit(void)
 		delete m_key;
 		m_key = nullptr;
 	}
+
 	// ゲームパッドの破棄
 	if (m_directInput != NULL)
 	{
@@ -213,6 +222,18 @@ void CManager::Uninit(void)
 		delete m_xinput;
 		m_xinput = nullptr;
 	}
+
+	//ネットワークマネージャーの生成
+	if (m_net_work_manager != nullptr)
+	{
+		//終了処理
+		m_net_work_manager->Uninit();
+
+		//メモリの開放
+		delete m_net_work_manager;
+		m_net_work_manager = nullptr;
+	}
+
 	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
 	{
 		// ライトクラスの破棄

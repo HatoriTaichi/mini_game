@@ -12,6 +12,7 @@
 //*****************************************************************************
 #define MAX_LIGHT (3)	//ライトの数
 #define MAX_PLAYER (2)	//プレイヤーの数
+
 //*****************************************************************************
 // 前方宣言
 //*****************************************************************************
@@ -23,9 +24,11 @@ class CCamera;	// カメラクラス
 class CLight;	// ライトクラス
 class CFade;	// フェードクラス
 class CSceneManager;	// シーンマネージャークラス
-class CDirectInput;//ダイレクトインプットクラス
-class CPlayer_ingredient_data;//プレイヤーの具材情報クラス
-class CXInput;//Xインプットクラス
+class CDirectInput;	//ダイレクトインプットクラス
+class CPlayer_ingredient_data;	//プレイヤーの具材情報クラス
+class CXInput;	//Xインプットクラス
+class CNetWorkManager;	// ネットワークマネージャー
+
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
@@ -45,7 +48,8 @@ public:
 	CMouse *GetMouse(void) { return m_mouse; }	// マウスクラスの取得
 	CKey *GetKey(void) { return m_key; }	// キーボードクラスの取得
 	CDirectInput *GetDirectInput(void) { return m_directInput; }	// キーボードクラスの取得
-	CXInput *GetXInput(void) { return m_xinput; }	// Xインプットの取得
+	CXInput *GetXInput(void) { return m_xinput; }	// Xインプットクラスの取得
+	CNetWorkManager *GetNetWorkManager(void) { return m_net_work_manager; }	// ネットワークマネージャークラスの取得
 	CPlayer_ingredient_data *GetPlayer_ingredient_data(int num_player) { return m_player_ingredient_data[num_player]; }	// プレイヤーの具材情報
 	HWND GetWindowHandle() { return m_hwnd; }	// ウィンドウハンドル取得処理
 	void SetWindowHandle(HWND hWind) { m_hwnd = hWind; }	// ウィンドウハンドル設定処理
@@ -63,8 +67,9 @@ private:
 	CKey *m_key;	// キーボードクラス
 	CDirectInput *m_directInput;	// キーボードクラス
 	CTexture *m_texture;	// テクスチャクラス
-	CXInput *m_xinput;
-	CPlayer_ingredient_data *m_player_ingredient_data[MAX_PLAYER];//プレイヤーの具材情報クラス
+	CXInput *m_xinput;	// xインプットクラス
+	CNetWorkManager *m_net_work_manager;	// ネットワークマネージャークラス
+	CPlayer_ingredient_data *m_player_ingredient_data[MAX_PLAYER];	// プレイヤーの具材情報クラス
 };
 
 
