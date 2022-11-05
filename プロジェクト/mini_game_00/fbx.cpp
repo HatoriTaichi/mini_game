@@ -458,11 +458,10 @@ void CFbx::GetMesh(FbxNodeAttribute *attrib)
 void CFbx::GetVertex(FbxMesh *mesh, MESH_INFO *mesh_info)
 {
 	int polygon_vertex_num = mesh->GetPolygonVertexCount();	// ポリゴンの頂上数の取得
+	int vtx_max = mesh->GetControlPointsCount();	// 頂点数の取得
 	int *index_ary = mesh->GetPolygonVertices();	// ポリゴンのインデックスの取得
-	int control_num = mesh->GetControlPointsCount();	// 頂点数の取得
 	FbxVector4 *src = mesh->GetControlPoints();	// 頂点座標の取得
-	D3DXVECTOR4 *control_ary = new D3DXVECTOR4[control_num];	// 配列を生成
-	vector<D3DXVECTOR4> vetor_buf;	// vetor配列のバッファ
+	D3DXVECTOR4 *control_ary = new D3DXVECTOR4[vtx_max];	// 配列を生成
 
 	// ポリゴンの頂点数分のループ
 	for (int count_control = 0; count_control < polygon_vertex_num; count_control++)
@@ -478,13 +477,13 @@ void CFbx::GetVertex(FbxMesh *mesh, MESH_INFO *mesh_info)
 
 		// 頂点情報の保存
 		mesh_info->vertex_max_ary.push_back(buf);
+
+		// 関連頂点の保存
+		mesh_info->map_index_to_vertex[index].push_back(count_control);
 	}
 
-	// 配列を初期化
-	vetor_buf.clear();
-
 	// 頂点数分のループ
-	for (int count_control = 0; count_control < control_num; count_control++)
+	for (int count_control = 0; count_control < vtx_max; count_control++)
 	{
 		// 頂点情報の保存
 		control_ary[count_control].x = static_cast<float>(src[count_control][0]);
@@ -502,32 +501,49 @@ void CFbx::GetVertex(FbxMesh *mesh, MESH_INFO *mesh_info)
 //=============================================================================
 void CFbx::GetIndex(FbxMesh *mesh, MESH_INFO *mesh_info)
 {
-	vector<int> vetor_buf;	// vector配列のバッファ
 	vector<int> vec_index;	// 重なり頂点カウント
-	pair<vector<int>, vector<vector<int>>> index_to_vertex;	// 関連頂点のペア
-	FbxVector4 *src = mesh->GetControlPoints();	// 頂点座標の取得
-	int index_max = mesh->GetPolygonVertexCount();	// インデックス数を取得
-	int polygon_max = mesh->GetPolygonCount();	// ポリゴン数の取得
+	int vtx_max = mesh_info->vertex_min_ary.size();	// 頂点数の取得
+	int index_to_vtx_max = mesh->GetPolygonVertexCount();	// インデックス数を取得
 	int *index_ary = mesh->GetPolygonVertices();	// ポリゴンのインデックスの取得
-	int control_max = mesh_info->vertex_min_ary.size();	// 頂点数の取得
+
+	// 頂点数分のループ
+	for (int count_index = 0; count_index < vtx_max; count_index++)
+	{
+		int buf = 0;
+		vec_index.push_back(buf);
+	}
 
 	// インデックス数分のループ
-	for (int count_index = 0; count_index < index_max; count_index++)
+	for (int count_index = 0; count_index < index_to_vtx_max; count_index++)
+	{
+		mesh_info->index_number.push_back(mesh_info->map_index_to_vertex[index_ary[count_index]][vec_index[index_ary[count_index]]]);
+
+		//vec_index[index_ary[count_index]]++;
+	}
+
+	/*	vector<int> vec_index;	// 重なり頂点カウント
+	pair<vector<int>, vector<vector<int>>> index_to_vertex;	// 関連頂点のペア
+	int polygon_max = mesh->GetPolygonCount();	// ポリゴン数の取得
+	int vtx_max = mesh_info->vertex_min_ary.size();	// 頂点数の取得
+	int index_to_vtx_max = mesh->GetPolygonVertexCount();	// インデックス数を取得
+	int *index_ary = mesh->GetPolygonVertices();	// ポリゴンのインデックスの取得
+
+	// インデックス数分のループ
+	for (int count_index = 0; count_index < index_to_vtx_max; count_index++)
 	{
 		// インデックスを保存
 		index_to_vertex.first.push_back(index_ary[count_index]);
 	}
-
 	// 頂点数分のループ
-	for (int count_vertex = 0; count_vertex < control_max; count_vertex++)
+	for (int count_vertex = 0; count_vertex < vtx_max; count_vertex++)
 	{
 		vector<int> vertex;	// 関連頂点の配列
 
 		// インデックス数分のループ
-		for (int count_index = 0; count_index < index_max; count_index++)
+		for (int count_index = 0; count_index < index_to_vtx_max; count_index++)
 		{
 			// 位置が一致していたら
-			if (mesh_info->vertex_min_ary[count_vertex] == mesh_info->vertex_max_ary[count_index])
+			if (mesh_info->vertex_min_ary[index_to_vertex.first[count_vertex]] == mesh_info->vertex_max_ary[count_index])
 			{
 				// 頂点番号を保存
 				vertex.push_back(count_index);
@@ -537,25 +553,58 @@ void CFbx::GetIndex(FbxMesh *mesh, MESH_INFO *mesh_info)
 		index_to_vertex.second.push_back(vertex);
 	}
 
+
 	// 保存
 	mesh_info->index_to_vertex.first = index_to_vertex.first;
 	mesh_info->index_to_vertex.second = index_to_vertex.second;
-
 	// 頂点数分のループ
-	for (int count_index = 0; count_index < control_max; count_index++)
+	for (int count_index = 0; count_index < vtx_max; count_index++)
 	{
 		int buf = 0;
 		vec_index.push_back(buf);
 	}
 
 	// インデックス数分のループ
-	for (int count_index = 0; count_index < index_max; count_index++)
+	for (int count_index = 0; count_index < index_to_vtx_max; count_index++)
 	{
 		// インデックスを設定
 		mesh_info->index_number.push_back(mesh_info->index_to_vertex.second[mesh_info->index_to_vertex.first[count_index]][vec_index[mesh_info->index_to_vertex.first[count_index]]]);
 
 		vec_index[mesh_info->index_to_vertex.first[count_index]]++;
 	}
+
+	// 頂点数分のループ
+	for (int count_index = 0; count_index < vtx_max; count_index++)
+	{
+		int buf = 0;
+		vec_index.push_back(buf);
+	}
+
+	// インデックス数分のループ
+	for (int count_index = 0; count_index < index_to_vtx_max; count_index++)
+	{
+		// インデックスを設定
+		mesh_info->index_number.push_back(mesh_info->index_to_vertex.second[mesh_info->index_to_vertex.first[count_index]][vec_index[mesh_info->index_to_vertex.first[count_index]]]);
+
+		int vtx_max = mesh_info->index_to_vertex.second[mesh_info->index_to_vertex.first[count_index]].size();
+
+		if (vtx_max >= vec_index[mesh_info->index_to_vertex.first[count_index]])
+		{
+			vec_index[mesh_info->index_to_vertex.first[count_index]]--;
+		}
+
+		else
+		{
+			// カウントアップ
+			vec_index[mesh_info->index_to_vertex.first[count_index]]++;
+		}
+
+		if (vec_index[mesh_info->index_to_vertex.first[count_index]] == -1)
+		{
+			// カウントアップ
+			vec_index[mesh_info->index_to_vertex.first[count_index]]++;
+		}
+	}*/
 }
 
 //=============================================================================
@@ -1157,7 +1206,7 @@ void CFbx::NoBoneAnim(FbxMesh *mesh)
 void CFbx::BoneAnim(int mesh_count, int anim_type)
 {
 	// 回転の計算
-	UpdateRotate(mesh_count, anim_type);
+	//UpdateRotate(mesh_count, anim_type);
 
 	// 位置の計算
 	//UpdatePos(mesh, mesh_count);
@@ -1193,13 +1242,14 @@ void CFbx::UpdateRotate(int mesh_count, int anim_type)
 			for (int count_weight = 0; count_weight < weight_num; count_weight++)
 			{
 				int weight_vtx_num = m_skin_info.cluster[count_cluster].index_weight.first[count_weight];	// ウェイト頂点の取得
-				int index_max = m_mesh_info[mesh_count]->index_to_vertex.second[weight_vtx_num].size();	// 関連頂上数を取得
+				//int index_max = m_mesh_info[mesh_count]->map_index_to_vertex.second[weight_vtx_num].size();	// 関連頂上数を取得
+				int index_max = m_mesh_info[mesh_count]->map_index_to_vertex[weight_vtx_num].size();	// 関連頂上数を取得
 
 				// 関連頂点分のループ
 				for (int count_index = 0; count_index < index_max; count_index++)
 				{
 					// 頂上情報を設定
-					vtx[m_mesh_info[mesh_count]->index_to_vertex.second[weight_vtx_num][count_index]].pos = m_skin_info.anim[anim_type].anim_vtx_pos[count_cluster][count_weight][m_frame_count];
+					vtx[m_mesh_info[mesh_count]->map_index_to_vertex[weight_vtx_num][count_index]].pos = m_skin_info.anim[anim_type].anim_vtx_pos[count_cluster][count_weight][m_frame_count];
 				}
 			}
 		}

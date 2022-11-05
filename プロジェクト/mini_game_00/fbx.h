@@ -25,6 +25,7 @@ public:
 		vector<D3DXVECTOR4> vertex_max_ary;
 		vector<D3DXVECTOR4> vertex_min_ary;
 		pair<vector<int>, vector<vector<int>>> index_to_vertex;
+		map<int, vector<int>> map_index_to_vertex;
 		vector<D3DXVECTOR3> normal_ary;
 		vector<D3DXCOLOR> color_ary;
 		vector<D3DXVECTOR2> uv_ary;
