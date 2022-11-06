@@ -11,7 +11,7 @@
 #include "manager.h"
 #include "renderer.h"
 
-#define ANIM_SPEED (1)
+#define ANIM_SPEED (15)
 
 //=============================================================================
 // コンストラクタ
@@ -72,7 +72,7 @@ HRESULT CFbx::Init(void)
 	{
 		LPDIRECT3DVERTEXBUFFER9 buf = nullptr;	// 頂点バッファ
 		VERTEX_3D *vtx;	// 頂点情報
-		int vertex_max = m_mesh_info[count_mesh]->vertex_max_ary.size();	// 頂点サイズの取得
+		int vertex_max = m_mesh_info[count_mesh]->vertex_min_ary.size();	// 頂点サイズの取得
 		int uv_max = m_mesh_info[count_mesh]->uv_ary.size();	// uvサイズの取得
 
 		// 頂点バッファの生成
@@ -90,7 +90,7 @@ HRESULT CFbx::Init(void)
 		for (int count_vertex = 0; count_vertex < vertex_max; count_vertex++)
 		{
 			// 頂上情報を設定
-			vtx[count_vertex].pos = D3DXVECTOR3(m_mesh_info[count_mesh]->vertex_max_ary[count_vertex].x, m_mesh_info[count_mesh]->vertex_max_ary[count_vertex].y, m_mesh_info[count_mesh]->vertex_max_ary[count_vertex].z);
+			vtx[count_vertex].pos = D3DXVECTOR3(m_mesh_info[count_mesh]->vertex_min_ary[count_vertex].x, m_mesh_info[count_mesh]->vertex_min_ary[count_vertex].y, m_mesh_info[count_mesh]->vertex_min_ary[count_vertex].z);
 			vtx[count_vertex].col = D3DCOLOR_RGBA(255, 255, 255, 255);
 			vtx[count_vertex].nor = D3DXVECTOR3(m_mesh_info[count_mesh]->normal_ary[count_vertex].x, m_mesh_info[count_mesh]->normal_ary[count_vertex].y, m_mesh_info[count_mesh]->normal_ary[count_vertex].z);
 			if (uv_max > 0)
@@ -300,7 +300,7 @@ void CFbx::Draw(void)
 		// インデックスバッファをデータストリームに設定
 		pDevice->SetIndices(m_mesh_info[count_mesh]->idx_buff);
 
-		int vtx_num = m_mesh_info[count_mesh]->vertex_max_ary.size();	// 頂点数
+		int vtx_num = m_mesh_info[count_mesh]->vertex_min_ary.size();	// 頂点数
 		int polygon_num = m_mesh_info[count_mesh]->index_number.size();	// ポリゴン数
 
 		// ポリゴンの描画
@@ -516,7 +516,7 @@ void CFbx::GetIndex(FbxMesh *mesh, MESH_INFO *mesh_info)
 	// インデックス数分のループ
 	for (int count_index = 0; count_index < index_to_vtx_max; count_index++)
 	{
-		mesh_info->index_number.push_back(mesh_info->map_index_to_vertex[index_ary[count_index]][vec_index[index_ary[count_index]]]);
+		mesh_info->index_number.push_back(index_ary[count_index]);
 
 		//vec_index[index_ary[count_index]]++;
 	}
@@ -1025,7 +1025,7 @@ void CFbx::GetAnimationInfo(void)
 			{
 				vector<vector<D3DXVECTOR3>> frame_vec;	// フレームのベクトル
 				vector<D3DXMATRIX> mat;	// マトリックス
-				vector<vector<D3DXVECTOR3>> vec_ary_mat;	// ベクトル配列
+				vector<vector<D3DXVECTOR3>> vec_ary_frame;	// ベクトル配列
 				D3DXVECTOR3 pos, init_vec;;	// 位置、初期姿勢ベクトル
 				D3DXQUATERNION quaterniom;	// クォータニオン
 				D3DXMATRIX rot_mat, init_mat;	// 現在の回転行列、初期姿勢ベ
@@ -1095,7 +1095,7 @@ void CFbx::GetAnimationInfo(void)
 						D3DXQuaternionToAxisAngle(&quaterniom, &rotate, &angle);
 
 						// ウェイト分の計算
-						angle *= m_skin_info.cluster[count_cluster].index_weight.second[count_point];
+						angle *= static_cast<float>(m_skin_info.cluster[count_cluster].index_weight.second[count_point]);
 
 						// 計算した角度でクォータニオンを生成
 						D3DXQuaternionRotationAxis(&quaterniom, &rotate, angle);
@@ -1103,14 +1103,14 @@ void CFbx::GetAnimationInfo(void)
 						// ベクトルを回転
 						QuaternionVec3Rotate(&ask_pos, quaterniom, &init_vec);
 
-						// ベクトルを保存
+						// 頂点を保存
 						vec_ary.push_back(pos + ask_pos);
 					}
 					// ベクトルを保存
-					vec_ary_mat.push_back(vec_ary);
+					vec_ary_frame.push_back(vec_ary);
 				}
 				// ベクトルを保存
-				anim_info.anim_vtx_pos.push_back(vec_ary_mat);
+				anim_info.anim_vtx_pos.push_back(vec_ary_frame);
 
 				// マトリックスを保存
 				anim_info.frame_mat.push_back(mat);
@@ -1206,7 +1206,7 @@ void CFbx::NoBoneAnim(FbxMesh *mesh)
 void CFbx::BoneAnim(int mesh_count, int anim_type)
 {
 	// 回転の計算
-	//UpdateRotate(mesh_count, anim_type);
+	UpdateRotate(mesh_count, anim_type);
 
 	// 位置の計算
 	//UpdatePos(mesh, mesh_count);
@@ -1235,21 +1235,27 @@ void CFbx::UpdateRotate(int mesh_count, int anim_type)
 		// クラスター数分のループ
 		for (int count_cluster = 0; count_cluster < cluster_max; count_cluster++)
 		{
-			// ウェイトがかけられている数
-			int weight_num = m_skin_info.cluster[count_cluster].index_weight.first.size();
-
-			// ウェイト数分のループ
-			for (int count_weight = 0; count_weight < weight_num; count_weight++)
+			// マトリッックスが動いていたら
+			if (m_skin_info.anim[anim_type].frame_mat[count_cluster][m_frame_count] != m_skin_info.anim[anim_type].frame_mat[count_cluster][m_frame_count_old])
 			{
-				int weight_vtx_num = m_skin_info.cluster[count_cluster].index_weight.first[count_weight];	// ウェイト頂点の取得
-				//int index_max = m_mesh_info[mesh_count]->map_index_to_vertex.second[weight_vtx_num].size();	// 関連頂上数を取得
-				int index_max = m_mesh_info[mesh_count]->map_index_to_vertex[weight_vtx_num].size();	// 関連頂上数を取得
+				// ウェイトがかけられている数
+				int weight_num = m_skin_info.cluster[count_cluster].index_weight.first.size();
 
-				// 関連頂点分のループ
-				for (int count_index = 0; count_index < index_max; count_index++)
+				// ウェイト数分のループ
+				for (int count_weight = 0; count_weight < weight_num; count_weight++)
 				{
-					// 頂上情報を設定
-					vtx[m_mesh_info[mesh_count]->map_index_to_vertex[weight_vtx_num][count_index]].pos = m_skin_info.anim[anim_type].anim_vtx_pos[count_cluster][count_weight][m_frame_count];
+					int weight_vtx_num = m_skin_info.cluster[count_cluster].index_weight.first[count_weight];	// ウェイト頂点の取得
+					//int index_max = m_mesh_info[mesh_count]->map_index_to_vertex.second[weight_vtx_num].size();	// 関連頂上数を取得
+					int index_max = m_mesh_info[mesh_count]->map_index_to_vertex[weight_vtx_num].size();	// 関連頂上数を取得
+
+					vtx[weight_vtx_num].pos = m_skin_info.anim[anim_type].anim_vtx_pos[count_cluster][count_weight][m_frame_count];
+
+					// 関連頂点分のループ
+					for (int count_index = 0; count_index < index_max; count_index++)
+					{
+						// 頂上情報を設定
+						//vtx[m_mesh_info[mesh_count]->map_index_to_vertex[weight_vtx_num][count_index]].pos = m_skin_info.anim[anim_type].anim_vtx_pos[count_cluster][count_weight][m_frame_count];
+					}
 				}
 			}
 		}
