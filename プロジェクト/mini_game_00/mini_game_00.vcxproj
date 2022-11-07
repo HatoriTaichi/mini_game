@@ -171,6 +171,7 @@
     <ClInclude Include="light.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="manager.h" />
+    <ClInclude Include="onlinegame.h" />
     <ClInclude Include="meshfloo.h" />
     <ClInclude Include="meshsphere.h" />
     <ClInclude Include="model.h" />
@@ -212,6 +213,7 @@
     <ClCompile Include="light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="manager.cpp" />
+    <ClCompile Include="onlinegame.cpp" />
     <ClCompile Include="meshfloo.cpp" />
     <ClCompile Include="meshsphere.cpp" />
     <ClCompile Include="model.cpp" />

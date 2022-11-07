@@ -216,6 +216,9 @@
     <ClInclude Include="enemyplayer.h">
       <Filter>ソース ファイル\敵</Filter>
     </ClInclude>
+    <ClInclude Include="onlinegame.h">
+      <Filter>ソース ファイル\ゲームシーン</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="item.cpp">
@@ -337,6 +340,9 @@
     </ClCompile>
     <ClCompile Include="enemyplayer.cpp">
       <Filter>ソース ファイル\敵</Filter>
+    </ClCompile>
+    <ClCompile Include="onlinegame.cpp">
+      <Filter>ソース ファイル\ゲームシーン</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

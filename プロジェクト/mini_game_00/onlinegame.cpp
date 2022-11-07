@@ -1,26 +1,22 @@
 //=============================================================================
 //
-// タイトル処理
+// オンライン対戦(onlinegame.cpp)
 // Author : 羽鳥太一
 //
 //=============================================================================
 //=============================================================================
 // インクルード
 //=============================================================================
-#include "title.h"
-#include "meshsphere.h"
-#include "keyinput.h"
+#include "onlinegame.h"
 #include "manager.h"
-#include "scenemanager.h"
-#include "player.h"
-#include "singlemodel.h"
-#include "ingredients.h"
-#include "enemy.h"
+#include "networkmanager.h"
+#include "communicationdata.h"
+#include "enemyplayer.h"
 
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
-CTitle::CTitle(CObject::LAYER_TYPE layer) :CObject(layer)
+COnlineGame::COnlineGame(CObject::LAYER_TYPE layer) :CObject(layer)
 {
 
 }
@@ -28,7 +24,7 @@ CTitle::CTitle(CObject::LAYER_TYPE layer) :CObject(layer)
 //=============================================================================
 // デフォルトデストラクタ
 //=============================================================================
-CTitle::~CTitle()
+COnlineGame::~COnlineGame()
 {
 
 }
@@ -36,9 +32,10 @@ CTitle::~CTitle()
 //=============================================================================
 // 初期化処理
 //=============================================================================
-HRESULT CTitle::Init(void)
+HRESULT COnlineGame::Init(void)
 {
-
+	// マッチング
+	Matching();
 	
 	return S_OK;
 }
@@ -46,7 +43,7 @@ HRESULT CTitle::Init(void)
 //=============================================================================
 // 終了処理
 //=============================================================================
-void CTitle::Uninit(void)
+void COnlineGame::Uninit(void)
 {
 	//オブジェクトの破棄
 	Release();
@@ -55,20 +52,43 @@ void CTitle::Uninit(void)
 //=============================================================================
 // 更新処理
 //=============================================================================
-void CTitle::Update(void)
+void COnlineGame::Update(void)
 {
-	CKey *key = CManager::GetInstance()->GetKey();
 
-	//if (key->GetTrigger(CKey::KEYBIND::W) == true)
-	//{
-	//	CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::GAME);
-	//}
 }
 
 //=============================================================================
 // 描画処理
 //=============================================================================
-void CTitle::Draw(void)
+void COnlineGame::Draw(void)
 {
 
+}
+
+//=============================================================================
+// マッチング
+//=============================================================================
+void COnlineGame::Matching(void)
+{
+	CTcpClient *client = CManager::GetInstance()->GetNetWorkManager()->GetCommunication();	// 通信クラスの取得
+	CCommunicationData::COMMUNICATION_DATA *player_data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();	// プレイヤーデータの取得
+
+	// 初期化
+	client->Init();
+
+	// 通信
+	client->Connect();
+
+	// 通信確立したら
+	if (client->GetConnect() == true)
+	{
+		// レシーブスレッドを作成
+		CManager::GetInstance()->GetNetWorkManager()->CreateRecvThread();
+	}
+
+	// 敵数分のループ
+	for (int count_enemy = 0; count_enemy < MAX_PLAYER - 1; count_enemy++)
+	{
+		m_enemy_player = CEnemyPlayer::Create();
+	}
 }
