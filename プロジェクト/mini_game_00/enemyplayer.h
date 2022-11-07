@@ -51,6 +51,11 @@ public:
 		MotionState m_moitonState;
 		vector<int> m_nGetIngredientsType;//取得した具材の種類
 		char m_motion_name[64];//モーションの名前
+		bool m_bDrop[MAX_NO_DROP];//ドロップ可能か
+		bool m_bCanDrop;
+		bool m_bOperationLock;
+		int m_nFacing;//向いてる方向
+
 	};
 	CEnemyPlayer(CObject::LAYER_TYPE layer = CObject::LAYER_TYPE::LAYER_01);	// デフォルトコンストラクタ
 	~CEnemyPlayer();	// デフォルトデストラクタ
@@ -61,6 +66,11 @@ public:
 	static CEnemyPlayer *Create(const D3DXVECTOR3& pos, const D3DXVECTOR3& rot,const string& motion_pas);	// 生成
 
 private:
+	void DropItem();//具材を落とす
+	void Item(void);//アイテムの処理
+	void SetItemType(int nType);//アイテム取得処理
+	void SetIngredients(int nType);//アイテム取得処理
+	void SetDropState(void);//具材を落とす状態にする
 	void Motion(void);
 	void CreateModel(void);	// モデルの生成
 	void InitMotionController(void);	// モーションコントローラーの初期化

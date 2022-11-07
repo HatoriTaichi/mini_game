@@ -14,7 +14,10 @@
 #include "model.h"
 #include "motion.h"
 #include "scenemanager.h"
-
+#include "game.h"
+#include "onlinegame.h"
+#include "ingredients.h"
+#include "player.h"
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
@@ -77,6 +80,13 @@ void CEnemyPlayer::Update(void)
 		// 位置と向きを代入
 		m_EnemyPlayerData.m_pos = data->player.pos;
 		m_EnemyPlayerData.m_rot = data->player.rot;
+		for (int nCnt = 0; nCnt < MAX_NO_DROP; nCnt++)
+		{
+			m_EnemyPlayerData.m_bDrop[nCnt] = data->player.bDrop[nCnt];
+		}
+		m_EnemyPlayerData.m_bCanDrop = data->player.bCanDrop;
+		m_EnemyPlayerData.m_bOperationLock = data->player.bOperationLock;
+		m_EnemyPlayerData.m_nFacing = data->player.nFacing;
 		//モーション
 		m_motion_controller->PlayMotin(data->player.motion);
 	}
@@ -148,6 +158,84 @@ CEnemyPlayer *CEnemyPlayer::Create(const D3DXVECTOR3& pos, const D3DXVECTOR3& ro
 		enemy->Init();
 	}
 	return enemy;
+}
+//=============================================================================
+// 具材を落とす処理
+//=============================================================================
+void CEnemyPlayer::DropItem()
+{
+	//具材のクラスにある落とす関数を呼び出す
+	if (m_EnemyPlayerData.m_bCanDrop)
+	{
+		int nSize = m_EnemyPlayerData.m_nGetIngredientsType.size();
+		if (nSize != 0)
+		{
+			m_EnemyPlayerData.m_bCanDrop = false;
+			float DropRot = 0.0f;
+			for (int nCnt = 0; nCnt < MAX_NO_DROP; nCnt++)
+			{
+				//ドロップ方向が可能な範囲なら
+				if (m_EnemyPlayerData.m_bDrop[m_EnemyPlayerData.m_nFacing])
+				{
+					switch (m_EnemyPlayerData.m_nFacing)
+					{
+					case CPlayer::UP:
+						DropRot = D3DXToRadian(180.0f);
+						break;
+					case CPlayer::DOWN:
+						DropRot = D3DXToRadian(0.0f);
+						break;
+					case CPlayer::RIGHT:
+						DropRot = D3DXToRadian(-90.0f);
+						break;
+					case CPlayer::LEFT:
+						DropRot = D3DXToRadian(90.0f);
+						break;
+					}
+					break;
+				}
+				else
+				{
+					switch (nCnt)
+					{
+					case CPlayer::UP:
+						DropRot = D3DXToRadian(180.0f);
+						break;
+					case CPlayer::DOWN:
+						DropRot = D3DXToRadian(0.0f);
+						break;
+					case CPlayer::RIGHT:
+						DropRot = D3DXToRadian(-90.0f);
+						break;
+					case CPlayer::LEFT:
+						DropRot = D3DXToRadian(90.0f);
+						break;
+					}
+					break;
+				}
+			}
+			for (int nCnt = 0; nCnt < 1; nCnt++)
+			{
+				if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::OnLine)
+				{
+					CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
+
+					CManager::GetInstance()->GetSceneManager()->GetOnloineGame()->AddIngredientsCnt(-1, m_EnemyPlayerData.m_nGetIngredientsType[nSize - 1], data->player.number);
+
+				}
+				else
+				{
+					//CManager::GetInstance()->GetSceneManager()->GetGame()->AddIngredientsCnt(-1, m_EnemyPlayerData.m_nGetIngredientsType[nSize - 1], m_nNumPlayer);
+
+				}
+				CIngredients::Create({ m_EnemyPlayerData.m_pos.x,m_EnemyPlayerData.m_pos.y + 90.0f,m_EnemyPlayerData.m_pos.z },
+				{ m_EnemyPlayerData.m_rot.x,DropRot ,m_EnemyPlayerData.m_rot.z }, { 1.0,1.0,1.0 },
+					(CIngredients::IngredientsType)m_EnemyPlayerData.m_nGetIngredientsType[nSize - 1], true, nCnt);
+				m_EnemyPlayerData.m_nGetIngredientsType.erase(m_EnemyPlayerData.m_nGetIngredientsType.end() - 1);
+			}
+		}
+
+	}
 }
 
 //=============================================================================
