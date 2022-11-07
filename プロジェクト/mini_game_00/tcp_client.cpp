@@ -18,6 +18,7 @@
 CTcpClient::CTcpClient()
 {
 	m_socket = INVALID_SOCKET;
+	m_is_connect = false;
 }
 
 //-------------------------------
@@ -53,7 +54,7 @@ bool CTcpClient::Init(void)
 	FILE *pFile;
 	char aFile[2][64];
 
-	pFile = fopen("data/severdata.txt", "r");
+	pFile = fopen("data/Txt/severdata.txt", "r");
 
 	if (pFile != NULL)
 	{
@@ -104,7 +105,7 @@ bool CTcpClient::Connect(void)
 
 	addr.sin_family = AF_INET;	// どの通信か
 	addr.sin_port = htons(m_port_num);	// ポート番号
-	addr.sin_addr.S_un.S_addr = inet_addr(m_ip_name.c_str());
+	addr.sin_addr.S_un.S_addr = inet_addr(m_ip_name.c_str());	// IP
 
 	//------------------------
 	// 接続
