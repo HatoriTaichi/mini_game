@@ -159,6 +159,7 @@
     <ClInclude Include="counter.h" />
     <ClInclude Include="directinput.h" />
     <ClInclude Include="enemy.h" />
+    <ClInclude Include="enemyplayer.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="field.h" />
     <ClInclude Include="fileload.h" />
@@ -217,6 +218,7 @@
     <ClCompile Include="motion.cpp" />
     <ClCompile Include="mouseinput.cpp" />
     <ClCompile Include="move_ui.cpp" />
+    <ClCompile Include="enemyplayer.cpp" />
     <ClCompile Include="networkmanager.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="player.cpp" />

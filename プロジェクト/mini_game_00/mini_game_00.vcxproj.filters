@@ -213,6 +213,9 @@
     <ClInclude Include="communicationdata.h">
       <Filter>ソース ファイル\ネットワーク</Filter>
     </ClInclude>
+    <ClInclude Include="enemyplayer.h">
+      <Filter>ソース ファイル\敵</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="item.cpp">
@@ -331,6 +334,9 @@
     </ClCompile>
     <ClCompile Include="communicationdata.cpp">
       <Filter>ソース ファイル\ネットワーク</Filter>
+    </ClCompile>
+    <ClCompile Include="enemyplayer.cpp">
+      <Filter>ソース ファイル\敵</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
