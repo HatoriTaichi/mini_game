@@ -58,6 +58,10 @@ public:
 		MotionState m_moitonState;
 		vector<int> m_nGetIngredientsType;//取得した具材の種類
 		char m_motion_name[64];//モーションの名前
+		bool m_bDrop[NoDropColli];//ドロップ可能か
+		bool m_bCanDrop;
+		bool m_bOperationLock;
+		int m_nFacing;//向いてる方向
 	};
 	CPlayer(LAYER_TYPE Layer = LAYER_TYPE::LAYER_01);	// デフォルトコンストラクタ
 	~CPlayer();	// デフォルトデストラクタ
@@ -85,9 +89,6 @@ private:
 	void Drawtext(void);
 	void CreateModel(void);	// モデルの生成
 	void InitMotionController(void);	// モーションコントローラーの初期化
-	bool m_bDrop[NoDropColli];//ドロップ可能か
-	bool m_bCanDrop;
-	bool m_bOperationLock;
 	vector<CModel*> m_model;	// モデル
 	CModel*m_pColliNoDrop[NoDropColli];//ドロップしない場所を検知するための当たり判定
 	CModel*m_pCenter;//ドロップしない場所を検知するための当たり判定
@@ -97,7 +98,6 @@ private:
 	D3DXVECTOR3 m_scale;	// スケール
 	D3DXMATRIX m_mtx_wold;	// ワールドマトリックス
 	PLAYER_DATA m_PlayerData;//プレイヤーの情報
-	int nFacing;//向いてる方向
 	int m_nOperationLockTimer;
 	int m_nCntIngredientsType;
 	int m_nItemTimer;

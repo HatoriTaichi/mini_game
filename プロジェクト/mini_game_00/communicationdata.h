@@ -18,6 +18,7 @@
 #define MAX_PLAYER (2)
 #define MAX_MOTION_DATA (64)
 #define MAX_COMMU_DATA (1024)
+#define MAX_NO_DROP (4)
 #define SEND_COUNTER (6)	//何フレームに一回サーバーから情報が送られてくるか
 
 //-------------------------------
@@ -32,6 +33,11 @@ public:
 		D3DXVECTOR3 rot;	// 向き
 		char motion[MAX_MOTION_DATA];	// モーション
 		int number;	// 振り分け番号
+		bool bDrop[MAX_NO_DROP];//ドロップ可能か
+		bool bCanDrop;//ドロップ状態か
+		bool bOperationLock;//行動ができるか
+		int nFacing;//向いてる方向
+
 	} PLAYER_DATA;
 
 	typedef struct

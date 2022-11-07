@@ -159,21 +159,21 @@ void CPlayer::Update(void)
 	//アイテム発動時の処理
 	Item();
 	//具材ドロップ可能なら
-	if (m_bCanDrop)
+	if (m_PlayerData.m_bCanDrop)
 	{
 		DropItem();
 	}
 	////テストで取得した具材を増やす処理
 	//TestGetIngredients();
 	//敵などに当たったら一定時間操作を聞かないようにする
-	if (m_bOperationLock)
+	if (m_PlayerData.m_bOperationLock)
 	{
 		m_PlayerData.m_moitonState = DIZZY;
 		m_nOperationLockTimer++;
 		if (m_nOperationLockTimer >= OperationAgainTime)
 		{
 			m_nOperationLockTimer = 0;
-			m_bOperationLock = false;
+			m_PlayerData.m_bOperationLock = false;
 		}
 	}
 	else
@@ -192,8 +192,8 @@ void CPlayer::Update(void)
 					if (pEnemy->Collision(m_PlayerData.m_pos, PlayerHitSize))
 					{
 						//具材ドロップを可能にする
-						m_bCanDrop = true;
-						m_bOperationLock = true;
+						m_PlayerData.m_bCanDrop = true;
+						m_PlayerData.m_bOperationLock = true;
 					}
 				}
 			}
@@ -249,7 +249,7 @@ void CPlayer::Update(void)
 
 	for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
 	{
-		m_bDrop[nCnt] = true;
+		m_PlayerData.m_bDrop[nCnt] = true;
 	}
 	vector<CObject *>Obj = CObject::GetObjTypeObject(CObject::OBJTYPE::BLOCK);
 	{
@@ -270,7 +270,7 @@ void CPlayer::Update(void)
 						LengthZ <= NoDropSize)
 					{
 						//ドロップしないようにする
-						m_bDrop[nCnt] = false;
+						m_PlayerData.m_bDrop[nCnt] = false;
 					}
 				}
 
@@ -287,7 +287,13 @@ void CPlayer::Update(void)
 		data->player.pos = m_PlayerData.m_pos;
 		data->player.rot = m_PlayerData.m_rot;
 		memcpy(&data->player.motion[0], &m_PlayerData.m_motion_name[0], sizeof(m_PlayerData.m_motion_name));
-
+		for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
+		{
+			data->player.bDrop[nCnt] = m_PlayerData.m_bDrop[nCnt];
+		}
+		data->player.bCanDrop = m_PlayerData.m_bCanDrop;
+		data->player.bOperationLock = m_PlayerData.m_bOperationLock;
+		data->player.nFacing = m_PlayerData.m_nFacing;
 		memcpy(&aSendData[0], data, sizeof(CCommunicationData::COMMUNICATION_DATA));
 		CManager::GetInstance()->GetNetWorkManager()->Send(&aSendData[0], sizeof(CCommunicationData::COMMUNICATION_DATA));
 
@@ -454,25 +460,25 @@ void CPlayer::KeyMove(void)
 	{
 		m_PlayerData.m_pos.z += m_Speed;
 		m_PlayerData.m_rot.y = D3DXToRadian(180.0f);
-		nFacing = UP;
+		m_PlayerData.m_nFacing = UP;
 	}
 	else if (pKey->GetPress(CKey::KEYBIND::S))
 	{
 		m_PlayerData.m_pos.z -= m_Speed;
 		m_PlayerData.m_rot.y = D3DXToRadian(0.0f);
-		nFacing = DOWN;
+		m_PlayerData.m_nFacing = DOWN;
 	}
 	else if (pKey->GetPress(CKey::KEYBIND::A))
 	{
 		m_PlayerData.m_pos.x -= m_Speed;
 		m_PlayerData.m_rot.y = D3DXToRadian(90.0f);
-		nFacing = LEFT;
+		m_PlayerData.m_nFacing = LEFT;
 	}
 	else if (pKey->GetPress(CKey::KEYBIND::D))
 	{
 		m_PlayerData.m_pos.x += m_Speed;
 		m_PlayerData.m_rot.y = D3DXToRadian(-90.0f);
-		nFacing = RIGHT;
+		m_PlayerData.m_nFacing = RIGHT;
 	}
 }
 void CPlayer::PadMove(void)
@@ -532,19 +538,19 @@ void CPlayer::DropItem()
 {
 	//具材のクラスにある落とす関数を呼び出す
 	CKey * pKey = CManager::GetInstance()->GetKey();
-	if (m_bCanDrop)
+	if (m_PlayerData.m_bCanDrop)
 	{
 		int nSize = m_PlayerData.m_nGetIngredientsType.size();
 		if (nSize != 0)
 		{
-			m_bCanDrop = false;
+			m_PlayerData.m_bCanDrop = false;
 			float DropRot = 0.0f;
 			for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
 			{
 				//ドロップ方向が可能な範囲なら
-				if (m_bDrop[nFacing])
+				if (m_PlayerData.m_bDrop[m_PlayerData.m_nFacing])
 				{
-					switch (nFacing)
+					switch (m_PlayerData.m_nFacing)
 					{
 					case CPlayer::UP:
 						DropRot = D3DXToRadian(180.0f);
@@ -668,8 +674,8 @@ void CPlayer::SetIngredients(int nType)
 void CPlayer::SetDropState(void)
 {
 	//具材ドロップを可能にする
-	m_bCanDrop = true;
-	m_bOperationLock = true;
+	m_PlayerData.m_bCanDrop = true;
+	m_PlayerData.m_bOperationLock = true;
 }
 //=============================================================================
 // デバッグ用スタック処理
