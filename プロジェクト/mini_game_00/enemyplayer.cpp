@@ -120,6 +120,13 @@ void CEnemyPlayer::Draw(void)
 	pDevice->SetTransform(	D3DTS_WORLD,
 							&m_mtx_wld);
 
+	// ƒTƒCƒY‚ÌŽæ“¾
+	int size = m_model.size();
+
+	for (int count_model = 0; count_model < size; count_model++)
+	{
+		m_model[count_model]->Draw();
+	}
 }
 
 //=============================================================================

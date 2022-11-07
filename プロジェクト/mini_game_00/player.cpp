@@ -286,7 +286,7 @@ void CPlayer::Update(void)
 		char aSendData[MAX_COMMU_DATA];
 		data->player.pos = m_PlayerData.m_pos;
 		data->player.rot = m_PlayerData.m_rot;
-		strcmp(data->player.motion, m_PlayerData.m_motion_name);
+		memcpy(&data->player.motion[0], &m_PlayerData.m_motion_name[0], sizeof(m_PlayerData.m_motion_name));
 
 		memcpy(&aSendData[0], data, sizeof(CCommunicationData::COMMUNICATION_DATA));
 		CManager::GetInstance()->GetNetWorkManager()->Send(&aSendData[0], sizeof(CCommunicationData::COMMUNICATION_DATA));
