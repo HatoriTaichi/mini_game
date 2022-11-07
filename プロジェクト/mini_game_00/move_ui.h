@@ -23,7 +23,13 @@ class CObject2D;
 class CMove_UI : public CObject
 {
 public:
-
+	enum UI_Type
+	{
+		Type_Start = 0,
+		Type_LastSpurt,
+		Type_Finish,
+		Type_Max
+	};
 
 	enum State
 	{
@@ -42,13 +48,18 @@ public:
 	void Motion(void);//ちょっとした動きの処理
 	void FadeIn(void);//画像のフェードイン
 	void FadeOut(void);//画像のフェードアウト
-	static CMove_UI *Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale,int nPopTime,int nFadeTime, string TexType);	// 生成(位置、サイズ、出現持続時間、フェードインアウトの時間)
+	static CMove_UI *Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale,
+		int nPopTime,int nFadeTime, string TexType, UI_Type type);	// 生成(位置、サイズ、出現持続時間、フェードインアウトの時間)
 	D3DXVECTOR3 GetPos(void) { return m_pos; }	// ゲッダー
 	D3DXVECTOR3 GetRot(void) { return m_rot; }	// ゲッダー
 
 private:
+	void Start(void);//スタートUIの処理
+	void LastSpurt(void);//lastspurtUIの処理
+	void Finisj(void);//フィニッシュUIの処理
 	CObject2D *m_pUI;
-	State m_state;
+	State m_state;//状態
+	UI_Type m_Type; //UIの種類
 	D3DXVECTOR3 m_pos;	// 位置
 	D3DXVECTOR3 m_rot;	// 向き
 	D3DXVECTOR3 m_scale;	// スケール

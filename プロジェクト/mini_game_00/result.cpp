@@ -21,13 +21,13 @@
 #include "2d_ingredients.h"
 #include "XInput.h"
 
-static const int IngredientNumX = 5;
+static const int IngredientNumX = 7;
 static const int IngredientNumY = 10;
 static const int IngredientPopTime = 5;
 static const D3DXVECTOR3 IngredientPosInit1 = {100.0f,100.0f,0.0f};
 static const D3DXVECTOR3 IngredientPosInit2 = { 800.0f,100.0f,0.0f };
-static const float IngredientPopInterval = 70.0f;
-static const float IngredientPopSize = 50.0f;
+static const float IngredientPopInterval = 50.0f;
+static const float IngredientPopSize = 30.0f;
 
 //=============================================================================
 // デフォルトコンストラクタ

@@ -14,6 +14,9 @@
 #include "manager.h"
 #include "billboard.h"
 #include "object2D.h"
+static const int StartUIEndTime = 30;
+static const int LastSpurtUIEndTime = 30;
+static const int FinishUIEndTime = 30;
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -58,18 +61,40 @@ void CMove_UI::Uninit(void)
 //=============================================================================
 void CMove_UI::Update(void)
 {
-	m_nTimer++;
 
 	switch (m_state)
 	{
 	case CMove_UI::ImmediatelyAfterPop:
-		if (m_nTimer >= m_nMaxFadeTime)
+		switch (m_Type)
 		{
-			m_state = Normal;
+		case CMove_UI::Type_Start:
+			FadeIn();
+			break;
+		case CMove_UI::Type_LastSpurt:
+			break;
+		case CMove_UI::Type_Finish:
+			break;
+
 		}
 
 		break;
 	case CMove_UI::Normal:
+		m_nTimer++;
+		switch (m_Type)
+		{
+		case CMove_UI::Type_Start:
+			if (m_nTimer >= StartUIEndTime)
+			{
+				m_nTimer = 0;
+				FadeOut();
+			}
+			break;
+		case CMove_UI::Type_LastSpurt:
+			break;
+		case CMove_UI::Type_Finish:
+			break;
+
+		}
 		break;
 
 	}
@@ -127,11 +152,25 @@ void CMove_UI::FadeIn(void)
 //=============================================================================
 void CMove_UI::FadeOut(void)
 {
+	float fColA = m_pUI->GetCol().a;
+
+	fColA -= 0.01f;
+
+	if (fColA <= 0.0f)
+	{
+		m_bUninit = true;
+	}
+
+	if (m_pUI)
+	{
+		m_pUI->SetCol({ 1.0,1.0,1.0,fColA });
+	}
 }
 //=============================================================================
 // モデルの生成
 //=============================================================================
-CMove_UI *CMove_UI::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, int nPopTime, int nFadeTime, string TexType)
+CMove_UI *CMove_UI::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale,
+	int nPopTime, int nFadeTime, string TexType, UI_Type type)
 {
 	// モデルのポインタ
 	CMove_UI *Ingredients = nullptr;
@@ -145,6 +184,7 @@ CMove_UI *CMove_UI::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, int nPopTime, int
 		Ingredients->m_scale = scale;
 		Ingredients->m_nMaxPopTime = nPopTime;
 		Ingredients->m_nMaxFadeTime = nFadeTime;
+		Ingredients->m_Type = type;
 		if (!Ingredients->m_pUI)
 		{
 			Ingredients->m_pUI = CObject2D::Create(pos, scale, TexType);
@@ -155,6 +195,28 @@ CMove_UI *CMove_UI::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, int nPopTime, int
 		Ingredients->Init();
 	}
 	return Ingredients;
+}
+//=============================================================================
+// スタートUIの処理
+//=============================================================================
+
+void CMove_UI::Start(void)
+{
+
+}
+//=============================================================================
+// lastspurtUIの処理
+//=============================================================================
+
+void CMove_UI::LastSpurt(void)
+{
+}
+//=============================================================================
+// フィニッシュUIの処理
+//=============================================================================
+
+void CMove_UI::Finisj(void)
+{
 }
 
 

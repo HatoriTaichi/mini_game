@@ -20,6 +20,8 @@ static const int MaxIngredients = 5;
 class CPlayer;
 class CObject2D;
 class CCounter;
+class CMove_UI;
+
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
@@ -48,13 +50,12 @@ private:
 	GameMode m_Mode;//ゲーム中のモード
 	CPlayer *m_pPlayer[MaxPlayer];
 	CObject2D *m_pBandUI;
-	CObject2D *m_pStartUI;
-	CObject2D *m_pFinishUI;
-	CObject2D *m_pLastSpurtUI;
 	CObject2D *m_pIngredientsUI[MaxIngredients][MaxPlayer];//具材のUI 
 	CCounter *m_pIngredientsCnt[MaxIngredients][MaxPlayer];//具材のカウント
-
 	CCounter *m_pGameTimer;//ゲームのたいまー
+	CMove_UI *m_pStartUI;
+	CMove_UI *m_pFinishUI;
+	CMove_UI *m_pLastSpurtUI;
 	int *m_NumIngredientsSpawnPoint;
 	int *m_NumItemSpawnPoint;
 	int m_MaxIngredientsSpawn;

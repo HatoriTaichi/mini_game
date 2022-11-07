@@ -21,6 +21,8 @@
 #include "player_ingredient_data.h"
 #include "scenemanager.h"
 #include "wall.h"
+#include "networkmanager.h"
+
 static const float MoveSpeed = 5.0f;
 static const float SpeedUpDiameter = 1.5f;//スピードアップ倍率
 static const float PossibleAttackSpeedUpDiameter = 1.2f;//攻撃可能時のスピードアップ倍率
@@ -39,7 +41,7 @@ CPlayer::CPlayer(LAYER_TYPE layer) : CObject(layer)
 	m_motion_controller = nullptr;
 	memset(m_pColliNoDrop, NULL, sizeof(m_pColliNoDrop));
 	m_Speed = MoveSpeed;
-	m_moitonState = MotionState::NUTLARAL;
+	m_PlayerData.m_moitonState = MotionState::NUTLARAL;
 }
 
 //=============================================================================
@@ -65,28 +67,28 @@ HRESULT CPlayer::Init(void)
 	if (!m_pColliNoDrop[RIGHT])
 	{
 		m_pColliNoDrop[RIGHT] = CModel::Create("box000.x");
-		m_pColliNoDrop[RIGHT]->SetPos({ m_pos.x + 100.0f,m_pos.y,m_pos.z });
+		m_pColliNoDrop[RIGHT]->SetPos({ m_PlayerData.m_pos.x + 100.0f,m_PlayerData.m_pos.y,m_PlayerData.m_pos.z });
 		m_pColliNoDrop[RIGHT]->SetPrent(m_pCenter);
 		m_pColliNoDrop[RIGHT]->SetTransparent(true);
 	}
 	if (!m_pColliNoDrop[LEFT])
 	{
 		m_pColliNoDrop[LEFT] = CModel::Create("crystal.x");
-		m_pColliNoDrop[LEFT]->SetPos({ m_pos.x - 100.0f,m_pos.y,m_pos.z });
+		m_pColliNoDrop[LEFT]->SetPos({ m_PlayerData.m_pos.x - 100.0f,m_PlayerData.m_pos.y,m_PlayerData.m_pos.z });
 		m_pColliNoDrop[LEFT]->SetPrent(m_pCenter);
 		m_pColliNoDrop[LEFT]->SetTransparent(true);
 	}
 	if (!m_pColliNoDrop[UP])
 	{
 		m_pColliNoDrop[UP] = CModel::Create("crystal.x");
-		m_pColliNoDrop[UP]->SetPos({ m_pos.x,m_pos.y,m_pos.z + 100.0f });
+		m_pColliNoDrop[UP]->SetPos({ m_PlayerData.m_pos.x,m_PlayerData.m_pos.y,m_PlayerData.m_pos.z + 100.0f });
 		m_pColliNoDrop[UP]->SetPrent(m_pCenter);
 		m_pColliNoDrop[UP]->SetTransparent(true);
 	}
 	if (!m_pColliNoDrop[DOWN])
 	{
 		m_pColliNoDrop[DOWN] = CModel::Create("crystal.x");
-		m_pColliNoDrop[DOWN]->SetPos({ m_pos.x,m_pos.y,m_pos.z - 100.0f });
+		m_pColliNoDrop[DOWN]->SetPos({ m_PlayerData.m_pos.x,m_PlayerData.m_pos.y,m_PlayerData.m_pos.z - 100.0f });
 		m_pColliNoDrop[DOWN]->SetPrent(m_pCenter);
 		m_pColliNoDrop[DOWN]->SetTransparent(true);
 	}
@@ -100,7 +102,7 @@ HRESULT CPlayer::Init(void)
 void CPlayer::Uninit(void)
 {
 	//具材の情報を保存
-	CManager::GetInstance()->GetPlayer_ingredient_data(m_nNumPlayer)->SetIngredientsType(m_nGetIngredientsType);
+	CManager::GetInstance()->GetPlayer_ingredient_data(m_nNumPlayer)->SetIngredientsType(m_PlayerData.m_nGetIngredientsType);
 	// サイズの取得
 	int size = m_model.size();
 	for (int count_model = 0; count_model < size; count_model++)
@@ -121,7 +123,7 @@ void CPlayer::Uninit(void)
 			m_pColliNoDrop[nCnt] = nullptr;
 		}
 	}
-	m_nGetIngredientsType.clear();
+	m_PlayerData.m_nGetIngredientsType.clear();
 	m_nNumPlayer--;//プレイヤー番号を増やす
 
 	Release();
@@ -134,23 +136,23 @@ void CPlayer::Update(void)
 {
 	if (m_pCenter)
 	{
-		m_pCenter->SetPos(m_pos);
+		m_pCenter->SetPos(m_PlayerData.m_pos);
 	}
 	if (m_pColliNoDrop[RIGHT])
 	{
-		m_pColliNoDrop[RIGHT]->SetPos({ m_pos.x + DropDistance,m_pos.y,m_pos.z });
+		m_pColliNoDrop[RIGHT]->SetPos({ m_PlayerData.m_pos.x + DropDistance,m_PlayerData.m_pos.y,m_PlayerData.m_pos.z });
 	}
 	if (m_pColliNoDrop[LEFT])
 	{
-		m_pColliNoDrop[LEFT]->SetPos({ m_pos.x - DropDistance,m_pos.y,m_pos.z });
+		m_pColliNoDrop[LEFT]->SetPos({ m_PlayerData.m_pos.x - DropDistance,m_PlayerData.m_pos.y,m_PlayerData.m_pos.z });
 	}
 	if (m_pColliNoDrop[UP])
 	{
-		m_pColliNoDrop[UP]->SetPos({ m_pos.x,m_pos.y,m_pos.z + DropDistance });
+		m_pColliNoDrop[UP]->SetPos({ m_PlayerData.m_pos.x,m_PlayerData.m_pos.y,m_PlayerData.m_pos.z + DropDistance });
 	}
 	if (m_pColliNoDrop[DOWN])
 	{
-		m_pColliNoDrop[DOWN]->SetPos({ m_pos.x,m_pos.y,m_pos.z - DropDistance });
+		m_pColliNoDrop[DOWN]->SetPos({ m_PlayerData.m_pos.x,m_PlayerData.m_pos.y,m_PlayerData.m_pos.z - DropDistance });
 	}
 	//モーションの処理
 	Motion();
@@ -162,11 +164,11 @@ void CPlayer::Update(void)
 		DropItem();
 	}
 	//テストで取得した具材を増やす処理
-	//TestGetIngredients();
+	TestGetIngredients();
 	//敵などに当たったら一定時間操作を聞かないようにする
 	if (m_bOperationLock)
 	{
-		m_moitonState = DIZZY;
+		m_PlayerData.m_moitonState = DIZZY;
 		m_nOperationLockTimer++;
 		if (m_nOperationLockTimer >= OperationAgainTime)
 		{
@@ -187,7 +189,7 @@ void CPlayer::Update(void)
 				for (int nCnt = 0; nCnt < nSize; nCnt++)
 				{
 					CEnemy *pEnemy = static_cast<CEnemy*>(ObjEnemy[nCnt]);
-					if (pEnemy->Collision(m_pos, PlayerHitSize))
+					if (pEnemy->Collision(m_PlayerData.m_pos, PlayerHitSize))
 					{
 						//具材ドロップを可能にする
 						m_bCanDrop = true;
@@ -197,7 +199,7 @@ void CPlayer::Update(void)
 			}
 		}
 		//攻撃可能な状態で相手プレイヤーに当たると具材を落とす
-		if (m_ItemState == PossibleAttack)
+		if (m_PlayerData.m_ItemState == PossibleAttack)
 		{
 			vector<CObject *>ObjPlayer = CObject::GetObjTypeObject(CObject::OBJTYPE::PLAYER);
 			{
@@ -210,9 +212,9 @@ void CPlayer::Update(void)
 						//取得したプレイヤー番号が自分と違ったら
 						if (pPlayer->GetPlayerNum() != m_nNumPlayer)
 						{
-							if (pPlayer->Collision(m_pos, PlayerHitSize))
+							if (pPlayer->Collision(m_PlayerData.m_pos, PlayerHitSize))
 							{
-								m_ItemState = Nown;
+								m_PlayerData.m_ItemState = Nown;
 
 								pPlayer->SetDropState();
 							}
@@ -240,7 +242,7 @@ void CPlayer::Update(void)
 		for (int nCntWall = 0; nCntWall < nWallSize; nCntWall++)
 		{
 			CWall *pWall = static_cast<CWall*>(ObjWall[nCntWall]);
-			pWall->Collision(&m_pos, &m_posold, NoDropSize);
+			pWall->Collision(&m_PlayerData.m_pos, &m_PlayerData.m_posold, NoDropSize);
 
 		}
 	}
@@ -257,7 +259,7 @@ void CPlayer::Update(void)
 			for (int nCnt = 0; nCnt < nSize; nCnt++)
 			{
 				CSingleModel *pSModel = static_cast<CSingleModel*>(Obj[nCnt]);
-				pSModel->GetModel()->BoxCollision(&m_pos, m_posold);
+				pSModel->GetModel()->BoxCollision(&m_PlayerData.m_pos, m_PlayerData.m_posold);
 				for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
 				{
 					D3DXVECTOR3 pos = m_pColliNoDrop[nCnt]->GetPos();
@@ -276,7 +278,20 @@ void CPlayer::Update(void)
 		}
 
 	}
-	m_posold = m_pos;
+	m_PlayerData.m_posold = m_PlayerData.m_pos;
+	if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::OnLine)
+	{
+		//プレイヤー情報をサーバーに送信
+		CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
+		char aSendData[MAX_COMMU_DATA];
+		data->player.pos = m_PlayerData.m_pos;
+		data->player.rot = m_PlayerData.m_rot;
+		strcmp(data->player.motion, m_PlayerData.m_motion_name);
+
+		memcpy(&aSendData[0], data, sizeof(CCommunicationData::COMMUNICATION_DATA));
+		CManager::GetInstance()->GetNetWorkManager()->Send(&aSendData[0], sizeof(CCommunicationData::COMMUNICATION_DATA));
+
+	}
 }
 
 //=============================================================================
@@ -298,18 +313,18 @@ void CPlayer::Draw(void)
 
 	// 向きの設定
 	D3DXMatrixRotationYawPitchRoll(	&mtx_rot,
-									m_rot.y,
-									m_rot.x,
-									m_rot.z);
+									m_PlayerData.m_rot.y,
+									m_PlayerData.m_rot.x,
+									m_PlayerData.m_rot.z);
 
 	D3DXMatrixMultiply(	&m_mtx_wold,
 						&m_mtx_wold,
 						&mtx_rot);
 	// 位置
 	D3DXMatrixTranslation(	&mtx_trans,
-							m_pos.x,
-							m_pos.y,
-							m_pos.z);
+							m_PlayerData.m_pos.x,
+							m_PlayerData.m_pos.y,
+							m_PlayerData.m_pos.z);
 
 	D3DXMatrixMultiply(	&m_mtx_wold,
 						&m_mtx_wold,
@@ -343,25 +358,36 @@ void CPlayer::Draw(void)
 //=============================================================================
 void CPlayer::Motion(void)
 {
-	switch (m_moitonState)
+	switch (m_PlayerData.m_moitonState)
 	{
 	case CPlayer::NUTLARAL:
 		m_motion_controller->PlayMotin("NUTLARAL");
+		strcmp(m_PlayerData.m_motion_name, "NUTLARAL");
 		break;
 	case CPlayer::RUN:
 		m_motion_controller->PlayMotin("RUN");
+		strcmp(m_PlayerData.m_motion_name, "RUN");
+
 		break;
 	case CPlayer::DIZZY:
 		m_motion_controller->PlayMotin("DIZZY");
+		strcmp(m_PlayerData.m_motion_name, "DIZZY");
+
 		break;
 	case CPlayer::NECKSWING:
 		m_motion_controller->PlayMotin("NECKSWING");
+		strcmp(m_PlayerData.m_motion_name, "NECKSWING");
+
 		break;
 	case CPlayer::WIN:
 		m_motion_controller->PlayMotin("WIN");
+		strcmp(m_PlayerData.m_motion_name, "WIN");
+
 		break;
 	case CPlayer::LOSE:
 		m_motion_controller->PlayMotin("LOSE");
+		strcmp(m_PlayerData.m_motion_name, "LOSE");
+
 		break;
 	}
 }
@@ -383,10 +409,10 @@ void CPlayer::Drawtext(void)
 		ThumbL.y * ThumbL.y);
 
 	nNum = sprintf(&str[0], "\n\n 情報 \n");
-	int nSize = m_nGetIngredientsType.size();
+	int nSize = m_PlayerData.m_nGetIngredientsType.size();
 	for (int nCnt = 0; nCnt < nSize; nCnt++)
 	{
-		nNum += sprintf(&str[nNum], " [Ingredients%d] %d\n", nCnt, m_nGetIngredientsType[nCnt]);
+		nNum += sprintf(&str[nNum], " [Ingredients%d] %d\n", nCnt, m_PlayerData.m_nGetIngredientsType[nCnt]);
 	}
 	nNum += sprintf(&str[nNum], " [numPlayer] %d\n",m_nNumPlayer);
 	nNum += sprintf(&str[nNum], " [fLength] %.6f\n", fLength);
@@ -426,26 +452,26 @@ void CPlayer::KeyMove(void)
 	CKey * pKey = CManager::GetInstance()->GetKey();
 	if (pKey->GetPress(CKey::KEYBIND::W))
 	{
-		m_pos.z += m_Speed;
-		m_rot.y = D3DXToRadian(180.0f);
+		m_PlayerData.m_pos.z += m_Speed;
+		m_PlayerData.m_rot.y = D3DXToRadian(180.0f);
 		nFacing = UP;
 	}
 	else if (pKey->GetPress(CKey::KEYBIND::S))
 	{
-		m_pos.z -= m_Speed;
-		m_rot.y = D3DXToRadian(0.0f);
+		m_PlayerData.m_pos.z -= m_Speed;
+		m_PlayerData.m_rot.y = D3DXToRadian(0.0f);
 		nFacing = DOWN;
 	}
 	else if (pKey->GetPress(CKey::KEYBIND::A))
 	{
-		m_pos.x -= m_Speed;
-		m_rot.y = D3DXToRadian(90.0f);
+		m_PlayerData.m_pos.x -= m_Speed;
+		m_PlayerData.m_rot.y = D3DXToRadian(90.0f);
 		nFacing = LEFT;
 	}
 	else if (pKey->GetPress(CKey::KEYBIND::D))
 	{
-		m_pos.x += m_Speed;
-		m_rot.y = D3DXToRadian(-90.0f);
+		m_PlayerData.m_pos.x += m_Speed;
+		m_PlayerData.m_rot.y = D3DXToRadian(-90.0f);
 		nFacing = RIGHT;
 	}
 }
@@ -468,7 +494,7 @@ void CPlayer::PadMove(void)
 		(float)GamePad->m_state[m_nNumPlayer].Gamepad.sThumbLX <= -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE || (float)GamePad->m_state[m_nNumPlayer].Gamepad.sThumbLY <= -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 	{
 		//移動モーションにする
-		m_moitonState = MotionState::RUN;
+		m_PlayerData.m_moitonState = MotionState::RUN;
 			//スティックの傾きの長さを求める
 		D3DXVECTOR2 ThumbL = { (float)GamePad->m_state[m_nNumPlayer].Gamepad.sThumbLX ,(float)GamePad->m_state[m_nNumPlayer].Gamepad.sThumbLY };
 		D3DXVec2Normalize(&ThumbL, &ThumbL);
@@ -476,9 +502,9 @@ void CPlayer::PadMove(void)
 			ThumbL.y * ThumbL.y);
 		float fRot = atan2f(-(float)ThumbL.x, -(float)ThumbL.y);
 		rot_y = fRot;
-		m_rot.y = fRot;
-		m_pos.x -= (sinf(rot_y)*m_Speed)*fLength;
-		m_pos.z -= (cosf(rot_y)*m_Speed)*fLength;
+		m_PlayerData.m_rot.y = fRot;
+		m_PlayerData.m_pos.x -= (sinf(rot_y)*m_Speed)*fLength;
+		m_PlayerData.m_pos.z -= (cosf(rot_y)*m_Speed)*fLength;
 		//m_fSoundInterval += 0.1f;
 		//if (m_fSoundInterval >= 1.3f)
 		//{
@@ -491,7 +517,7 @@ void CPlayer::PadMove(void)
 	else
 	{
 		////待機モーションに戻る
-		m_moitonState = MotionState::NUTLARAL;
+		m_PlayerData.m_moitonState = MotionState::NUTLARAL;
 		//m_fSoundInterval = 1.3f;
 
 		//CManager::GetSound()->StopSound(CSound::SOUND_LABEL_SE_WALK);
@@ -508,7 +534,7 @@ void CPlayer::DropItem()
 	CKey * pKey = CManager::GetInstance()->GetKey();
 	if (m_bCanDrop)
 	{
-		int nSize = m_nGetIngredientsType.size();
+		int nSize = m_PlayerData.m_nGetIngredientsType.size();
 		if (nSize != 0)
 		{
 			m_bCanDrop = false;
@@ -557,11 +583,11 @@ void CPlayer::DropItem()
 			}
 			for (int nCnt = 0; nCnt < 1; nCnt++)
 			{
-				CManager::GetInstance()->GetSceneManager()->GetGame()->AddIngredientsCnt(-1, m_nGetIngredientsType[nSize - 1], m_nNumPlayer);
-				CIngredients::Create({ m_pos.x,m_pos.y + 90.0f,m_pos.z },
-				{ m_rot.x,DropRot ,m_rot.z }, { 1.0,1.0,1.0 },
-					(CIngredients::IngredientsType)m_nGetIngredientsType[nSize - 1], true, nCnt);
-				m_nGetIngredientsType.erase(m_nGetIngredientsType.end()-1);
+				CManager::GetInstance()->GetSceneManager()->GetGame()->AddIngredientsCnt(-1, m_PlayerData.m_nGetIngredientsType[nSize - 1], m_nNumPlayer);
+				CIngredients::Create({ m_PlayerData.m_pos.x,m_PlayerData.m_pos.y + 90.0f,m_PlayerData.m_pos.z },
+				{ m_PlayerData.m_rot.x,DropRot ,m_PlayerData.m_rot.z }, { 1.0,1.0,1.0 },
+					(CIngredients::IngredientsType)m_PlayerData.m_nGetIngredientsType[nSize - 1], true, nCnt);
+				m_PlayerData.m_nGetIngredientsType.erase(m_PlayerData.m_nGetIngredientsType.end()-1);
 			}
 		}
 
@@ -573,7 +599,7 @@ void CPlayer::DropItem()
 void CPlayer::Item(void)
 {
 	int SpeedUpSpeed = 0;
-	switch (m_ItemState)
+	switch (m_PlayerData.m_ItemState)
 	{
 	case CPlayer::Nown:
 		m_Speed = MoveSpeed;
@@ -588,7 +614,7 @@ void CPlayer::Item(void)
 		if (m_nItemTimer >= SpeedUpTimeLimit)
 		{
 			m_nItemTimer = 0;
-			m_ItemState = Nown;
+			m_PlayerData.m_ItemState = Nown;
 		}
 		break;
 		//攻撃可能
@@ -600,7 +626,7 @@ void CPlayer::Item(void)
 		if (m_nItemTimer >= PossibleAttackTimeLimit)
 		{
 			m_nItemTimer = 0;
-			m_ItemState = Nown;
+			m_PlayerData.m_ItemState = Nown;
 		}
 		//相手プレイヤーに当たったら具材をおとさせる
 
@@ -612,9 +638,9 @@ void CPlayer::Item(void)
 //=============================================================================
 void CPlayer::SetItemType(int nType)
 {
-	if (m_ItemState == Nown)
+	if (m_PlayerData.m_ItemState == Nown)
 	{
-		m_ItemState = static_cast <ItemGetState>(nType);
+		m_PlayerData.m_ItemState = static_cast <ItemGetState>(nType);
 	}
 
 }
@@ -623,7 +649,7 @@ void CPlayer::SetItemType(int nType)
 //=============================================================================
 void CPlayer::SetIngredients(int nType)
 {
-	m_nGetIngredientsType.push_back(nType);
+	m_PlayerData.m_nGetIngredientsType.push_back(nType);
 }
 //=============================================================================
 // 具材を落とす状態にする
@@ -633,7 +659,6 @@ void CPlayer::SetDropState(void)
 	//具材ドロップを可能にする
 	m_bCanDrop = true;
 	m_bOperationLock = true;
-
 }
 //=============================================================================
 // デバッグ用スタック処理
@@ -647,12 +672,12 @@ void CPlayer::TestGetIngredients(void)
 		std::random_device random;	// 非決定的な乱数生成器
 		std::mt19937_64 mt(random());            // メルセンヌ・ツイスタの64ビット版、引数は初期シード
 		std::uniform_real_distribution<> randType(0, 5);
-		std::uniform_real_distribution<> randNum(5, 35);
+		std::uniform_real_distribution<> randNum(30, 55);
 		int nMax = static_cast <int>(randNum(mt));
 		for (int nCnt = 0; nCnt < nMax; nCnt++)
 		{
 			int nType = static_cast <int>(randType(mt));
-			m_nGetIngredientsType.push_back(nType);
+			m_PlayerData.m_nGetIngredientsType.push_back(nType);
 
 		}
 		CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT);
@@ -665,7 +690,7 @@ void CPlayer::TestGetIngredients(void)
 //=============================================================================
 bool CPlayer::Collision(const D3DXVECTOR3 & pos, float fSize)
 {
-	D3DXVECTOR3 vec = pos - m_pos;
+	D3DXVECTOR3 vec = pos - m_PlayerData.m_pos;
 	float LengthX = sqrtf((vec.x*vec.x));
 	float LengthZ = sqrtf((vec.z*vec.z));
 
@@ -690,8 +715,8 @@ CPlayer *CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, st
 	if (player != nullptr)
 	{
 		// 値を代入
-		player->m_pos = pos;
-		player->m_rot = rot;
+		player->m_PlayerData.m_pos = pos;
+		player->m_PlayerData.m_rot = rot;
 		player->m_scale = scale;
 		player->m_motion_text_pas = motion_pas;
 		player->m_nNumPlayer = nNumPlayer;
