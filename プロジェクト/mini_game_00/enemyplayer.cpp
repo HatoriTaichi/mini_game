@@ -125,7 +125,7 @@ void CEnemyPlayer::Draw(void)
 //=============================================================================
 // モデルの生成
 //=============================================================================
-CEnemyPlayer *CEnemyPlayer::Create(void)
+CEnemyPlayer *CEnemyPlayer::Create(const D3DXVECTOR3& pos, const D3DXVECTOR3& rot, const string& motion_pas)
 {
 	// 敵のポインタ
 	CEnemyPlayer *enemy = nullptr;
@@ -134,6 +134,9 @@ CEnemyPlayer *CEnemyPlayer::Create(void)
 	// 生成されていたら
 	if (enemy != nullptr)
 	{
+		enemy->m_EnemyPlayerData.m_pos = pos;
+		enemy->m_EnemyPlayerData.m_rot = rot;
+		enemy->m_motion_text_pas = motion_pas;
 		// 初期化
 		enemy->Init();
 	}

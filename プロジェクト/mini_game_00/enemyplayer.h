@@ -58,7 +58,7 @@ public:
 	void Uninit(void);	// ポリゴンの終了
 	void Update(void);	// ポリゴンの更新
 	void Draw(void);	// ポリゴンの描画
-	static CEnemyPlayer *Create(void);	// 生成
+	static CEnemyPlayer *Create(const D3DXVECTOR3& pos, const D3DXVECTOR3& rot,const string& motion_pas);	// 生成
 
 private:
 	void Motion(void);
