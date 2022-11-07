@@ -18,6 +18,8 @@
 #include"game.h"
 #include "scenemanager.h"
 #include "wall.h"
+#include "onlinegame.h"
+#include "networkmanager.h"
 static float Size = 7.0f;
 static float fDropMoveSpeed = 8.0f;
 static const float FallSpeed = 5.0f;
@@ -407,7 +409,16 @@ void CIngredients::ColisionPlayer(void)
 				if (!m_bDelete)
 				{
 					pPlayer->SetIngredients(m_Type);
-					CManager::GetInstance()->GetSceneManager()->GetGame()->AddIngredientsCnt(1, m_Type, nCnt);
+					if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::OnLine)
+					{
+						CManager::GetInstance()->GetSceneManager()->GetOnloineGame()->AddIngredientsCnt(1, m_Type, nCnt);
+
+					}
+					else
+					{
+						CManager::GetInstance()->GetSceneManager()->GetGame()->AddIngredientsCnt(1, m_Type, nCnt);
+
+					}
 					if (!m_bDoDrop)
 					{
 						DeleteIngredient();

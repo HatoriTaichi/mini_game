@@ -39,7 +39,7 @@ CEnemyPlayer::~CEnemyPlayer()
 //=============================================================================
 HRESULT CEnemyPlayer::Init(void)
 {
-	SetObjType(CObject::OBJTYPE::ENEMYPLAYER);
+	SetObjType(CObject::OBJTYPE::PLAYER);
 	CreateModel();
 	return S_OK;
 }
