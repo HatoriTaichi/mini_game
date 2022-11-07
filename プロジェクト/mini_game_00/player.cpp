@@ -22,7 +22,7 @@
 #include "scenemanager.h"
 #include "wall.h"
 #include "networkmanager.h"
-
+#include "onlinegame.h"
 static const float MoveSpeed = 5.0f;
 static const float SpeedUpDiameter = 1.5f;//スピードアップ倍率
 static const float PossibleAttackSpeedUpDiameter = 1.2f;//攻撃可能時のスピードアップ倍率
@@ -163,8 +163,8 @@ void CPlayer::Update(void)
 	{
 		DropItem();
 	}
-	//テストで取得した具材を増やす処理
-	TestGetIngredients();
+	////テストで取得した具材を増やす処理
+	//TestGetIngredients();
 	//敵などに当たったら一定時間操作を聞かないようにする
 	if (m_bOperationLock)
 	{
@@ -180,7 +180,7 @@ void CPlayer::Update(void)
 	{
 		//移動処理
 		KeyMove();
-		PadMove();
+		//PadMove();
 		vector<CObject *>ObjEnemy = CObject::GetObjTypeObject(CObject::OBJTYPE::ENEMY);
 		{
 			int nSize = ObjEnemy.size();
@@ -583,7 +583,18 @@ void CPlayer::DropItem()
 			}
 			for (int nCnt = 0; nCnt < 1; nCnt++)
 			{
-				CManager::GetInstance()->GetSceneManager()->GetGame()->AddIngredientsCnt(-1, m_PlayerData.m_nGetIngredientsType[nSize - 1], m_nNumPlayer);
+				if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::OnLine)
+				{
+					CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
+
+					CManager::GetInstance()->GetSceneManager()->GetOnloineGame()->AddIngredientsCnt(-1, m_PlayerData.m_nGetIngredientsType[nSize - 1], data->player.number);
+
+				}
+				else
+				{
+					CManager::GetInstance()->GetSceneManager()->GetGame()->AddIngredientsCnt(-1, m_PlayerData.m_nGetIngredientsType[nSize - 1], m_nNumPlayer);
+
+				}
 				CIngredients::Create({ m_PlayerData.m_pos.x,m_PlayerData.m_pos.y + 90.0f,m_PlayerData.m_pos.z },
 				{ m_PlayerData.m_rot.x,DropRot ,m_PlayerData.m_rot.z }, { 1.0,1.0,1.0 },
 					(CIngredients::IngredientsType)m_PlayerData.m_nGetIngredientsType[nSize - 1], true, nCnt);
