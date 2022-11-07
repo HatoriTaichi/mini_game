@@ -307,12 +307,19 @@ void COnlineGame::Matching(void)
 {
 	CTcpClient *client = CManager::GetInstance()->GetNetWorkManager()->GetCommunication();	// 通信クラスの取得
 	CCommunicationData::COMMUNICATION_DATA *player_data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();	// プレイヤーデータの取得
+	char recv_data[MAX_COMMU_DATA];	// 受信データ
 
 	// 初期化
 	client->Init();
 
 	// 通信
 	client->Connect();
+
+	// 受信
+	client->Recv(&recv_data[0], sizeof(CCommunicationData::COMMUNICATION_DATA));
+
+	// メモリのコピー
+	memcpy(player_data, &recv_data[0], sizeof(CCommunicationData::COMMUNICATION_DATA));
 
 	// 通信確立したら
 	if (client->GetConnect() == true)
