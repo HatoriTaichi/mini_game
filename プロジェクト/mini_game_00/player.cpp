@@ -362,31 +362,31 @@ void CPlayer::Motion(void)
 	{
 	case CPlayer::NUTLARAL:
 		m_motion_controller->PlayMotin("NUTLARAL");
-		strcmp(m_PlayerData.m_motion_name, "NUTLARAL");
+		memcpy(&m_PlayerData.m_motion_name[0], "NUTLARAL", sizeof(m_PlayerData.m_motion_name));
 		break;
 	case CPlayer::RUN:
 		m_motion_controller->PlayMotin("RUN");
-		strcmp(m_PlayerData.m_motion_name, "RUN");
+		memcpy(&m_PlayerData.m_motion_name[0], "RUN", sizeof(m_PlayerData.m_motion_name));
 
 		break;
 	case CPlayer::DIZZY:
 		m_motion_controller->PlayMotin("DIZZY");
-		strcmp(m_PlayerData.m_motion_name, "DIZZY");
+		memcpy(&m_PlayerData.m_motion_name[0], "DIZZY", sizeof(m_PlayerData.m_motion_name));
 
 		break;
 	case CPlayer::NECKSWING:
 		m_motion_controller->PlayMotin("NECKSWING");
-		strcmp(m_PlayerData.m_motion_name, "NECKSWING");
+		memcpy(&m_PlayerData.m_motion_name[0], "NECKSWING", sizeof(m_PlayerData.m_motion_name));
 
 		break;
 	case CPlayer::WIN:
 		m_motion_controller->PlayMotin("WIN");
-		strcmp(m_PlayerData.m_motion_name, "WIN");
+		memcpy(&m_PlayerData.m_motion_name[0], "WIN", sizeof(m_PlayerData.m_motion_name));
 
 		break;
 	case CPlayer::LOSE:
 		m_motion_controller->PlayMotin("LOSE");
-		strcmp(m_PlayerData.m_motion_name, "LOSE");
+		memcpy(&m_PlayerData.m_motion_name[0], "LOSE", sizeof(m_PlayerData.m_motion_name));
 
 		break;
 	}
