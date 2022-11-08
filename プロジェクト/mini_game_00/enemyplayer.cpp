@@ -102,7 +102,7 @@ void CEnemyPlayer::Update(void)
 		pos_vec /= static_cast<float>(SEND_FRAME);
 
 		// ˆÊ’u‚Ìİ’è
-		m_enemy_player_data.pos += pos_vec;
+		m_enemy_player_data.pos = m_enemy_player_data.pos_old + pos_vec;
 	}
 }
 
