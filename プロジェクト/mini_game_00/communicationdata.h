@@ -33,10 +33,10 @@ public:
 		D3DXVECTOR3 rot;	// 向き
 		char motion[MAX_MOTION_DATA];	// モーション
 		int number;	// 振り分け番号
-		bool drop[MAX_NO_DROP];//ドロップ可能か
-		bool can_drop;//ドロップ状態か
-		bool operation_loock;//行動ができるか
-		int facing;//向いてる方向
+		bool drop[MAX_NO_DROP];	// ドロップ可能か
+		bool can_drop;	// ドロップ状態か
+		bool operation_loock;	// 行動ができるか
+		int facing;	// 向いてる方向
 	} PLAYER_DATA;
 
 	typedef struct
