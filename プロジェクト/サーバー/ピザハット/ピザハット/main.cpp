@@ -167,7 +167,7 @@ void CreateRoom(vector<CCommunication*> communication, int room_num)
 		}
 
 		// 1秒に指定した回数だけ
-		//if ((current_time - exec_last_time) >= ((1000) / SEND_COUNTER_FRAME))
+		//if ((current_time - exec_last_time) >= ((1000) / 60))
 		{
 			// 現在の時間を保存
 			exec_last_time = current_time;
@@ -206,7 +206,7 @@ void CreateRoom(vector<CCommunication*> communication, int room_num)
 				cout << "Player : " << count_player << "->プレイヤーの位置" << data[count_player]->player.pos.x << " : " << data[count_player]->player.pos.y << " : " << data[count_player]->player.pos.z << endl;
 				cout << "Player : " << count_player << "->プレイヤーの回転" << data[count_player]->player.rot.x << " : " << data[count_player]->player.rot.y << " : " << data[count_player]->player.rot.z << endl;
 				cout << "Player : " << count_player << "->プレイヤーのモーション" << data[count_player]->player.motion << endl;
-				cout << "Player : " << count_player << "->プレイヤーのモーション" << data[count_player]->connect << endl;
+				cout << "Player : " << count_player << "->プレイヤーの接続状況" << data[count_player]->connect << endl;
 			}
 			cout << "=======================================================" << endl;
 		}

@@ -23,9 +23,9 @@
 //=============================================================================
 CEnemyPlayer::CEnemyPlayer(CObject::LAYER_TYPE layer) : CObject(layer)
 {
-	m_EnemyPlayerData.m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_EnemyPlayerData.m_pos_old = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_EnemyPlayerData.m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_enemy_player_data.pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_enemy_player_data.pos_old = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_enemy_player_data.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXMatrixIdentity(&m_mtx_wld);
 }
 
@@ -78,15 +78,15 @@ void CEnemyPlayer::Update(void)
 		CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetEnemyData()->GetCmmuData();
 
 		// 位置と向きを代入
-		m_EnemyPlayerData.m_pos = data->player.pos;
-		m_EnemyPlayerData.m_rot = data->player.rot;
-		for (int nCnt = 0; nCnt < MAX_NO_DROP; nCnt++)
+		m_enemy_player_data.pos = data->player.pos;
+		m_enemy_player_data.rot = data->player.rot;
+		for (int count_drop = 0; count_drop < MAX_NO_DROP; count_drop++)
 		{
-			m_EnemyPlayerData.m_bDrop[nCnt] = data->player.bDrop[nCnt];
+			m_enemy_player_data.drop[count_drop] = data->player.drop[count_drop];
 		}
-		m_EnemyPlayerData.m_bCanDrop = data->player.bCanDrop;
-		m_EnemyPlayerData.m_bOperationLock = data->player.bOperationLock;
-		m_EnemyPlayerData.m_nFacing = data->player.nFacing;
+		m_enemy_player_data.can_drop = data->player.can_drop;
+		m_enemy_player_data.operation_lock = data->player.operation_loock;
+		m_enemy_player_data.facing = data->player.facing;
 		//モーション
 		m_motion_controller->PlayMotin(data->player.motion);
 	}
@@ -110,18 +110,18 @@ void CEnemyPlayer::Draw(void)
 
 	//向きの設定
 	D3DXMatrixRotationYawPitchRoll(	&mtxRot,
-									m_EnemyPlayerData.m_rot.y,
-									m_EnemyPlayerData.m_rot.x,
-									m_EnemyPlayerData.m_rot.z);
+									m_enemy_player_data.rot.y,
+									m_enemy_player_data.rot.x,
+									m_enemy_player_data.rot.z);
 
 	D3DXMatrixMultiply(	&m_mtx_wld,
 						&m_mtx_wld,
 						&mtxRot);
 	//位置
 	D3DXMatrixTranslation(	&mtxTrans,
-							m_EnemyPlayerData.m_pos.x,
-							m_EnemyPlayerData.m_pos.y,
-							m_EnemyPlayerData.m_pos.z);
+							m_enemy_player_data.pos.x,
+							m_enemy_player_data.pos.y,
+							m_enemy_player_data.pos.z);
 
 	D3DXMatrixMultiply(	&m_mtx_wld,
 						&m_mtx_wld,
@@ -151,8 +151,8 @@ CEnemyPlayer *CEnemyPlayer::Create(const D3DXVECTOR3& pos, const D3DXVECTOR3& ro
 	// 生成されていたら
 	if (enemy != nullptr)
 	{
-		enemy->m_EnemyPlayerData.m_pos = pos;
-		enemy->m_EnemyPlayerData.m_rot = rot;
+		enemy->m_enemy_player_data.pos = pos;
+		enemy->m_enemy_player_data.rot = rot;
 		enemy->m_motion_text_pas = motion_pas;
 		// 初期化
 		enemy->Init();
@@ -165,19 +165,19 @@ CEnemyPlayer *CEnemyPlayer::Create(const D3DXVECTOR3& pos, const D3DXVECTOR3& ro
 void CEnemyPlayer::DropItem()
 {
 	//具材のクラスにある落とす関数を呼び出す
-	if (m_EnemyPlayerData.m_bCanDrop)
+	if (m_enemy_player_data.can_drop)
 	{
-		int nSize = m_EnemyPlayerData.m_nGetIngredientsType.size();
-		if (nSize != 0)
+		int size = m_enemy_player_data.get_ingredients_type.size();
+		if (size != 0)
 		{
-			m_EnemyPlayerData.m_bCanDrop = false;
+			m_enemy_player_data.can_drop = false;
 			float DropRot = 0.0f;
 			for (int nCnt = 0; nCnt < MAX_NO_DROP; nCnt++)
 			{
 				//ドロップ方向が可能な範囲なら
-				if (m_EnemyPlayerData.m_bDrop[m_EnemyPlayerData.m_nFacing])
+				if (m_enemy_player_data.drop[m_enemy_player_data.facing])
 				{
-					switch (m_EnemyPlayerData.m_nFacing)
+					switch (m_enemy_player_data.facing)
 					{
 					case CPlayer::UP:
 						DropRot = D3DXToRadian(180.0f);
@@ -220,7 +220,7 @@ void CEnemyPlayer::DropItem()
 				{
 					CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
 
-					CManager::GetInstance()->GetSceneManager()->GetOnloineGame()->AddIngredientsCnt(-1, m_EnemyPlayerData.m_nGetIngredientsType[nSize - 1], data->player.number);
+					CManager::GetInstance()->GetSceneManager()->GetOnloineGame()->AddIngredientsCnt(-1, m_enemy_player_data.get_ingredients_type[size - 1], data->player.number);
 
 				}
 				else
@@ -228,10 +228,10 @@ void CEnemyPlayer::DropItem()
 					//CManager::GetInstance()->GetSceneManager()->GetGame()->AddIngredientsCnt(-1, m_EnemyPlayerData.m_nGetIngredientsType[nSize - 1], m_nNumPlayer);
 
 				}
-				CIngredients::Create({ m_EnemyPlayerData.m_pos.x,m_EnemyPlayerData.m_pos.y + 90.0f,m_EnemyPlayerData.m_pos.z },
-				{ m_EnemyPlayerData.m_rot.x,DropRot ,m_EnemyPlayerData.m_rot.z }, { 1.0,1.0,1.0 },
-					(CIngredients::IngredientsType)m_EnemyPlayerData.m_nGetIngredientsType[nSize - 1], true, nCnt);
-				m_EnemyPlayerData.m_nGetIngredientsType.erase(m_EnemyPlayerData.m_nGetIngredientsType.end() - 1);
+				CIngredients::Create({ m_enemy_player_data.pos.x,m_enemy_player_data.pos.y + 90.0f,m_enemy_player_data.pos.z },
+				{ m_enemy_player_data.rot.x,DropRot ,m_enemy_player_data.rot.z }, { 1.0,1.0,1.0 },
+					(CIngredients::IngredientsType)m_enemy_player_data.get_ingredients_type[size - 1], true, nCnt);
+				m_enemy_player_data.get_ingredients_type.erase(m_enemy_player_data.get_ingredients_type.end() - 1);
 			}
 		}
 
@@ -284,7 +284,7 @@ void CEnemyPlayer::InitMotionController(void)
 	vector<D3DXVECTOR3*> model_rot;	// モデルの向き
 	int max_model = m_model.size();	// サイズの取得
 
-									// サイズ分のループ
+	// サイズ分のループ
 	for (int count_model = 0; count_model < max_model; count_model++)
 	{
 		// ポインタの保存

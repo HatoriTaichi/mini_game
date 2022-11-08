@@ -289,11 +289,11 @@ void CPlayer::Update(void)
 		memcpy(&data->player.motion[0], &m_PlayerData.m_motion_name[0], sizeof(m_PlayerData.m_motion_name));
 		for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
 		{
-			data->player.bDrop[nCnt] = m_PlayerData.m_bDrop[nCnt];
+			data->player.drop[nCnt] = m_PlayerData.m_bDrop[nCnt];
 		}
-		data->player.bCanDrop = m_PlayerData.m_bCanDrop;
-		data->player.bOperationLock = m_PlayerData.m_bOperationLock;
-		data->player.nFacing = m_PlayerData.m_nFacing;
+		data->player.can_drop = m_PlayerData.m_bCanDrop;
+		data->player.operation_loock = m_PlayerData.m_bOperationLock;
+		data->player.facing = m_PlayerData.m_nFacing;
 		memcpy(&aSendData[0], data, sizeof(CCommunicationData::COMMUNICATION_DATA));
 		CManager::GetInstance()->GetNetWorkManager()->Send(&aSendData[0], sizeof(CCommunicationData::COMMUNICATION_DATA));
 
