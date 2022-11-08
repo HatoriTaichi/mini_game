@@ -98,7 +98,7 @@ HRESULT COnlineGame::Init(void)
 	// マッチング
 	Matching();
 
-	while (!CNetWorkManager::GetAllConnect())
+	while (true)
 	{
 		if (CNetWorkManager::GetAllConnect())
 		{
@@ -255,6 +255,10 @@ HRESULT COnlineGame::Init(void)
 					"wooden_floor.png");
 			}
 			EnemySpawn();
+		}
+		else if (!CNetWorkManager::GetAllConnect())
+		{
+			break;
 		}
 	}
 
