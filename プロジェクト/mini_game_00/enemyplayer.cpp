@@ -78,6 +78,7 @@ void CEnemyPlayer::Update(void)
 		CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetEnemyData()->GetCmmuData();
 
 		// 位置と向きを代入
+		m_enemy_player_data.pos_old = m_enemy_player_data.pos;
 		m_enemy_player_data.pos = data->player.pos;
 		m_enemy_player_data.rot = data->player.rot;
 		for (int count_drop = 0; count_drop < MAX_NO_DROP; count_drop++)
@@ -91,6 +92,18 @@ void CEnemyPlayer::Update(void)
 		m_motion_controller->PlayMotin(data->player.motion);
 	}
 
+	// 動いてたら
+	if (m_enemy_player_data.pos_old != m_enemy_player_data.pos)
+	{
+		// ベクトルを算出
+		D3DXVECTOR3 pos_vec = m_enemy_player_data.pos - m_enemy_player_data.pos_old;
+
+		// ベクトルの計算
+		pos_vec /= static_cast<float>(SEND_FRAME);
+
+		// 位置の設定
+		m_enemy_player_data.pos += pos_vec;
+	}
 }
 
 //=============================================================================

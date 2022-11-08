@@ -167,7 +167,7 @@ void CreateRoom(vector<CCommunication*> communication, int room_num)
 		}
 
 		// 1•b‚Éw’è‚µ‚½‰ñ”‚¾‚¯
-		//if ((current_time - exec_last_time) >= ((1000) / 60))
+		if ((current_time - exec_last_time) >= ((1000) / SEND_FRAME))
 		{
 			// Œ»İ‚ÌŠÔ‚ğ•Û‘¶
 			exec_last_time = current_time;

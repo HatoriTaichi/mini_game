@@ -20,7 +20,7 @@
 #define MAX_MOTION_DATA (64)
 #define MAX_COMMU_DATA (1024)
 #define MAX_NO_DROP (4)
-#define SEND_COUNTER (6)	//何フレームに一回サーバーから情報が送られてくるか
+#define SEND_FRAME (6)
 
 //-------------------------------
 // Classの定義
