@@ -20,7 +20,7 @@ CFbx::CFbx()
 {
 	D3DXMatrixIdentity(&m_mtx_wold);
 	m_pas.clear();
-	m_pos = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
+	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_is_bone = false;
