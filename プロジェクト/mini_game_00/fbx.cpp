@@ -72,7 +72,7 @@ HRESULT CFbx::Init(void)
 	{
 		LPDIRECT3DVERTEXBUFFER9 buf = nullptr;	// 頂点バッファ
 		VERTEX_3D *vtx;	// 頂点情報
-		int vertex_max = m_mesh_info[count_mesh]->vertex_min_ary.size();	// 頂点サイズの取得
+		int vertex_max = m_mesh_info[count_mesh]->vertex_max_ary.size();	// 頂点サイズの取得
 		int uv_max = m_mesh_info[count_mesh]->uv_ary.size();	// uvサイズの取得
 
 		// 頂点バッファの生成
@@ -90,7 +90,7 @@ HRESULT CFbx::Init(void)
 		for (int count_vertex = 0; count_vertex < vertex_max; count_vertex++)
 		{
 			// 頂上情報を設定
-			vtx[count_vertex].pos = D3DXVECTOR3(m_mesh_info[count_mesh]->vertex_min_ary[count_vertex].x, m_mesh_info[count_mesh]->vertex_min_ary[count_vertex].y, m_mesh_info[count_mesh]->vertex_min_ary[count_vertex].z);
+			vtx[count_vertex].pos = D3DXVECTOR3(m_mesh_info[count_mesh]->vertex_max_ary[count_vertex].x, m_mesh_info[count_mesh]->vertex_max_ary[count_vertex].y, m_mesh_info[count_mesh]->vertex_max_ary[count_vertex].z);
 			vtx[count_vertex].col = D3DCOLOR_RGBA(255, 255, 255, 255);
 			vtx[count_vertex].nor = D3DXVECTOR3(m_mesh_info[count_mesh]->normal_ary[count_vertex].x, m_mesh_info[count_mesh]->normal_ary[count_vertex].y, m_mesh_info[count_mesh]->normal_ary[count_vertex].z);
 			if (uv_max > 0)
@@ -300,7 +300,7 @@ void CFbx::Draw(void)
 		// インデックスバッファをデータストリームに設定
 		pDevice->SetIndices(m_mesh_info[count_mesh]->idx_buff);
 
-		int vtx_num = m_mesh_info[count_mesh]->vertex_min_ary.size();	// 頂点数
+		int vtx_num = m_mesh_info[count_mesh]->vertex_max_ary.size();	// 頂点数
 		int polygon_num = m_mesh_info[count_mesh]->index_number.size();	// ポリゴン数
 
 		// ポリゴンの描画
@@ -516,9 +516,9 @@ void CFbx::GetIndex(FbxMesh *mesh, MESH_INFO *mesh_info)
 	// インデックス数分のループ
 	for (int count_index = 0; count_index < index_to_vtx_max; count_index++)
 	{
-		mesh_info->index_number.push_back(index_ary[count_index]);
+		mesh_info->index_number.push_back(mesh_info->map_index_to_vertex[index_ary[count_index]][vec_index[index_ary[count_index]]]);
 
-		//vec_index[index_ary[count_index]]++;
+		vec_index[index_ary[count_index]]++;
 	}
 
 	/*	vector<int> vec_index;	// 重なり頂点カウント
@@ -1076,6 +1076,7 @@ void CFbx::GetAnimationInfo(void)
 				for (int count_point = 0; count_point < point_num; count_point++)
 				{
 					vector<D3DXVECTOR3> vec_ary;	// ベクトル配列
+					float first_angle;	// 最初の角度
 
 					// ベクトルを出す
 					init_vec.x = m_mesh_info[count_skin]->vertex_min_ary[m_skin_info.cluster[count_cluster].index_weight.first[count_point]].x - init_mat._41;
@@ -1097,6 +1098,27 @@ void CFbx::GetAnimationInfo(void)
 
 						// 角度と軸を取り出す
 						D3DXQuaternionToAxisAngle(&quaterniom, &rotate, &angle);
+
+						// 3.14を超えていたら
+						if (angle >= D3DX_PI)
+						{
+							angle -= D3DX_PI;
+						}
+						// -3.14以下だったら
+						else if (angle <= -D3DX_PI)
+						{
+							angle += D3DX_PI;
+						}
+
+						// 最初のフレームなら
+						if (count_frame == 0)
+						{
+							// 最初の角度を保存
+							first_angle = angle;
+						}
+
+						// 角度を直す
+						angle = angle - first_angle;
 
 						// ウェイト分の計算
 						angle *= static_cast<float>(m_skin_info.cluster[count_cluster].index_weight.second[count_point]);
@@ -1249,7 +1271,6 @@ void CFbx::UpdateRotate(int mesh_count, int anim_type)
 				for (int count_weight = 0; count_weight < weight_num; count_weight++)
 				{
 					int weight_vtx_num = m_skin_info.cluster[count_cluster].index_weight.first[count_weight];	// ウェイト頂点の取得
-					//int index_max = m_mesh_info[mesh_count]->map_index_to_vertex.second[weight_vtx_num].size();	// 関連頂上数を取得
 					int index_max = m_mesh_info[mesh_count]->map_index_to_vertex[weight_vtx_num].size();	// 関連頂上数を取得
 
 					vtx[weight_vtx_num].pos = m_skin_info.anim[anim_type].anim_vtx_pos[count_cluster][count_weight][m_frame_count];
@@ -1258,7 +1279,7 @@ void CFbx::UpdateRotate(int mesh_count, int anim_type)
 					for (int count_index = 0; count_index < index_max; count_index++)
 					{
 						// 頂上情報を設定
-						//vtx[m_mesh_info[mesh_count]->map_index_to_vertex[weight_vtx_num][count_index]].pos = m_skin_info.anim[anim_type].anim_vtx_pos[count_cluster][count_weight][m_frame_count];
+						vtx[m_mesh_info[mesh_count]->map_index_to_vertex[weight_vtx_num][count_index]].pos = m_skin_info.anim[anim_type].anim_vtx_pos[count_cluster][count_weight][m_frame_count];
 					}
 				}
 			}
