@@ -13,6 +13,7 @@
 #include "object.h"
 static const int MaxPlayer = 2;
 static const int MaxIngredients = 5;
+#define MAXINGREDIENTS (5)
 
 //*****************************************************************************
 // ‘O•ûéŒ¾

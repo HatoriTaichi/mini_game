@@ -94,6 +94,9 @@
     <Filter Include="ソース ファイル\ネットワーク">
       <UniqueIdentifier>{bbe261db-4926-4fe4-9cfc-52eef6d814fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\テロップ">
+      <UniqueIdentifier>{1787db4e-6c98-4f85-adac-1047dea2d16a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="item.h">
@@ -219,6 +222,15 @@
     <ClInclude Include="onlinegame.h">
       <Filter>ソース ファイル\ゲームシーン</Filter>
     </ClInclude>
+    <ClInclude Include="telop.h">
+      <Filter>ソース ファイル\テロップ</Filter>
+    </ClInclude>
+    <ClInclude Include="letter.h">
+      <Filter>ソース ファイル\テロップ</Filter>
+    </ClInclude>
+    <ClInclude Include="move_telop.h">
+      <Filter>ソース ファイル\テロップ</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="item.cpp">
@@ -343,6 +355,15 @@
     </ClCompile>
     <ClCompile Include="onlinegame.cpp">
       <Filter>ソース ファイル\ゲームシーン</Filter>
+    </ClCompile>
+    <ClCompile Include="telop.cpp">
+      <Filter>ソース ファイル\テロップ</Filter>
+    </ClCompile>
+    <ClCompile Include="letter.cpp">
+      <Filter>ソース ファイル\テロップ</Filter>
+    </ClCompile>
+    <ClCompile Include="move_telop.cpp">
+      <Filter>ソース ファイル\テロップ</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

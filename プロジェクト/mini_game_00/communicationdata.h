@@ -29,6 +29,11 @@ class CCommunicationData
 public:
 	typedef struct
 	{
+		int rand_pos_candidate;	// 候補地乱数
+		bool is_pos_change;	// 候補地が変わったか
+	};
+	typedef struct
+	{
 		D3DXVECTOR3 pos;	// 位置
 		D3DXVECTOR3 rot;	// 向き
 		char motion[MAX_MOTION_DATA];	// モーション

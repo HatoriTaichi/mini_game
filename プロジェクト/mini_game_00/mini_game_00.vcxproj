@@ -168,9 +168,11 @@
     <ClInclude Include="input.h" />
     <ClInclude Include="item.h" />
     <ClInclude Include="keyinput.h" />
+    <ClInclude Include="letter.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="manager.h" />
+    <ClInclude Include="move_telop.h" />
     <ClInclude Include="onlinegame.h" />
     <ClInclude Include="meshfloo.h" />
     <ClInclude Include="meshsphere.h" />
@@ -189,6 +191,7 @@
     <ClInclude Include="scenemanager.h" />
     <ClInclude Include="singlemodel.h" />
     <ClInclude Include="tcp_client.h" />
+    <ClInclude Include="telop.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="title.h" />
     <ClInclude Include="wall.h" />
@@ -210,9 +213,11 @@
     <ClCompile Include="input.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="keyinput.cpp" />
+    <ClCompile Include="letter.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="manager.cpp" />
+    <ClCompile Include="move_telop.cpp" />
     <ClCompile Include="onlinegame.cpp" />
     <ClCompile Include="meshfloo.cpp" />
     <ClCompile Include="meshsphere.cpp" />
@@ -232,6 +237,7 @@
     <ClCompile Include="scenemanager.cpp" />
     <ClCompile Include="singlemodel.cpp" />
     <ClCompile Include="tcp_client.cpp" />
+    <ClCompile Include="telop.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="title.cpp" />
     <ClCompile Include="wall.cpp" />

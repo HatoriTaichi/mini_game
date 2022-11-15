@@ -427,7 +427,7 @@ void CGame::IngredientsSpawn(void)
 		std::uniform_real_distribution<> randIngredientsCnt(NormalIngredientsSpawnMin, NormalIngredientsSpawnMax);
 		std::uniform_real_distribution<> randIngredientsType(0, 5);
 		std::uniform_real_distribution<> randIngredientsPosType(0, m_MaxIngredientsSpawn);
-		bool *bOverlapPos = nullptr;
+		bool *bOverlapPos = nullptr;//ランダムで選出した位置に再度出現しないようにするための変数
 		bOverlapPos = new bool[m_MaxIngredientsSpawn];
 		for (int nCntNum = 0; nCntNum < m_MaxIngredientsSpawn; nCntNum++)
 		{
@@ -439,7 +439,6 @@ void CGame::IngredientsSpawn(void)
 		{
 			//具材を配置する最大値を決める
 			int nCntMax = static_cast<int>(randIngredientsCnt(mt));
-			//具材の
 			m_NumIngredientsSpawnPoint = new int[nCntMax];
 			//数値の初期化
 			for (int nCntNum = 0; nCntNum < nCntMax; nCntNum++)
