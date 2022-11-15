@@ -80,14 +80,11 @@ private:
 	void GetAnimationInfo(void);
 	void NoBoneAnim(FbxMesh *mesh);
 	void BoneAnim(int mesh_count, int anim_type);
-	void UpdateRotate(int mesh_count, int anim_type);
-	void UpdatePos(FbxMesh *mesh, int mesh_count);
 	D3DXMATRIX FbxAMatToD3dxmat(FbxMatrix fbx_mat);
 	D3DXMATRIX PopMatPos(D3DXMATRIX mat);
 	D3DXMATRIX PopMatScale(D3DXMATRIX mat);
 	D3DXMATRIX PopMatRotate(D3DXMATRIX mat);
 	D3DXVECTOR3 *QuaternionVec3Rotate(D3DXVECTOR3 *out, D3DXQUATERNION quaternoin, D3DXVECTOR3 *vec);
-	bool m_is_bone;
 	FbxManager *m_manager;
 	FbxImporter *m_importer;
 	FbxScene *m_scene;
@@ -104,6 +101,7 @@ private:
 	int m_frame_count_old;
 	int m_count;
 	int m_anim_num;
+	bool m_is_bone;
 	bool m_is_anim_countup;
 };
 
