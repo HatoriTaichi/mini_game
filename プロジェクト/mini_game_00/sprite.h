@@ -26,13 +26,17 @@ public:
 		UINT x;	// X
 		UINT y;	// Y
 	} TEX_SIZE;
-	CSprite(LAYER_TYPE Layer = LAYER_TYPE::LAYER_00);	// デフォルトコンストラクタ
+	CSprite(LAYER_TYPE Layer = LAYER_TYPE::LAYER_05);	// デフォルトコンストラクタ
 	~CSprite();	// デフォルトデストラクタ
-	virtual HRESULT Init(void);	// ポリゴンの初期化
-	virtual void Uninit(void);	// ポリゴンの終了
-	virtual void Update(void);	// ポリゴンの更新
-	virtual void Draw(void);	// ポリゴンの描画
+	HRESULT Init(void);	// ポリゴンの初期化
+	void Uninit(void);	// ポリゴンの終了
+	void Update(void);	// ポリゴンの更新
+	void Draw(void);	// ポリゴンの描画
 	static CSprite *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, string type);	// オブジェクトの生成
+	static CSprite *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, LPDIRECT3DTEXTURE9 tex);	// オブジェクトの生成
+	D3DXVECTOR3 GetCenter(void) { return m_center; }	// 制御点の取得
+	void SetPos(D3DXVECTOR3 pos) { m_pos = pos; }	// 位置を設定
+	void SetCol(D3DXCOLOR col) { m_col = col; }	// カラーを設定
 
 private:
 	LPD3DXSPRITE m_sprite = nullptr;	// スプライト
@@ -44,6 +48,7 @@ private:
 	D3DXVECTOR3 m_rot;	// 回転
 	D3DXMATRIX m_mat;	// マトリッックス
 	string m_tex_pas;	// テクスチャタイプ
+	bool m_is_letter;	// 文字ポリゴンか
 };
 
 #endif

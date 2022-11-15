@@ -1,0 +1,144 @@
+//=============================================================================
+//
+// 文字列処理 [letterarray.cpp]
+// Author : 羽鳥太一
+//
+//=============================================================================
+//=============================================================================
+// インクルード
+//=============================================================================
+#include "letterarray.h"
+#include "letter.h"
+
+//=============================================================================
+// デフォルトコンストラクタ
+//=============================================================================
+CLetterArray::CLetterArray()
+{
+
+}
+
+//=============================================================================
+// デフォルトデストラクタ
+//=============================================================================
+CLetterArray::~CLetterArray()
+{
+
+}
+
+//=============================================================================
+// ポリゴンの初期化処理
+//=============================================================================
+HRESULT CLetterArray::Init(void)
+{
+	vector<wstring> buf;	// 変換後文字列
+	D3DXVECTOR3 distance_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	int text_size = 0;	// 文字数
+
+	buf = CLetter::Conbrt(m_text);	// 変換
+	text_size = buf[0].size();	// サイズを取得
+
+	// 文字数分のループ
+	for (int text_count = 0; text_count < text_size; text_count++)
+	{
+		// 文字を生成
+		m_letter.push_back(CLetter::Create(D3DXVECTOR3(m_first_pos.x + distance_pos.x, m_first_pos.y, m_first_pos.z), D3DXVECTOR3(0.0f, 0.0f, 0.0f), m_font_size, m_font_weight, buf[0][text_count]));
+
+		// 最初の文字じゃなかったら
+		if (text_count != 0)
+		{
+			// 制御点を取得
+			D3DXVECTOR3 old_center = m_letter[text_count - 1]->GetSprite()->GetCenter();
+			D3DXVECTOR3 center = m_letter[text_count]->GetSprite()->GetCenter();
+
+			// 位置の差分
+			distance_pos.x += old_center.x + center.x;
+		}
+		m_letter[text_count]->SetSpritePos(D3DXVECTOR3(m_first_pos.x + distance_pos.x, m_first_pos.y, m_first_pos.z));
+	}
+
+	// ディレイが設定されていたら
+	if (m_showing_delay != 0)
+	{
+		// 文字数分のループ
+		for (int text_count = 1; text_count < text_size; text_count++)
+		{
+			// 透明化
+			m_letter[text_count]->SetSpriteCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
+		}
+	}
+
+
+	return S_OK;
+}
+
+//=============================================================================
+// ポリゴンの終了処理
+//=============================================================================
+void CLetterArray::Uninit(void)
+{
+	int letter_size = m_letter.size();	// 文字列サイズを取得
+
+	// 文字列分のループ
+	for (int count_letter = 0; count_letter < letter_size; count_letter++)
+	{
+		// 破棄
+		m_letter[count_letter]->Uninit();
+	}
+	// 破棄
+	m_letter.clear();
+}
+
+//=============================================================================
+// ポリゴンの更新処理
+//=============================================================================
+void CLetterArray::Update(void)
+{
+	// ディレイが設定されていたら
+	if (m_showing_delay != 0)
+	{
+		int letter_size = m_letter.size();	// 文字列のサイズを取得
+
+		m_delay_count++;
+
+		// ディレイカウントになって最大文字列じゃなかったら
+		if (m_delay_count >= m_showing_delay &&
+			m_now_showing < letter_size)
+		{
+			// 0にする
+			m_delay_count = 0;
+
+			// カラーを変える
+			m_letter[m_now_showing]->SetSpriteCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+
+			// 配列を進める
+			m_now_showing++;
+		}
+	}
+}
+
+//=============================================================================
+// 生成処理
+//=============================================================================
+CLetterArray *CLetterArray::Create(D3DXVECTOR3 first_pos, int font_size, int font_weight, int showing_delay, string text)
+{
+	// 文字のポインタ
+	CLetterArray *letter_array = nullptr;
+	letter_array = new CLetterArray;
+
+	// 生成されていたら
+	if (letter_array != nullptr)
+	{
+		// 引数の代入
+		letter_array->m_first_pos = first_pos;
+		letter_array->m_font_size = font_size;
+		letter_array->m_font_weight = font_weight;
+		letter_array->m_text = text;
+		letter_array->m_showing_delay = showing_delay;
+
+		// 初期化
+		letter_array->Init();
+	}
+
+	return letter_array;
+}
