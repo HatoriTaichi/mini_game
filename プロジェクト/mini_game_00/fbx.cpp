@@ -994,6 +994,7 @@ void CFbx::GetAnimationInfo(void)
 		FbxTime period, start, stop;	// 1フレーム時間、スタート時間、終了時間
 		FbxTakeInfo *take_info;	// テイク情報
 		ANIMATION_INFO anim_info;	// アニメーション情報
+		int distance_frame;	// 差分フレーム
 
 		// アニメーションを設定
 		FbxAnimStack *stack = m_scene->GetSrcObject<FbxAnimStack>(count_anim);
@@ -1016,6 +1017,9 @@ void CFbx::GetAnimationInfo(void)
 		// スタートフレームと終了フレームの計算
 		anim_info.start = static_cast<int>(start.Get() / period.Get());
 		anim_info.stop = static_cast<int>(stop.Get() / period.Get());
+		
+		// 差分を計算
+		distance_frame = anim_info.stop - anim_info.start;
 
 		// スキン数分のループ
 		for (int count_skin = 0; count_skin < skin_max; count_skin++)
@@ -1047,7 +1051,7 @@ void CFbx::GetAnimationInfo(void)
 				}
 
 				// フレーム数分のループ
-				for (int count_frame = anim_info.start; count_frame < anim_info.stop; count_frame++)
+				for (int count_frame = 0; count_frame < distance_frame; count_frame++)
 				{
 					FbxAMatrix fbx_mat;	// FBX規格のマトリッックス
 					FbxTime time;	// 時間
@@ -1079,7 +1083,7 @@ void CFbx::GetAnimationInfo(void)
 					init_vec.z = m_mesh_info[count_skin]->vertex_min_ary[m_skin_info.cluster[count_cluster].index_weight.first[count_point]].z - init_mat._43;
 
 					// フレーム分のループ
-					for (int count_frame = anim_info.start; count_frame < anim_info.stop; count_frame++)
+					for (int count_frame = 0; count_frame < distance_frame; count_frame++)
 					{
 						pos = D3DXVECTOR3(mat[count_frame]._41, mat[count_frame]._42, mat[count_frame]._43);	// 現在の位置を取得
 						D3DXVECTOR3 vec, ask_pos, rotate;	// ベクトル、目標の位置、軸
@@ -1217,15 +1221,15 @@ void CFbx::BoneAnim(int mesh_count, int anim_type)
 //=============================================================================
 void CFbx::UpdateRotate(int mesh_count, int anim_type)
 {
-	int cluster_max = m_skin_info.cluster.size();	// クラスター数を取得
-	VERTEX_3D *vtx;	// 頂点情報
-
-	// 頂点バッファをロックし、頂点データへのポインタを取得
-	m_mesh_info[mesh_count]->vtx_buff->Lock(0, 0, (void**)&vtx, 0);
-
 	// フレームが進んでいたら
 	if (m_is_anim_countup == true)
 	{
+		int cluster_max = m_skin_info.cluster.size();	// クラスター数を取得
+		VERTEX_3D *vtx;	// 頂点情報
+
+		// 頂点バッファをロックし、頂点データへのポインタを取得
+		m_mesh_info[mesh_count]->vtx_buff->Lock(0, 0, (void**)&vtx, 0);
+
 		// フレームが最後までいったら
 		if (m_frame_count >= m_skin_info.anim[anim_type].stop)
 		{
@@ -1450,12 +1454,12 @@ D3DXMATRIX CFbx::PopMatRotate(D3DXMATRIX mat)
 D3DXVECTOR3 *CFbx::QuaternionVec3Rotate(D3DXVECTOR3 *out, D3DXQUATERNION quaternoin, D3DXVECTOR3 *vec)
 {
 	D3DXQUATERNION quaternion_revers, quaternion_vec;	// 逆クォータニオン、正規化クォータニオン
+	D3DXVECTOR3 vec_buf;	// ベクトルの正規化バッファ
 
 	// 逆クォータニオンを生成
 	D3DXQuaternionConjugate(&quaternion_revers, &quaternoin);
 
 	// ベクトル回転
-	D3DXVECTOR3 vec_buf;	// ベクトルの正規化バッファ
 	float length = D3DXVec3Length(vec);	// ベクトルの長さ
 	D3DXVec3Normalize(&vec_buf, vec);	// 回転させるベクトルの正規化
 
