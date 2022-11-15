@@ -1176,7 +1176,7 @@ void CFbx::BoneAnim(int mesh_count, int anim_type)
 		int cluster_max = m_skin_info.cluster.size();	// クラスター数を取得
 		VERTEX_3D *vtx;	// 頂点情報
 
-						// 頂点バッファをロックし、頂点データへのポインタを取得
+		// 頂点バッファをロックし、頂点データへのポインタを取得
 		m_mesh_info[mesh_count]->vtx_buff->Lock(0, 0, (void**)&vtx, 0);
 
 		// フレームが最後までいったら
