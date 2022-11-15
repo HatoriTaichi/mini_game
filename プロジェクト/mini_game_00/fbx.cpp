@@ -820,12 +820,12 @@ void CFbx::GetTexture(FbxSurfaceMaterial *material, MESH_INFO *mesh_info)
 		{
 			FbxFileTexture *texture = FbxCast<FbxFileTexture>(property.GetSrcObject(count_tex));	// テクスチャオブジェクト取得
 			string absolute_file_name = texture->GetFileName();	// テクスチャファイルパスを取得（フルパス）
-			//string folder_name = "C:/Users/student/Desktop/Git/mini_game/プロジェクト/mini_game_00/data/Texture/Mesh/";	// パスを消す為の名前
-			//string folder_name = "C:\\Users\\student\\Desktop\\blenderモデル\\SDharu_ver1.0\\SDharu_ver1.0\\tex\\";	// パスを消す為の名前
-			string folder_name = "C:\\Users\\student\\Desktop\\blenderモデル\\Loika_v1.0\\Loika_v1.0\\tex\\";	// パスを消す為の名前
-			int folder_size = folder_name.size();	// パスのサイズ
-			char *file_name;	// 名前のバッファ
 			size_t size = 0;	// サイズ
+			char extension[] = ".";	// 検索用(拡張子)
+			char slash[] = "\\";	// 検索用(スラッシュ)
+			char *file_name;	// 名前のバッファ
+			int slash_num = 0;	// スラッシュまでのインデックス
+			int name_max = 0;	// パスのサイズ
 
 			// 文字コード変換(日本語パスがダメな為)
 			FbxUTF8ToAnsi(absolute_file_name.c_str(), file_name, &size);
@@ -833,12 +833,36 @@ void CFbx::GetTexture(FbxSurfaceMaterial *material, MESH_INFO *mesh_info)
 			// 正規パスをstrigに代入
 			absolute_file_name = file_name;
 
+			// パスのサイズを取得
+			name_max = absolute_file_name.size();
+
 			// パスのサイズ数分のループ
-			for (int count_erase = 0; count_erase < folder_size; count_erase++)
+			for (int count_name = 0; count_name < name_max; count_name++)
+			{
+				// 拡張子がついてたら
+				if (absolute_file_name[count_name] == extension[0])
+				{
+					// パスのサイズ数分のループ(逆から)
+					for (int count_slash = name_max; count_slash > 0; count_slash--)
+					{
+						// スラッシュがついてたら
+						if (absolute_file_name[count_slash] == slash[0])
+						{
+							// スラッシュまでとスラッシュ分のインデックスを保存
+							slash_num = count_slash + 1;
+							break;
+						}
+					}
+				}
+			}
+
+			// スラッシュまでのループ
+			for (int count_slash = 0; count_slash < slash_num; count_slash++)
 			{
 				// 名前だけを残す
 				absolute_file_name.erase(absolute_file_name.begin());
 			}
+
 			tex_buf = CManager::GetInstance()->GetTexture()->GetTexture(absolute_file_name);	// テクスチャの取得
 			mesh_info->tex.push_back(tex_buf);	// テクスチャの保存
 		}
@@ -1176,9 +1200,9 @@ void CFbx::BoneAnim(int mesh_count, int anim_type)
 					int weight_vtx_num = m_skin_info.cluster[count_cluster].index_weight.first[count_weight];	// ウェイト頂点の取得
 					int index_max = m_mesh_info[mesh_count]->map_index_to_vertex[weight_vtx_num].size();	// 関連頂上数を取得
 
-																											//vtx[weight_vtx_num].pos = m_skin_info.anim[anim_type].anim_vtx_pos[count_cluster][count_weight][m_frame_count];
+					//vtx[weight_vtx_num].pos = m_skin_info.anim[anim_type].anim_vtx_pos[count_cluster][count_weight][m_frame_count];
 
-																											// 関連頂点分のループ
+					// 関連頂点分のループ
 					for (int count_index = 0; count_index < index_max; count_index++)
 					{
 						// 頂上情報を設定

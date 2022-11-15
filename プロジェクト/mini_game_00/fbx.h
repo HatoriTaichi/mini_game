@@ -89,8 +89,8 @@ private:
 	FbxImporter *m_importer;
 	FbxScene *m_scene;
 	vector<MESH_INFO*> m_mesh_info;
-	SKIN_INFO m_skin_info;
 	vector<FbxMesh*> m_mesh;
+	SKIN_INFO m_skin_info;
 	string m_pas;
 	D3DXMATRIX m_mtx_wold;
 	D3DXVECTOR3 m_pos;
@@ -100,7 +100,6 @@ private:
 	int m_frame_count;
 	int m_frame_count_old;
 	int m_count;
-	int m_anim_num;
 	bool m_is_bone;
 	bool m_is_anim_countup;
 };
