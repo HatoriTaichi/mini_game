@@ -296,7 +296,7 @@ void CRenderer::Update(void)
 //=============================================================================
 void CRenderer::Draw(void)
 {
-	CFade *fade = CManager::GetInstance()->GetSceneManager()->GetFade();	// フェードクラス	
+	/*CFade *fade = CManager::GetInstance()->GetSceneManager()->GetFade();	// フェードクラス	
 	CCamera *camera = CManager::GetInstance()->GetCamera();	// カメラクラス
 
 	// デバックバッファ&Zバッファのクリア
@@ -327,10 +327,10 @@ void CRenderer::Draw(void)
 #endif //!_DEBUG
 		// Direct3Dによる描画の終了
 		m_pD3DDevice->EndScene();
-	}
+	}*/
 	// バックバッファとフロントバッファの入れ替え
 	m_pD3DDevice->Present(NULL, NULL, NULL, NULL);
-	/*CFade *fade = CManager::GetInstance()->GetSceneManager()->GetFade();	// フェードクラス	
+	CFade *fade = CManager::GetInstance()->GetSceneManager()->GetFade();	// フェードクラス	
 	CCamera *camera = CManager::GetInstance()->GetCamera();	// カメラクラス
 
 	// デバックバッファ&Zバッファのクリア
@@ -398,7 +398,7 @@ void CRenderer::Draw(void)
 		m_pD3DDevice->EndScene();
 	}
 	// バックバッファとフロントバッファの入れ替え
-	m_pD3DDevice->Present(nullptr, nullptr, nullptr, nullptr);*/
+	m_pD3DDevice->Present(nullptr, nullptr, nullptr, nullptr);
 }
 
 //=============================================================================

@@ -58,6 +58,7 @@ public:
 
 private:
 	string m_tex_pas;	// テクスチャパス
+	D3DXMATERIAL m_material;		//ポリゴンのマテリアル
 	D3DXMATRIX m_mtx_world;// ワールドマトリックス
 	LPDIRECT3DTEXTURE9 m_texture;	// テクスチャ
 	LPDIRECT3DVERTEXBUFFER9 m_vtx_buff;	// 頂点バッファのポインタ

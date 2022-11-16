@@ -13,6 +13,10 @@
 //=============================================================================
 CObject3D::CObject3D(LAYER_TYPE Layer) : CObject(Layer)
 {
+	m_material.MatD3D.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	m_material.MatD3D.Emissive = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
+	m_material.MatD3D.Specular = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
+	m_material.MatD3D.Power = 1.0f;
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXMatrixIdentity(&m_mtx_world);
@@ -104,10 +108,10 @@ void CObject3D::Draw(void)
 	// ワールドマトリックスの設定
 	device->SetTransform(D3DTS_WORLD, &m_mtx_world);
 
-	//シェーダにマトリックスを設定
+	// シェーダにマトリックスを設定
 	CManager::GetInstance()->GetRenderer()->SetEffectMatrixWorld(m_mtx_world);
 
-	//シェーダにテクスチャを設定
+	// シェーダにテクスチャを設定
 	CManager::GetInstance()->GetRenderer()->SetEffectTexture(m_texture);
 
 	// 頂点フォーマットの設定
@@ -124,32 +128,30 @@ void CObject3D::Draw(void)
 	// インデックスバッファをデータストリームに設定
 	device->SetIndices(m_idx_buff);
 
-	//頂点定義を設定
+	// 頂点定義を設定
 	CManager::GetInstance()->GetRenderer()->SetVtxDecl3D();
 
-	//ライトの状態取得
+	// ライトの状態取得
 	device->GetRenderState(D3DRS_LIGHTING, &eable_light);
 
 	pass_flag = PASS_3D;
 
-	//テクスチャがある場合フラグを追加
+	// テクスチャがある場合フラグを追加
 	if (m_texture != nullptr)
 	{
 		pass_flag |= PASS_TEXTURE;
 	}
-	//ライトがある場合フラグを追加
+	// ライトがある場合フラグを追加
 	pass_flag |= PASS_LIGHT;
 
-	//モデルが設定したマテリアルの影響を受けないようにマテリアルの設定
-	pRenderer->SetEffectMaterialDiffuse(m_mat.MatD3D.Diffuse);
-	pRenderer->SetEffectMaterialEmissive(m_mat.MatD3D.Emissive);
-	pRenderer->SetEffectMaterialSpecular(m_mat.MatD3D.Specular);
-	pRenderer->SetEffectMaterialPower(m_mat.MatD3D.Power);
-	//輪郭の発光色の設定
-	pRenderer->SetEffectGlow(m_colGlow, m_powGlow);
+	// モデルが設定したマテリアルの影響を受けないようにマテリアルの設定
+	CManager::GetInstance()->GetRenderer()->SetEffectMaterialDiffuse(m_material.MatD3D.Diffuse);
+	CManager::GetInstance()->GetRenderer()->SetEffectMaterialEmissive(m_material.MatD3D.Emissive);
+	CManager::GetInstance()->GetRenderer()->SetEffectMaterialSpecular(m_material.MatD3D.Specular);
+	CManager::GetInstance()->GetRenderer()->SetEffectMaterialPower(m_material.MatD3D.Power);
 
-	//パスの開始
-	pRenderer->BeginPassEffect(dwPassFlag);
+	// パスの開始
+	CManager::GetInstance()->GetRenderer()->BeginPassEffect(pass_flag);
 
 	// ポリゴンの描画
 	device->DrawIndexedPrimitive(	D3DPT_TRIANGLESTRIP,
@@ -158,4 +160,7 @@ void CObject3D::Draw(void)
 									m_num_vtx,	// 使用する頂点数
 									0,	// ここの値が最初のインデックス
 									m_num_idx - 2);	// 三角形の数
+
+	// エフェクト終了
+	CManager::GetInstance()->GetRenderer()->EndPassEffect();
 }
