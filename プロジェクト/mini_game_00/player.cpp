@@ -164,7 +164,7 @@ void CPlayer::Update(void)
 		DropItem();
 	}
 	////ƒeƒXƒg‚Åæ“¾‚µ‚½‹ïŞ‚ğ‘‚â‚·ˆ—
-	TestGetIngredients();
+	//TestGetIngredients();
 	//“G‚È‚Ç‚É“–‚½‚Á‚½‚çˆê’èŠÔ‘€ì‚ğ•·‚©‚È‚¢‚æ‚¤‚É‚·‚é
 	if (m_PlayerData.m_bOperationLock)
 	{

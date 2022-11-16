@@ -34,7 +34,7 @@
 #define CAMERA_POS_V (D3DXVECTOR3(0.0f, 1105.0f, -100.0f))	// カメラの位置
 #define CAMERA_POS_R (D3DXVECTOR3(0.0f, 0.0f, 0.0f))	// カメラの注視点
 #define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(0.0f), D3DXToRadian(180.0f),D3DXToRadian(0.0f)))	// カメラの向き
-static const CSceneManager::MODE mode = CSceneManager::MODE::GAME;//最初のモード
+static const CSceneManager::MODE mode = CSceneManager::MODE::ONLINE_GAME;//最初のモード
 //=============================================================================
 // 静的メンバ変数宣言
 //=============================================================================
