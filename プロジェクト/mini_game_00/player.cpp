@@ -180,7 +180,7 @@ void CPlayer::Update(void)
 	{
 		//ˆÚ“®ˆ—
 		KeyMove();
-		PadMove();
+		//PadMove();
 		vector<CObject *>ObjEnemy = CObject::GetObjTypeObject(CObject::OBJTYPE::ENEMY);
 		{
 			int nSize = ObjEnemy.size();

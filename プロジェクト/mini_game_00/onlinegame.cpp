@@ -300,8 +300,8 @@ void COnlineGame::Uninit(void)
 //=============================================================================
 void COnlineGame::Update(void)
 {
-	//ItemSpawn();
-	//IngredientsSpawn();
+	ItemSpawn();
+	IngredientsSpawn();
 	CKey *key = CManager::GetInstance()->GetKey();
 	m_nGameTimeSeconds++;
 	if (m_pGameTimer)
