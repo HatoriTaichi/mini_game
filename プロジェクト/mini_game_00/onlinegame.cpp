@@ -25,6 +25,14 @@
 #include "object2D.h"
 #include "counter.h"
 
+//=============================================================================
+// 静的メンバ変数宣言
+//=============================================================================
+bool COnlineGame::m_is_onece = true;
+
+//=============================================================================
+// 
+//=============================================================================
 static const int IngredientsSpawnInterval = 30 * 60;
 static const int NormalItemSpawnInterval = 17 * 60;
 static const int ClimaxItemSpawnInterval = 12 * 60;
@@ -102,159 +110,163 @@ HRESULT COnlineGame::Init(void)
 	{
 		if (!CNetWorkManager::GetAllConnect())
 		{
-			//プレイヤーの生成
-			if (!m_pPlayer[0])
+			if (m_is_onece)
 			{
-				m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-					D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_2.txt", 0);
-			}
-			//if (!m_pPlayer[1])
-			//{
-			//	m_pPlayer[1] = CPlayer::Create(D3DXVECTOR3(100.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-			//		D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt", 1);
-			//}
-			//CEnemy::Create(D3DXVECTOR3(0.0f, 0.0f, 200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/motion.txt");
-			if (!m_pBandUI)
-			{
-				m_pBandUI = CObject2D::Create(BandUIPos, BandUISize, "national_flag.png");
-			}
-			//タイマー生成
-			if (!m_pGameTimer)
-			{
-				m_pGameTimer = CCounter::Create(GameTimerPos, GameTimerSize, 2, "Number000.png");
-				m_pGameTimer->SetCounterNum(90);
-			}
-			//具材のUI生成
-			for (int nCnt = 0; nCnt < OnLineMaxIngredients; nCnt++)
-			{
-				string TexName;
-				switch (nCnt)
+				//プレイヤーの生成
+				if (!m_pPlayer[0])
 				{
-				case CIngredients::IngredientsType::Basil:
-					TexName = "basil.png";
-					break;
-				case CIngredients::IngredientsType::Tomato:
-					TexName = "cut_tomato.png";
-					break;
-				case CIngredients::IngredientsType::Cheese:
-					TexName = "mozzarella_chaeese.png";
-					break;
-				case CIngredients::IngredientsType::Mushroom:
-					TexName = "mushroom.png";
-					break;
-				case CIngredients::IngredientsType::Salami:
-					TexName = "salami.png";
-					break;
+					m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+						D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_2.txt", 0);
 				}
-				if (!m_pIngredientsUI[nCnt][0])
+				//if (!m_pPlayer[1])
+				//{
+				//	m_pPlayer[1] = CPlayer::Create(D3DXVECTOR3(100.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+				//		D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt", 1);
+				//}
+				//CEnemy::Create(D3DXVECTOR3(0.0f, 0.0f, 200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/motion.txt");
+				if (!m_pBandUI)
 				{
-					m_pIngredientsUI[nCnt][0] = CObject2D::Create({ IngredientsPos.x + (IngredientsSize.x * 2 * nCnt),IngredientsPos.y,0.0f }, IngredientsSize, TexName);
+					m_pBandUI = CObject2D::Create(BandUIPos, BandUISize, "national_flag.png");
 				}
-				if (!m_pIngredientsCnt[nCnt][0])
+				//タイマー生成
+				if (!m_pGameTimer)
 				{
-					m_pIngredientsCnt[nCnt][0] = CCounter::Create({ NumberPos.x + (IngredientsSize.x * 2 * nCnt),
-						NumberPos.y + 40.0f,0.0f }, NumberSize, 2, "Number000.png");
+					m_pGameTimer = CCounter::Create(GameTimerPos, GameTimerSize, 2, "Number000.png");
+					m_pGameTimer->SetCounterNum(90);
 				}
-				if (!m_pIngredientsCnt[nCnt][1])
+				//具材のUI生成
+				for (int nCnt = 0; nCnt < OnLineMaxIngredients; nCnt++)
 				{
-					m_pIngredientsCnt[nCnt][1] = CCounter::Create({ NumberPos2.x + (IngredientsSize.x * 2 * nCnt),
-						NumberPos.y + 40.0f,0.0f }, NumberSize, 2, "Number000.png");
-				}
+					string TexName;
+					switch (nCnt)
+					{
+					case CIngredients::IngredientsType::Basil:
+						TexName = "basil.png";
+						break;
+					case CIngredients::IngredientsType::Tomato:
+						TexName = "cut_tomato.png";
+						break;
+					case CIngredients::IngredientsType::Cheese:
+						TexName = "mozzarella_chaeese.png";
+						break;
+					case CIngredients::IngredientsType::Mushroom:
+						TexName = "mushroom.png";
+						break;
+					case CIngredients::IngredientsType::Salami:
+						TexName = "salami.png";
+						break;
+					}
+					if (!m_pIngredientsUI[nCnt][0])
+					{
+						m_pIngredientsUI[nCnt][0] = CObject2D::Create({ IngredientsPos.x + (IngredientsSize.x * 2 * nCnt),IngredientsPos.y,0.0f }, IngredientsSize, TexName);
+					}
+					if (!m_pIngredientsCnt[nCnt][0])
+					{
+						m_pIngredientsCnt[nCnt][0] = CCounter::Create({ NumberPos.x + (IngredientsSize.x * 2 * nCnt),
+							NumberPos.y + 40.0f,0.0f }, NumberSize, 2, "Number000.png");
+					}
+					if (!m_pIngredientsCnt[nCnt][1])
+					{
+						m_pIngredientsCnt[nCnt][1] = CCounter::Create({ NumberPos2.x + (IngredientsSize.x * 2 * nCnt),
+							NumberPos.y + 40.0f,0.0f }, NumberSize, 2, "Number000.png");
+					}
 
-				if (!m_pIngredientsUI[nCnt][1])
+					if (!m_pIngredientsUI[nCnt][1])
+					{
+						m_pIngredientsUI[nCnt][1] = CObject2D::Create({ IngredientsPos2.x + (IngredientsSize.x * 2 * nCnt),IngredientsPos2.y,0.0f }, IngredientsSize, TexName);
+					}
+				}
+				////スタートUIを生成
+				//if (!m_pStartUI)
+				//{
+				//	m_pStartUI = CObject2D::Create(StartPos, StartSize, "Start000.png");
+				//	m_pStartUI->SetCol({ 1.0,1.0,1.0,0.0 });
+				//}
+				////フィニッシュUIを生成
+				//if (!m_pFinishUI)
+				//{
+				//	m_pFinishUI = CObject2D::Create(FinishPos, FinishSize, "Finish000.png");
+				//	m_pFinishUI->SetCol({ 1.0,1.0,1.0,0.0 });
+				//}
+				//ラストスパートUIUIを生成
+				if (!m_pLastSpurtUI)
 				{
-					m_pIngredientsUI[nCnt][1] = CObject2D::Create({ IngredientsPos2.x + (IngredientsSize.x * 2 * nCnt),IngredientsPos2.y,0.0f }, IngredientsSize, TexName);
+					//m_pLastSpurtUI = CObject2D::Create(LastSpurtPos, LastSpurtSize, "lastspurt000.png");
+					//m_pLastSpurtUI
 				}
-			}
-			////スタートUIを生成
-			//if (!m_pStartUI)
-			//{
-			//	m_pStartUI = CObject2D::Create(StartPos, StartSize, "Start000.png");
-			//	m_pStartUI->SetCol({ 1.0,1.0,1.0,0.0 });
-			//}
-			////フィニッシュUIを生成
-			//if (!m_pFinishUI)
-			//{
-			//	m_pFinishUI = CObject2D::Create(FinishPos, FinishSize, "Finish000.png");
-			//	m_pFinishUI->SetCol({ 1.0,1.0,1.0,0.0 });
-			//}
-			//ラストスパートUIUIを生成
-			if (!m_pLastSpurtUI)
-			{
-				//m_pLastSpurtUI = CObject2D::Create(LastSpurtPos, LastSpurtSize, "lastspurt000.png");
-				//m_pLastSpurtUI
-			}
-			vector<string> TextElement;	// フォルダの保存バッファ
-			CFileLoad::STAGE_INFO Stage;
-			CFileLoad::STAGE_SPAWN_INFO Spawn;
+				vector<string> TextElement;	// フォルダの保存バッファ
+				CFileLoad::STAGE_INFO Stage;
+				CFileLoad::STAGE_SPAWN_INFO Spawn;
 
-			// ファイルを読み込む
-			TextElement = CFileLoad::LoadTxt("data/Txt/SpawnData.txt");
+				// ファイルを読み込む
+				TextElement = CFileLoad::LoadTxt("data/Txt/SpawnData.txt");
 
-			// パスと名前を取得
-			Stage.spawn_info.push_back(CFileLoad::CreateSpawnInfo(TextElement));
-			//具材スポーン位置の最大数を取得
-			m_MaxIngredientsSpawn = Stage.spawn_info[0].spawn_num["INGREDIENTSSET"];
-			//アイテムスポーン位置の最大数を取得
-			m_MaxItemSpawn = Stage.spawn_info[0].spawn_num["ITEMSET"];
-			//敵スポーン位置の最大数を取得
-			m_MaxEnemySpawn = Stage.spawn_info[0].spawn_num["ENEMYSET"];
+				// パスと名前を取得
+				Stage.spawn_info.push_back(CFileLoad::CreateSpawnInfo(TextElement));
+				//具材スポーン位置の最大数を取得
+				m_MaxIngredientsSpawn = Stage.spawn_info[0].spawn_num["INGREDIENTSSET"];
+				//アイテムスポーン位置の最大数を取得
+				m_MaxItemSpawn = Stage.spawn_info[0].spawn_num["ITEMSET"];
+				//敵スポーン位置の最大数を取得
+				m_MaxEnemySpawn = Stage.spawn_info[0].spawn_num["ENEMYSET"];
 
-			//アイテムの位置情報を取得
-			for (int count_size = 0; count_size < Stage.spawn_info[0].spawn_num["ITEMSET"]; count_size++)
-			{
-				D3DXVECTOR3 hoge = { 0.0f,0.0f,0.0f };
-				m_ItemSpawnPoint.push_back(hoge);
-				m_ItemSpawnPoint[count_size] = Stage.spawn_info[0].pos["ITEMSET"][count_size];
-			}
-			//具材の位置情報を取得
-			for (int count_size = 0; count_size < m_MaxIngredientsSpawn; count_size++)
-			{
-				D3DXVECTOR3 hoge = { 0.0f,0.0f,0.0f };
-				m_IngredientsSpawnPoint.push_back(hoge);
-				m_IngredientsSpawnPoint[count_size] = Stage.spawn_info[0].pos["INGREDIENTSSET"][count_size];
-			}
-			// ファイルを読み込む
-			TextElement = CFileLoad::LoadTxt("data/Txt/StageData_Type2.txt");
-
-			// パスと名前を取得
-			Stage.stage_model.push_back(CFileLoad::CreateStageModelInfo(TextElement));
-
-			int StageSize = Stage.stage_model.size();
-			for (int nCountModelInfo = 0; nCountModelInfo < StageSize; nCountModelInfo++)
-			{
-				for (int nCountModel = 0; nCountModel < Stage.stage_model[nCountModelInfo].all_model; nCountModel++)
+				//アイテムの位置情報を取得
+				for (int count_size = 0; count_size < Stage.spawn_info[0].spawn_num["ITEMSET"]; count_size++)
 				{
-					CSingleModel::Create(Stage.stage_model[nCountModelInfo].pos[nCountModel], Stage.stage_model[nCountModelInfo].rot[nCountModel], D3DXVECTOR3(1.0f, 1.0f, 1.0f), Stage.stage_model[nCountModelInfo].type[nCountModel], CObject::OBJTYPE::BLOCK);
+					D3DXVECTOR3 hoge = { 0.0f,0.0f,0.0f };
+					m_ItemSpawnPoint.push_back(hoge);
+					m_ItemSpawnPoint[count_size] = Stage.spawn_info[0].pos["ITEMSET"][count_size];
 				}
-			}
-			// パスと名前を取得
-			Stage.mesh_info.push_back(CFileLoad::CreateStageMeshInfo(TextElement));
+				//具材の位置情報を取得
+				for (int count_size = 0; count_size < m_MaxIngredientsSpawn; count_size++)
+				{
+					D3DXVECTOR3 hoge = { 0.0f,0.0f,0.0f };
+					m_IngredientsSpawnPoint.push_back(hoge);
+					m_IngredientsSpawnPoint[count_size] = Stage.spawn_info[0].pos["INGREDIENTSSET"][count_size];
+				}
+				// ファイルを読み込む
+				TextElement = CFileLoad::LoadTxt("data/Txt/StageData_Type2.txt");
 
-			int StageWallSize = Stage.mesh_info[0].all_wall_mesh;
-			//壁の生成
-			for (int nWall = 0; nWall < StageWallSize; nWall++)
-			{
-				CWall::Create(Stage.mesh_info[0].pos["WALLSET"][nWall],
-				{ Stage.mesh_info[0].radius_x_or_z["WALLSET"][nWall],
-					Stage.mesh_info[0].radius_y_or_z["WALLSET"][nWall],0.0f },
-					Stage.mesh_info[0].rot["WALLSET"][nWall],
-					Stage.mesh_info[0].division_x_or_z["WALLSET"][nWall],
-					Stage.mesh_info[0].division_y_or_z["WALLSET"][nWall], "wood_wall.jpg");
+				// パスと名前を取得
+				Stage.stage_model.push_back(CFileLoad::CreateStageModelInfo(TextElement));
+
+				int StageSize = Stage.stage_model.size();
+				for (int nCountModelInfo = 0; nCountModelInfo < StageSize; nCountModelInfo++)
+				{
+					for (int nCountModel = 0; nCountModel < Stage.stage_model[nCountModelInfo].all_model; nCountModel++)
+					{
+						CSingleModel::Create(Stage.stage_model[nCountModelInfo].pos[nCountModel], Stage.stage_model[nCountModelInfo].rot[nCountModel], D3DXVECTOR3(1.0f, 1.0f, 1.0f), Stage.stage_model[nCountModelInfo].type[nCountModel], CObject::OBJTYPE::BLOCK);
+					}
+				}
+				// パスと名前を取得
+				Stage.mesh_info.push_back(CFileLoad::CreateStageMeshInfo(TextElement));
+
+				int StageWallSize = Stage.mesh_info[0].all_wall_mesh;
+				//壁の生成
+				for (int nWall = 0; nWall < StageWallSize; nWall++)
+				{
+					CWall::Create(Stage.mesh_info[0].pos["WALLSET"][nWall],
+					{ Stage.mesh_info[0].radius_x_or_z["WALLSET"][nWall],
+						Stage.mesh_info[0].radius_y_or_z["WALLSET"][nWall],0.0f },
+						Stage.mesh_info[0].rot["WALLSET"][nWall],
+						Stage.mesh_info[0].division_x_or_z["WALLSET"][nWall],
+						Stage.mesh_info[0].division_y_or_z["WALLSET"][nWall], "wood_wall.jpg");
+				}
+				int StageFloorSize = Stage.mesh_info[0].all_floor_mesh;
+				//床の生成
+				for (int nFloor = 0; nFloor < StageFloorSize; nFloor++)
+				{
+					CField::Create(Stage.mesh_info[0].pos["FIELDSET"][nFloor], { Stage.mesh_info[0].radius_x_or_z["FIELDSET"][nFloor] ,
+						0.0f,
+						Stage.mesh_info[0].radius_y_or_z["FIELDSET"][nFloor] },
+						{ 0.0f,0.0f,0.0f },
+						Stage.mesh_info[0].division_x_or_z["FIELDSET"][nFloor],
+						Stage.mesh_info[0].division_y_or_z["FIELDSET"][nFloor],
+						"wooden_floor.png");
+				}
+				//EnemySpawn();
+				m_is_onece = false;
 			}
-			int StageFloorSize = Stage.mesh_info[0].all_floor_mesh;
-			//床の生成
-			for (int nFloor = 0; nFloor < StageFloorSize; nFloor++)
-			{
-				CField::Create(Stage.mesh_info[0].pos["FIELDSET"][nFloor], { Stage.mesh_info[0].radius_x_or_z["FIELDSET"][nFloor] ,
-					0.0f,
-					Stage.mesh_info[0].radius_y_or_z["FIELDSET"][nFloor] },
-					{ 0.0f,0.0f,0.0f },
-					Stage.mesh_info[0].division_x_or_z["FIELDSET"][nFloor],
-					Stage.mesh_info[0].division_y_or_z["FIELDSET"][nFloor],
-					"wooden_floor.png");
-			}
-			//EnemySpawn();
 		}
 		else if (CNetWorkManager::GetAllConnect())
 		{
