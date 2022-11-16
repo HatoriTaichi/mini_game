@@ -12,6 +12,35 @@
 #include "fade.h"
 #include "camera.h"
 
+//===========================================================
+// マクロ定義
+//===========================================================
+#define DEFAULT_EFFECT_FILE_NAME "source/fx/DefaultEffect.fx"	//読み込むエフェクトファイルの名前
+#define DEFAULT_EFFECT_TECHNIQUE_NAME "RenderScene"	//エフェクトファイルのTechniqueの名前
+
+//=============================================================================
+// サーフェイスの幅高取得関数
+//=============================================================================
+bool GetSurfaceWH(IDirect3DSurface9 *surf, UINT &ui_width, UINT &ui_height)
+{
+	D3DSURFACE_DESC suf_desc;	// サーフェイスの設定
+
+	// サーフェイスがあったら
+	if (surf != nullptr)
+	{
+		return false;
+	}
+
+	// サーフェイスの設定を取得
+	surf->GetDesc(&suf_desc);
+
+	// 幅と高さを取得
+	ui_width = suf_desc.Width;
+	ui_height = suf_desc.Height;
+
+	return true;
+}
+
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
@@ -28,14 +57,18 @@ CRenderer::~CRenderer()
 
 }
 
-
 //=============================================================================
 // 初期化処理
 //=============================================================================
 HRESULT CRenderer::Init(const HWND &hWnd, const bool &bWindow)
 {
+	HRESULT hr = 0;	//ハンドル
+	LPD3DXBUFFER err_message = nullptr;	//エラーメッセージ
 	D3DPRESENT_PARAMETERS d3dpp;
 	D3DDISPLAYMODE d3ddm;
+	int pixel = 1920;	//Z値テクスチャの解像度
+	UINT tex_width_z;	// Z値テクスチャの幅高を
+	UINT tex_height_z;	// Z値テクスチャの幅高を
 
 	// Direct3Dオブジェクトの作成
 	m_pD3D = Direct3DCreate9(D3D_SDK_VERSION);
@@ -116,6 +149,63 @@ HRESULT CRenderer::Init(const HWND &hWnd, const bool &bWindow)
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+
+	// 描画デバイスサーフェイス群を取得保持
+	m_pD3DDevice->GetRenderTarget(0, &m_default_surf);
+	m_pD3DDevice->GetDepthStencilSurface(&m_default_depth_surf);
+
+	// Z値テクスチャを作成
+	D3DXCreateTexture(	m_pD3DDevice,
+						pixel,
+						pixel,
+						1,
+						D3DUSAGE_RENDERTARGET,
+						D3DFMT_A16B16G16R16,
+						D3DPOOL_DEFAULT,
+						&m_tex_buff_z);
+
+	// Z値テクスチャサーフェイスを保持
+	m_tex_buff_z->GetSurfaceLevel(0, &m_tex_surf_z);
+	GetSurfaceWH(m_tex_surf_z, tex_width_z, tex_height_z);
+
+	// 深度バッファサーフェイスの作成
+	m_pD3DDevice->CreateDepthStencilSurface(tex_width_z,
+											tex_height_z,
+											D3DFMT_D16,
+											D3DMULTISAMPLE_NONE,
+											0,
+											FALSE,
+											&m_depth_buff,
+											NULL);
+
+	// エフェクトの読み込み
+	hr = D3DXCreateEffectFromFile(	m_pD3DDevice,
+									DEFAULT_EFFECT_FILE_NAME,
+									NULL,
+									NULL,
+									0,
+									NULL,
+									&m_effect,
+									&err_message);
+
+	// 失敗してたら
+	if (FAILED(hr) && err_message != nullptr)
+	{
+		// エラーメッセージ表示
+		MessageBoxA(NULL, (LPCSTR)(err_message->GetBufferPointer()), "", MB_OK);
+		err_message->Release();
+	}
+
+	// テクニックの設定
+	if (m_effect != nullptr)
+	{
+		m_effect->SetTechnique(DEFAULT_EFFECT_TECHNIQUE_NAME);
+		m_effect->Begin(NULL, 0);	// エフェクト開始
+	}
+
+	//頂点定義の生成
+	CreateVtxDecl2D();
+	CreateVtxDecl3D();
 
 #ifdef _DEBUG
 	// デバッグ情報表示用フォントの生成
@@ -203,6 +293,90 @@ void CRenderer::Draw(void)
 	}
 	// バックバッファとフロントバッファの入れ替え
 	m_pD3DDevice->Present(NULL, NULL, NULL, NULL);
+}
+
+//=============================================================================
+// 2Dポリゴンの頂点定義を生成
+//=============================================================================
+void CRenderer::CreateVtxDecl2D(void)
+{
+	// nullptrなら
+	if (m_pD3DDevice == nullptr)
+	{
+		return;
+	}
+	// 生成されていたら
+	if (m_vtx_decl_2D != nullptr)
+	{
+		m_vtx_decl_2D->Release();
+	}
+
+	// 頂点データの構造を定義
+	D3DVERTEXELEMENT9 decl[] = 
+	{
+		{ 0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITIONT, 0 },	// 位置とRHW
+		{ 0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 },	// 色
+		{ 0, 20, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },	// テクスチャ座標
+		D3DDECL_END()	// 最後に必ずD3DDECL_END()をつける
+	};
+
+	// 頂点の定義を作成する
+	m_pD3DDevice->CreateVertexDeclaration(decl, &m_vtx_decl_2D);
+}
+
+//=============================================================================
+// 2Dポリゴンの頂点定義を破棄
+//=============================================================================
+void CRenderer::ReleaseVtxDecl2D(void)
+{
+	// 生成されていたら
+	if (m_vtx_decl_2D != nullptr)
+	{
+		// 破棄
+		m_vtx_decl_2D->Release();
+	}
+}
+
+//=============================================================================
+// 3Dポリゴンの頂点定義を生成
+//=============================================================================
+void CRenderer::CreateVtxDecl3D(void)
+{
+	// nullptrなら
+	if (m_pD3DDevice == nullptr)
+	{
+		return;
+	}
+	// 生成されていたら
+	if (m_vtx_decl_3D != nullptr)
+	{
+		m_vtx_decl_3D->Release();
+	}
+
+	// 頂点データの構造を定義
+	D3DVERTEXELEMENT9 decl[] =
+	{
+		{ 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },	// 位置
+		{ 0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },	// 法線
+		{ 0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },	// テクスチャ座標
+		D3DDECL_END() // 最後に必ずD3DDECL_END()をつける
+	};
+
+	// 頂点の定義を作成する
+	m_pD3DDevice->CreateVertexDeclaration(decl, &m_vtx_decl_3D);
+}
+
+//=============================================================================
+// 3Dポリゴンの頂点定義を破棄
+//=============================================================================
+void CRenderer::ReleaseVtxDecl3D(void)
+{
+	// 生成されていたら
+	if (m_vtx_decl_3D != nullptr)
+	{
+		// 破棄
+		m_vtx_decl_3D->Release();
+	}
 }
 
 #ifdef _DEBUG
