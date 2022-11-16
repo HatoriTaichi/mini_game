@@ -256,6 +256,7 @@ void AllAcceptInit(CTcpListener *listener, int room_num)
 
 		// ‰Šú‰»
 		data.player.number = count_player + 1;
+		data.connect = true;
 
 		// ƒƒ‚ƒŠ‚ÌƒRƒs[
 		memcpy(&recv_data[0], &data, sizeof(CCommunicationData::COMMUNICATION_DATA));
