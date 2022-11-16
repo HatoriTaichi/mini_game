@@ -324,6 +324,7 @@ void COnlineGame::Matching(void)
 	CTcpClient *client = CManager::GetInstance()->GetNetWorkManager()->GetCommunication();	// 通信クラスの取得
 	CCommunicationData::COMMUNICATION_DATA *player_data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();	// プレイヤーデータの取得
 	char recv_data[MAX_COMMU_DATA];	// 受信データ
+	char send_data[MAX_COMMU_DATA];	// 送信データ
 
 	// 初期化
 	client->Init();
@@ -349,6 +350,10 @@ void COnlineGame::Matching(void)
 	{
 		m_enemy_player = CEnemyPlayer::Create({ 0.0f,0.0f,0.0f }, {0.0f,0.0f,0.0f}, "data/Txt/player_motion_1.txt");
 	}
+
+	// 送信
+	memcpy(&send_data[0], player_data, sizeof(CCommunicationData::COMMUNICATION_DATA));
+	CManager::GetInstance()->GetNetWorkManager()->Send(&send_data[0], sizeof(CCommunicationData::COMMUNICATION_DATA));
 }
 //=============================================================================
 // アイテム出現処理
