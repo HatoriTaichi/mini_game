@@ -46,7 +46,7 @@ bool GetSurfaceWH(IDirect3DSurface9 *surf, UINT &ui_width, UINT &ui_height)
 //=============================================================================
 CRenderer::CRenderer()
 {
-	
+	m_col_back_buff = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 //=============================================================================
@@ -221,27 +221,64 @@ HRESULT CRenderer::Init(const HWND &hWnd, const bool &bWindow)
 //=============================================================================
 void CRenderer::Uninit(void)
 {
+	//エフェクトの終了
+	if (m_effect != nullptr)
+	{
+		m_effect->End();
+	}
 #ifdef _DEBUG
 	// デバッグ情報表示用フォントの破棄
-	if (m_pFont != NULL)
+	if (m_pFont != nullptr)
 	{
 		m_pFont->Release();
-		m_pFont = NULL;
+		m_pFont = nullptr;
 	}
 #endif //!_DEBUG
 
+	//頂点定義の破棄
+	ReleaseVtxDecl2D();
+	ReleaseVtxDecl3D();
+
+	//Z値テクスチャの破棄
+	if (m_tex_buff_z != nullptr)
+	{
+		m_tex_buff_z->Release();
+		m_tex_buff_z = nullptr;
+	}
+
+	//Z値テクスチャのサーフェイスの破棄
+	if (m_tex_surf_z != nullptr)
+	{
+		m_tex_surf_z->Release();
+		m_tex_surf_z = nullptr;
+	}
+
+	//深度バッファの破棄
+	if (m_depth_buff != nullptr)
+	{
+		m_depth_buff->Release();
+		m_depth_buff = nullptr;
+	}
+
+	//エフェクトの破棄
+	if (m_effect != nullptr)
+	{
+		m_effect->Release();
+		m_effect = nullptr;
+	}
+
 	// デバイスの破棄
-	if (m_pD3DDevice != NULL)
+	if (m_pD3DDevice != nullptr)
 	{
 		m_pD3DDevice->Release();
-		m_pD3DDevice = NULL;
+		m_pD3DDevice = nullptr;
 	}
 
 	// Direct3Dオブジェクトの破棄
-	if (m_pD3D != NULL)
+	if (m_pD3D != nullptr)
 	{
 		m_pD3D->Release();
-		m_pD3D = NULL;
+		m_pD3D = nullptr;
 	}
 }
 
@@ -271,13 +308,46 @@ void CRenderer::Draw(void)
 	// Direct3Dによる描画の開始
 	if (SUCCEEDED(m_pD3DDevice->BeginScene()))
 	{
-		// カメラクラス
+		//----------------------------------
+		//ライトからの深度値の描画
+		//----------------------------------
 		if (camera != nullptr)
 		{
 			camera->SetCamera();
+
+			//サーフェイスとステンシルの設定
+			m_pD3DDevice->SetRenderTarget(0, m_tex_surf_z);
+			m_pD3DDevice->SetDepthStencilSurface(m_depth_buff);
+
+			// バックバッファ＆Ｚバッファのクリア
+			m_pD3DDevice->Clear(0, nullptr, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, 0);
+
+			//Z値バッファ描画中
+			m_draw_tex_z = true;
+
+			//各オブジェクトの描画処理
+			CObject::DrawAll();
+
+			//スペキュラー用のカメラの視点の位置を設定
+			D3DXVECTOR4 posV = camera->GetPosV();
+			SetEffectPosView(posV);
 		}
+
+		//サーフェイスとステンシルの設定
+		m_pD3DDevice->SetRenderTarget(0, m_tex_surf_z);
+		m_pD3DDevice->SetDepthStencilSurface(m_depth_buff);
+		// バックバッファ＆Ｚバッファ＆ステンシルバッファのクリア
+		m_pD3DDevice->Clear(0, nullptr, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), m_col_back_buff, 1.0f, 0);	//フォグと同じ色にするといい感じ
+
+		//Z値バッファ描画中ではない
+		m_draw_tex_z = false;
+
+		//シェーダのシャドウマップの設定
+		SetEffectTextureShadowMap(m_tex_buff_z);
+
 		// オブジェクトの描画処理
 		CObject::DrawAll();
+
 		// フェードクラス
 		if (fade != nullptr)
 		{
@@ -292,8 +362,310 @@ void CRenderer::Draw(void)
 		m_pD3DDevice->EndScene();
 	}
 	// バックバッファとフロントバッファの入れ替え
-	m_pD3DDevice->Present(NULL, NULL, NULL, NULL);
+	m_pD3DDevice->Present(nullptr, nullptr, nullptr, nullptr);
 }
+
+//=============================================================================
+// エフェクトのパスを開始
+//=============================================================================
+void CRenderer::BeginPassEffect(DWORD pass_flag)
+{
+	// 深度バッファ描画時
+	if (m_draw_tex_z)
+	{
+		// 生成されていたら
+		if (m_effect != nullptr)
+		{
+			m_effect->BeginPass(static_cast<int>(PASS_TYPE::BUFF_DEPTH));
+			return;
+		}
+	}
+
+	// パスの種類を設定
+	PASS_TYPE type_pass = PASS_TYPE::DEF_2D;
+
+	//2Dオブジェクトのパス
+	if (pass_flag & PASS_2D)
+	{
+		//テクスチャ無し
+		type_pass = PASS_TYPE::DEF_2D;
+
+		//テクスチャあり
+		if (pass_flag & PASS_TEXTURE)
+		{
+			// パスの種類を設定
+			type_pass = PASS_TYPE::TEX_2D;
+		}
+	}
+
+	// 3Dオブジェクトのパス
+	else if (pass_flag & PASS_3D)
+	{
+		// テクスチャあり
+		if (pass_flag & PASS_TEXTURE)
+		{
+			//ライトあり
+			if (pass_flag & PASS_LIGHT)
+			{
+				// パスの種類を設定
+				type_pass = PASS_TYPE::LIGHT_TEX_3D;
+			}
+			//ライトなし
+			else
+			{
+				// パスの種類を設定
+				type_pass = PASS_TYPE::TEX_3D;
+			}
+		}
+		//テクスチャ無し
+		else 
+		{
+			//ライトあり
+			if (pass_flag & PASS_LIGHT)
+			{
+				// パスの種類を設定
+				type_pass = PASS_TYPE::LIGHT_3D;
+			}
+			//ライトなし
+			else
+			{
+				// パスの種類を設定
+				type_pass = PASS_TYPE::DEF_3D;
+			}
+		}
+	}
+
+	// 生成されていたら
+	if (m_effect != nullptr)
+	{
+		m_effect->BeginPass(static_cast<int>(type_pass));
+	}
+}
+
+//=============================================================================
+// エフェクトのパスを終了
+//=============================================================================
+void CRenderer::EndPassEffect(void)
+{
+	// 生成されていたら
+	if (m_effect != nullptr)
+	{
+		m_effect->EndPass();
+	}
+}
+
+//=============================================================================
+// シェーダのワールドマトリックスを設定
+//=============================================================================
+void CRenderer::SetEffectMatrixWorld(D3DXMATRIX mtx_world)
+{
+	// 生成されていたら
+	if (m_effect != nullptr)
+	{
+		m_effect->SetMatrix("g_mWorld", &mtx_world);
+	}
+}
+
+//=============================================================================
+// シェーダのビューマトリックスを設定
+//=============================================================================
+void CRenderer::SetEffectMatrixView(D3DXMATRIX mtx_view)
+{
+	// 生成されていたら
+	if (m_effect != nullptr)
+	{
+		m_effect->SetMatrix("g_mView", &mtx_view);
+	}
+}
+
+//=============================================================================
+// シェーダのプロジェクトマトリックスを設定
+//=============================================================================
+void CRenderer::SetEffectMatrixProj(D3DXMATRIX mtx_proj)
+{
+	// 生成されていたら
+	if (m_effect != nullptr)
+	{
+		m_effect->SetMatrix("g_mProj", &mtx_proj);
+	}
+}
+
+//=============================================================================
+// シェーダのテクスチャを設定
+//=============================================================================
+void CRenderer::SetEffectTexture(LPDIRECT3DTEXTURE9 tex)
+{
+	// 生成されていたら
+	if (m_effect != nullptr)
+	{
+		m_effect->SetTexture("g_Texture", tex);
+	}
+}
+
+//=============================================================================
+// シェーダのシャドウマップテクスチャを設定
+//=============================================================================
+void CRenderer::SetEffectTextureShadowMap(LPDIRECT3DTEXTURE9 tex)
+{
+	// 生成されていたら
+	if (m_effect != nullptr)
+	{
+		m_effect->SetTexture("g_texShadowMap", tex);
+	}
+}
+
+//=============================================================================
+// シェーダのライトを設定
+//=============================================================================
+void CRenderer::SetEffectLightVector(D3DXVECTOR4 vec_light)
+{
+	// 生成されていたら
+	if (m_effect != nullptr)
+	{
+		m_effect->SetVector("g_Light", &vec_light);
+	}
+}
+
+//=============================================================================
+// シェーダのライトのビューマトリックスを設定
+//=============================================================================
+void CRenderer::SetEffectLightMatrixView(D3DXMATRIX mtx_view)
+{
+	// 生成されていたら
+	if (m_effect != nullptr)
+	{
+		m_effect->SetMatrix("g_mLightView", &mtx_view);
+	}
+}
+
+//=============================================================================
+// シェーダのライトのプロジェクションマトリックスを設定
+//=============================================================================
+void CRenderer::SetEffectLightMatrixProj(D3DXMATRIX mtx_proj)
+{
+	// 生成されていたら
+	if (m_effect != nullptr)
+	{
+		m_effect->SetMatrix("g_mLightProj", &mtx_proj);
+	}
+}
+
+//=============================================================================
+// シェーダの視点を設定
+//=============================================================================
+void CRenderer::SetEffectPosView(D3DXVECTOR4 posV)
+{
+	// 生成されていたら
+	if (m_effect != nullptr)
+	{
+		m_effect->SetVector("g_posEye", &posV);
+	}
+}
+
+//=============================================================================
+// シェーダのフォグの有効状態を設定
+//=============================================================================
+void CRenderer::SetEffectFogEnable(bool enable)
+{
+	// 生成されていたら
+	if (m_effect != nullptr)
+	{
+		m_effect->SetBool("g_bEnableFog", enable);
+	}
+}
+
+//=============================================================================
+// シェーダのフォグのカラーを設定
+//=============================================================================
+void CRenderer::SetEffectFogColor(D3DXCOLOR col_fog)
+{
+	// カラー
+	D3DXVECTOR4 vec_color = D3DXVECTOR4(col_fog.r, col_fog.g, col_fog.b, col_fog.a);
+
+	// 生成されていたら
+	if (m_effect != nullptr)
+	{
+		m_effect->SetVector("g_fogColor", &vec_color);
+	}
+}
+
+//=============================================================================
+// シェーダのフォグの範囲を設定
+//=============================================================================
+void CRenderer::SetEffectFogRange(float fog_start, float fog_end)
+{
+	// フォグ
+	float fog_ragne[2] = { fog_end / (fog_end - fog_start), -1 / (fog_end - fog_start) };
+
+	// 生成されていたら
+	if (m_effect != nullptr)
+	{
+		m_effect->SetFloatArray("g_fogRange", fog_ragne, 2);
+	}
+}
+
+//=============================================================================
+// シェーダのマテリアルのディフューズ色を設定
+//=============================================================================
+void CRenderer::SetEffectMaterialDiffuse(D3DXCOLOR mat_diffuse)
+{
+	// 生成されていたら
+	if (m_effect != nullptr)
+	{
+		m_effect->SetVector("g_matDiffuse", &D3DXVECTOR4(mat_diffuse.r, mat_diffuse.g, mat_diffuse.b, mat_diffuse.a));
+	}
+}
+
+//=============================================================================
+// シェーダのマテリアルのエミッシブ色を設定
+//=============================================================================
+void CRenderer::SetEffectMaterialEmissive(D3DXCOLOR mat_emissive)
+{
+	// 生成されていたら
+	if (m_effect != nullptr)
+	{
+		m_effect->SetVector("g_matEmissive", &D3DXVECTOR4(mat_emissive.r, mat_emissive.g, mat_emissive.b, mat_emissive.a));
+	}
+}
+
+//=============================================================================
+// シェーダのマテリアルのスペキュラーを設定
+//=============================================================================
+void CRenderer::SetEffectMaterialSpecular(D3DXCOLOR mat_specular)
+{
+	// 生成されていたら
+	if (m_effect != nullptr)
+	{
+		m_effect->SetVector("g_matSpecular", &D3DXVECTOR4(mat_specular.r, mat_specular.g, mat_specular.b, mat_specular.a));
+	}
+}
+
+//=============================================================================
+// シェーダのマテリアルの反射の強さを設定
+//=============================================================================
+void CRenderer::SetEffectMaterialPower(float mat_power)
+{
+	// 生成されていたら
+	if (m_effect != nullptr)
+	{
+		m_effect->SetFloat("g_matPower", mat_power);
+	}
+}
+
+
+//=============================================================================
+// シェーダの輪郭の発光色を設定
+//=============================================================================
+void CRenderer::SetEffectGlow(D3DXCOLOR col_glow, float power)
+{
+	// 生成されていたら
+	if (m_effect != nullptr)
+	{
+		m_effect->SetVector("g_colGlow", &D3DXVECTOR4(col_glow.r, col_glow.g, col_glow.b, col_glow.a));
+		m_effect->SetFloat("g_powGlow", power);
+	}
+}
+
 
 //=============================================================================
 // 2Dポリゴンの頂点定義を生成
