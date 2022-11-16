@@ -15,7 +15,7 @@
 //===========================================================
 // マクロ定義
 //===========================================================
-#define DEFAULT_EFFECT_FILE_NAME "source/fx/DefaultEffect.fx"	//読み込むエフェクトファイルの名前
+#define DEFAULT_EFFECT_FILE_NAME "data/fx/DefaultEffect.fx"	//読み込むエフェクトファイルの名前
 #define DEFAULT_EFFECT_TECHNIQUE_NAME "RenderScene"	//エフェクトファイルのTechniqueの名前
 
 //=============================================================================
@@ -192,7 +192,7 @@ HRESULT CRenderer::Init(const HWND &hWnd, const bool &bWindow)
 	if (FAILED(hr) && err_message != nullptr)
 	{
 		// エラーメッセージ表示
-		MessageBoxA(NULL, (LPCSTR)(err_message->GetBufferPointer()), "", MB_OK);
+		MessageBoxA(NULL, (LPCSTR)(err_message->GetBufferPointer()), "エラー", MB_OK);
 		err_message->Release();
 	}
 
@@ -296,7 +296,7 @@ void CRenderer::Update(void)
 //=============================================================================
 void CRenderer::Draw(void)
 {
-	/*CFade *fade = CManager::GetInstance()->GetSceneManager()->GetFade();	// フェードクラス	
+	CFade *fade = CManager::GetInstance()->GetSceneManager()->GetFade();	// フェードクラス	
 	CCamera *camera = CManager::GetInstance()->GetCamera();	// カメラクラス
 
 	// デバックバッファ&Zバッファのクリア
@@ -327,19 +327,11 @@ void CRenderer::Draw(void)
 #endif //!_DEBUG
 		// Direct3Dによる描画の終了
 		m_pD3DDevice->EndScene();
-	}*/
+	}
 	// バックバッファとフロントバッファの入れ替え
-	m_pD3DDevice->Present(NULL, NULL, NULL, NULL);
-	CFade *fade = CManager::GetInstance()->GetSceneManager()->GetFade();	// フェードクラス	
+	m_pD3DDevice->Present(nullptr, nullptr, nullptr, nullptr);
+	/*CFade *fade = CManager::GetInstance()->GetSceneManager()->GetFade();	// フェードクラス	
 	CCamera *camera = CManager::GetInstance()->GetCamera();	// カメラクラス
-
-	// デバックバッファ&Zバッファのクリア
-	m_pD3DDevice->Clear(0,
-						NULL,
-						(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER),
-						D3DCOLOR_RGBA(0, 0, 0, 255),
-						1.0f,
-						0);
 
 	// Direct3Dによる描画の開始
 	if (SUCCEEDED(m_pD3DDevice->BeginScene()))
@@ -370,8 +362,9 @@ void CRenderer::Draw(void)
 		}
 
 		//サーフェイスとステンシルの設定
-		m_pD3DDevice->SetRenderTarget(0, m_tex_surf_z);
-		m_pD3DDevice->SetDepthStencilSurface(m_depth_buff);
+		m_pD3DDevice->SetRenderTarget(0, m_default_surf);
+		m_pD3DDevice->SetDepthStencilSurface(m_default_depth_surf);
+
 		// バックバッファ＆Ｚバッファ＆ステンシルバッファのクリア
 		m_pD3DDevice->Clear(0, nullptr, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), m_col_back_buff, 1.0f, 0);	//フォグと同じ色にするといい感じ
 
@@ -398,7 +391,7 @@ void CRenderer::Draw(void)
 		m_pD3DDevice->EndScene();
 	}
 	// バックバッファとフロントバッファの入れ替え
-	m_pD3DDevice->Present(nullptr, nullptr, nullptr, nullptr);
+	m_pD3DDevice->Present(nullptr, nullptr, nullptr, nullptr);*/
 }
 
 //=============================================================================
