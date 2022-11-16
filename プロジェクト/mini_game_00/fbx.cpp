@@ -201,8 +201,6 @@ void CFbx::Draw(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();	//デバイスのポインタ
 	D3DXMATRIX mtx_scale, mtx_rot, mtx_trans, mtx_parent;	// 計算用マトリックス
-	DWORD enable_light = 0;
-	DWORD pass_flag = PASS_3D;
 	int mesh_num = m_mesh.size();	// メッシュ数を取得
 
 	// マトリックス初期化
@@ -248,12 +246,6 @@ void CFbx::Draw(void)
 	// マトリックスの設定
 	pDevice->SetTransform(	D3DTS_WORLD,
 							&m_mtx_wold);
-
-	//シェーダにマトリックスを設定
-	CManager::GetRenderer()->SetEffectMatrixWorld(m_mtx_wold);
-
-	//シェーダにテクスチャを設定
-	CManager::GetRenderer()->SetEffectTexture(m_mesh_info[0]->tex[0]);
 
 	// メッシュ数分のループ
 	for (int count_mesh = 0; count_mesh < mesh_num; count_mesh++)
@@ -308,32 +300,6 @@ void CFbx::Draw(void)
 		// インデックスバッファをデータストリームに設定
 		pDevice->SetIndices(m_mesh_info[count_mesh]->idx_buff);
 
-		//頂点定義を設定
-		CManager::GetRenderer()->SetVtxDecl3D();
-
-		//ライトの状態取得
-		pDevice->GetRenderState(D3DRS_LIGHTING, &enable_light);
-
-		//テクスチャがある場合フラグを追加
-		if (m_mesh_info[0]->tex[0] != nullptr)
-		{
-			pass_flag |= PASS_TEXTURE;
-		}
-		//ライトフラグを追加
-		pass_flag |= PASS_LIGHT;
-
-		//モデルが設定したマテリアルの影響を受けないようにマテリアルの設定
-		CManager::GetRenderer()->SetEffectMaterialDiffuse(m_mesh_info[0]->material[0].MatD3D.Diffuse);
-		CManager::GetRenderer()->SetEffectMaterialEmissive(m_mesh_info[0]->material[0].MatD3D.Emissive);
-		CManager::GetRenderer()->SetEffectMaterialSpecular(m_mesh_info[0]->material[0].MatD3D.Specular);
-		CManager::GetRenderer()->SetEffectMaterialPower(m_mesh_info[0]->material[0].MatD3D.Power);
-
-		//輪郭の発光色の設定
-		//CManager::GetRenderer()->SetEffectGlow(m_colGlow, m_powGlow);
-
-		//パスの開始
-		CManager::GetRenderer()->BeginPassEffect(pass_flag);
-
 		int vtx_num = m_mesh_info[count_mesh]->vertex_max_ary.size();	// 頂点数
 		int polygon_num = m_mesh_info[count_mesh]->index_number.size();	// ポリゴン数
 
@@ -344,9 +310,6 @@ void CFbx::Draw(void)
 										vtx_num,	// 使用する頂点数
 										0,	// ここの値が最初のインデックス
 										polygon_num);	// 三角形の数
-
-		// エフェクト終了
-		CManager::GetRenderer()->EndPassEffect();
 	}
 }
 
