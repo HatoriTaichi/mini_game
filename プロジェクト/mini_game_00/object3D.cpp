@@ -77,6 +77,8 @@ void CObject3D::Draw(void)
 {
 	LPDIRECT3DDEVICE9 device = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスの取得
 	D3DXMATRIX mtx_rot, mtx_trans;	// 計算用マトリックス
+	DWORD eable_light = 0;
+	DWORD pass_flag;
 
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtx_world);
@@ -124,6 +126,30 @@ void CObject3D::Draw(void)
 
 	//頂点定義を設定
 	CManager::GetInstance()->GetRenderer()->SetVtxDecl3D();
+
+	//ライトの状態取得
+	device->GetRenderState(D3DRS_LIGHTING, &eable_light);
+
+	pass_flag = PASS_3D;
+
+	//テクスチャがある場合フラグを追加
+	if (m_texture != nullptr)
+	{
+		pass_flag |= PASS_TEXTURE;
+	}
+	//ライトがある場合フラグを追加
+	pass_flag |= PASS_LIGHT;
+
+	//モデルが設定したマテリアルの影響を受けないようにマテリアルの設定
+	pRenderer->SetEffectMaterialDiffuse(m_mat.MatD3D.Diffuse);
+	pRenderer->SetEffectMaterialEmissive(m_mat.MatD3D.Emissive);
+	pRenderer->SetEffectMaterialSpecular(m_mat.MatD3D.Specular);
+	pRenderer->SetEffectMaterialPower(m_mat.MatD3D.Power);
+	//輪郭の発光色の設定
+	pRenderer->SetEffectGlow(m_colGlow, m_powGlow);
+
+	//パスの開始
+	pRenderer->BeginPassEffect(dwPassFlag);
 
 	// ポリゴンの描画
 	device->DrawIndexedPrimitive(	D3DPT_TRIANGLESTRIP,
