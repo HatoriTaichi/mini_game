@@ -32,6 +32,7 @@ public:
 	void Uninit(void);	// ポリゴンの終了
 	void Update(void);	// ポリゴンの更新
 	static void Load(void);	// フォントのロード
+	static void UnLoad(void);	// フォントの破棄
 	static CLetter*Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int font_size, int font_weight, wchar_t text);	// 生成処理
 	static vector<wstring> Conbrt(string buf);	// コンバート
 	CSprite *GetSprite(void) { return m_sprite; }	// スプライトの取得

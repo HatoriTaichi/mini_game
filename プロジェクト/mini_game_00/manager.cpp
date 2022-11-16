@@ -17,6 +17,7 @@
 #include "camera.h"
 #include "scenemanager.h"
 #include "model.h"
+#include "letter.h"
 
 //=============================================================================
 // マクロ定義
@@ -92,6 +93,9 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	// モデルのロード
 	CModel::Load();
 
+	// フォントのロード
+	CLetter::Load();
+
 	// キーボードクラスの生成
 	m_key = new CKey;
 	if (m_key != nullptr)
@@ -142,6 +146,9 @@ void CManager::Uninit(void)
 
 	// モデルの破棄
 	CModel::UnLoad();
+
+	// フォントの破棄
+	CLetter::UnLoad();
 
 	// テクスチャの破棄
 	if (m_texture != nullptr)

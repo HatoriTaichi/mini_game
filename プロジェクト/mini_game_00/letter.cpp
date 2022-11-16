@@ -210,3 +210,11 @@ void CLetter::Load(void)
 {
 	AddFontResourceEx("data/Font/MochiyPopOne-Regular.ttf", FR_PRIVATE, NULL);	// モチイpopワン
 }
+
+//=============================================================================
+// フォントの破棄
+//=============================================================================
+void CLetter::UnLoad(void)
+{
+	RemoveFontResourceEx("data/Font/MochiyPopOne-Regular.ttf", FR_PRIVATE, NULL);	// モチイpopワン
+}
