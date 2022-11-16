@@ -113,6 +113,7 @@ void CEnemyPlayer::Update(void)
 		// ˆÊ’u‚Ìİ’è
 		m_enemy_player_data.pos = m_enemy_player_data.pos_old + pos_vec;
 	}
+
 }
 
 //=============================================================================

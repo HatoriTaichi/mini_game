@@ -115,8 +115,11 @@ HRESULT COnlineGame::Init(void)
 				//プレイヤーの生成
 				if (!m_pPlayer[0])
 				{
+					// データを取得
+					CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetEnemyData()->GetCmmuData();
+
 					m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-						D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_2.txt", 0);
+						D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_2.txt", data->player.number);
 				}
 				//if (!m_pPlayer[1])
 				//{
