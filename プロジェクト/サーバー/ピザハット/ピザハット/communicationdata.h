@@ -31,7 +31,7 @@ public:
 	{
 		int rand_pos_candidate;	// 候補地乱数
 		bool is_pos_change;	// 候補地が変わったか
-	};
+	} CANDIDATES_PLACE_DATA;
 	typedef struct
 	{
 		D3DXVECTOR3 pos;	// 位置
@@ -47,6 +47,7 @@ public:
 	typedef struct
 	{
 		PLAYER_DATA player;	// プレイヤーデータ
+		CANDIDATES_PLACE_DATA candidates_place_data;//候補地の情報
 		bool connect;	// 接続確認
 	} COMMUNICATION_DATA;
 
