@@ -299,7 +299,7 @@ void CRenderer::Draw(void)
 	CFade *fade = CManager::GetInstance()->GetSceneManager()->GetFade();	// フェードクラス	
 	CCamera *camera = CManager::GetInstance()->GetCamera();	// カメラクラス
 
-															// デバックバッファ&Zバッファのクリア
+	// デバックバッファ&Zバッファのクリア
 	m_pD3DDevice->Clear(0,
 		NULL,
 		(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER),

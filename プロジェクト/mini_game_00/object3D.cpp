@@ -102,6 +102,12 @@ void CObject3D::Draw(void)
 	// ワールドマトリックスの設定
 	device->SetTransform(D3DTS_WORLD, &m_mtx_world);
 
+	//シェーダにマトリックスを設定
+	CManager::GetInstance()->GetRenderer()->SetEffectMatrixWorld(m_mtx_world);
+
+	//シェーダにテクスチャを設定
+	CManager::GetInstance()->GetRenderer()->SetEffectTexture(m_texture);
+
 	// 頂点フォーマットの設定
 	device->SetFVF(FVF_VERTEX_3D);
 
