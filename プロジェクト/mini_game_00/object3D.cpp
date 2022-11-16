@@ -122,6 +122,9 @@ void CObject3D::Draw(void)
 	// インデックスバッファをデータストリームに設定
 	device->SetIndices(m_idx_buff);
 
+	//頂点定義を設定
+	CManager::GetInstance()->GetRenderer()->SetVtxDecl3D();
+
 	// ポリゴンの描画
 	device->DrawIndexedPrimitive(	D3DPT_TRIANGLESTRIP,
 									0,
