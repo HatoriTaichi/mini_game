@@ -292,15 +292,19 @@ void COnlineGame::Update(void)
 	//IngredientsSpawn();
 	CKey *key = CManager::GetInstance()->GetKey();
 	m_nGameTimeSeconds++;
-	if (m_nGameTimeSeconds >= 60)
+	if (m_pGameTimer)
 	{
-		m_nGameTimeSeconds = 0;
-		m_pGameTimer->AddCounter(-1);
+		if (m_nGameTimeSeconds >= 60)
+		{
+			m_nGameTimeSeconds = 0;
+			m_pGameTimer->AddCounter(-1);
+		}
+		if (m_pGameTimer->GetCounter() <= 0)
+		{
+			CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT);
+		}
 	}
-	if (m_pGameTimer->GetCounter() <= 0)
-	{
-		CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT);
-	}
+
 
 }
 
