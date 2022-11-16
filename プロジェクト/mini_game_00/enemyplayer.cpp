@@ -18,6 +18,13 @@
 #include "onlinegame.h"
 #include "ingredients.h"
 #include "player.h"
+#define MOVE_SPEED (5.0f)
+#define SPEED_UP_DIAMETER (1.5f)//スピードアップ倍率
+#define SPEED_UP_TIME_LIMIT (60 * 5)//スピードアップの時間制限
+#define POSSIBLE_ATTACK_SPEED_UP_DIAMETER (1.2f)//スピードアップ倍率
+#define POSSIBLE_ATTACK_TIME_LIMIT (60 * 8)//攻撃可能時の時間制限
+
+
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
@@ -27,6 +34,8 @@ CEnemyPlayer::CEnemyPlayer(CObject::LAYER_TYPE layer) : CObject(layer)
 	m_enemy_player_data.pos_old = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_enemy_player_data.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXMatrixIdentity(&m_mtx_wld);
+	m_item_timer = 0;
+	m_speed = 0.0f;
 }
 
 //=============================================================================
@@ -249,6 +258,73 @@ void CEnemyPlayer::DropItem()
 		}
 
 	}
+}
+//=============================================================================
+// 取得したアイテムの処理
+//=============================================================================
+void CEnemyPlayer::Item(void)
+{
+	int speedup_speed = 0;
+	switch (m_enemy_player_data.item_state)
+	{
+	case ITEM_GETSTATE::NONE:
+		m_speed = MOVE_SPEED;
+
+		break;
+		//スピードアップ
+	case ITEM_GETSTATE::SPEED_UP:
+		m_item_timer++;
+		speedup_speed = static_cast<int>(MOVE_SPEED * SPEED_UP_DIAMETER);
+		m_speed = static_cast<float>(speedup_speed);
+		//時間になったら終わる
+		if (m_item_timer >= SPEED_UP_TIME_LIMIT)
+		{
+			m_item_timer = 0;
+			m_enemy_player_data.item_state = ITEM_GETSTATE::NONE;
+		}
+		break;
+		//攻撃可能
+	case ITEM_GETSTATE::POSSIBLEATTACK:
+		m_item_timer++;
+		speedup_speed = static_cast<int>(MOVE_SPEED * POSSIBLE_ATTACK_SPEED_UP_DIAMETER);
+		m_speed = static_cast<float>(speedup_speed);
+		//時間になったら終わる
+		if (m_item_timer >= POSSIBLE_ATTACK_TIME_LIMIT)
+		{
+			m_item_timer = 0;
+			m_enemy_player_data.item_state = ITEM_GETSTATE::NONE;
+		}
+		//相手プレイヤーに当たったら具材をおとさせる
+
+		break;
+	}
+}
+//=============================================================================
+// アイテムの情報を保存
+//=============================================================================
+void CEnemyPlayer::SetItemType(int nType)
+{
+	if (m_enemy_player_data.item_state == ITEM_GETSTATE::NONE)
+	{
+		m_enemy_player_data.item_state = static_cast <ITEM_GETSTATE>(nType);
+	}
+
+}
+//=============================================================================
+// 取得した具材をスタックする
+//=============================================================================
+void CEnemyPlayer::SetIngredients(int nType)
+{
+	m_enemy_player_data.get_ingredients_type.push_back(nType);
+}
+//=============================================================================
+// 具材を落とす状態にする
+//=============================================================================
+void CEnemyPlayer::SetDropState(void)
+{
+	//具材ドロップを可能にする
+	m_enemy_player_data.can_drop = true;
+	m_enemy_player_data.operation_lock = true;
 }
 
 //=============================================================================

@@ -72,7 +72,6 @@ private:
 	void SetItemType(int nType);//アイテム取得処理
 	void SetIngredients(int nType);//アイテム取得処理
 	void SetDropState(void);//具材を落とす状態にする
-	void Motion(void);
 	void CreateModel(void);	// モデルの生成
 	void InitMotionController(void);	// モーションコントローラーの初期化
 	D3DXMATRIX m_mtx_wld;	// ワールドマトリックス
@@ -81,6 +80,8 @@ private:
 	CFileLoad::MODEL_INFO m_model_info;	// モデル情報
 	string m_motion_text_pas;	// モーションテキストのパス
 	ENEMYPLAYER_DATA m_enemy_player_data;	//　敵プレイヤー情報
+	float m_speed;//速度
+	int m_item_timer;
 };
 
 #endif

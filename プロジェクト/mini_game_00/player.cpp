@@ -284,15 +284,22 @@ void CPlayer::Update(void)
 		//プレイヤー情報をサーバーに送信
 		CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
 		char aSendData[MAX_COMMU_DATA];
+		//位置
 		data->player.pos = m_PlayerData.m_pos;
+		//向き
 		data->player.rot = m_PlayerData.m_rot;
+		//モーション情報
 		memcpy(&data->player.motion[0], &m_PlayerData.m_motion_name[0], sizeof(m_PlayerData.m_motion_name));
 		for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
 		{
+			//ドロップ可能な方向の情報
 			data->player.drop[nCnt] = m_PlayerData.m_bDrop[nCnt];
 		}
+		//ドロップ可能な状態
 		data->player.can_drop = m_PlayerData.m_bCanDrop;
+		//行動が可能かの情報
 		data->player.operation_loock = m_PlayerData.m_bOperationLock;
+		//自身が向いてる向き
 		data->player.facing = m_PlayerData.m_nFacing;
 		memcpy(&aSendData[0], data, sizeof(CCommunicationData::COMMUNICATION_DATA));
 		CManager::GetInstance()->GetNetWorkManager()->Send(&aSendData[0], sizeof(CCommunicationData::COMMUNICATION_DATA));
