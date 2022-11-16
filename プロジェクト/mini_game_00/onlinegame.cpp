@@ -100,7 +100,7 @@ HRESULT COnlineGame::Init(void)
 
 	while (true)
 	{
-		if (CNetWorkManager::GetAllConnect())
+		if (!CNetWorkManager::GetAllConnect())
 		{
 			//ÉvÉåÉCÉÑÅ[ÇÃê∂ê¨
 			if (!m_pPlayer[0])
@@ -256,7 +256,7 @@ HRESULT COnlineGame::Init(void)
 			}
 			//EnemySpawn();
 		}
-		else if (!CNetWorkManager::GetAllConnect())
+		else if (CNetWorkManager::GetAllConnect())
 		{
 			break;
 		}
