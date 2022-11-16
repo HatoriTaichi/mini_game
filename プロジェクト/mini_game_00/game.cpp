@@ -314,49 +314,41 @@ void CGame::ItemSpawn(void)
 		{
 			bOverlapPos[nCntNum] = false;
 		}
-		//具材をスポーン
-		int nSize = m_ItemSpawnPoint.size();
-		if (nSize != 0)
+		//アイテムのスポーンポイント番号を動的確保
+		m_NumItemSpawnPoint = new int[NormalItemSpawnMin];
+		//アイテムのスポーンポイント番号を初期化
+		for (int nCntNum = 0; nCntNum < NormalItemSpawnMin; nCntNum++)
 		{
-			//具材を配置する最大値を決める
-			int nCntMax = NormalItemSpawnMin;
-			//具材の
-			m_NumItemSpawnPoint = new int[nCntMax];
-			//数値の初期化
-			for (int nCntNum = 0; nCntNum < nCntMax; nCntNum++)
+			m_NumItemSpawnPoint[nCntNum] = -1;
+		}
+		for (int nCnt = 0; nCnt < NormalItemSpawnMin; nCnt++)
+		{
+			bool bStop = false;//ループ終了用変数
+			while (!bStop)
 			{
-				m_NumItemSpawnPoint[nCntNum] = -1;
-			}
-			for (int nCnt = 0; nCnt < nCntMax; nCnt++)
-			{
-				bool bHoge = false;
-				while (!bHoge)
-				{
-					//ランダムな位置を決める
-					int nCntType = static_cast<int>(randItemPosType(mt));
+				//ランダムな位置を決める
+				int nCntType = static_cast<int>(randItemPosType(mt));
 
-					for (int nCntPoint = 0; nCntPoint < nCntMax; nCntPoint++)
+				for (int nCntPoint = 0; nCntPoint < NormalItemSpawnMin; nCntPoint++)
+				{
+					if (!bOverlapPos[nCntType])
 					{
-						if (!bOverlapPos[nCntType])
-						{
-							m_NumItemSpawnPoint[nCnt] = nCntType;
-							bOverlapPos[nCntType] = true;
-							bHoge = true;
-							break;
-						}
+						//アイテムのスポーンポイントを代入
+						m_NumItemSpawnPoint[nCnt] = nCntType;
+						bOverlapPos[nCntType] = true;
+						bStop = true;
+						break;
 					}
 				}
-				int nType = static_cast<int>(randItemType(mt));
-				//具材を生成
-				CItem::Create({ m_ItemSpawnPoint[m_NumItemSpawnPoint[nCnt]].x ,
-					m_ItemSpawnPoint[m_NumItemSpawnPoint[nCnt]].y + 200.0f,
-					m_ItemSpawnPoint[m_NumItemSpawnPoint[nCnt]].z }, { 7.0f,7.0f,0.0f }, static_cast<CItem::ItemType>(nType));
-				//CIngredients::Create({ 0.0f ,
-				//	0.0f,
-				//	0.0f }, { 0.0f,0.0f,0.0f }, { 1.0f,1.0f,1.0f }, static_cast<CIngredients::IngredientsType>(nType));
-
 			}
+			//アイテムの種類を代入
+			int nType = static_cast<int>(randItemType(mt));
+			//アイテムを生成
+			CItem::Create({ m_ItemSpawnPoint[m_NumItemSpawnPoint[nCnt]].x ,
+				m_ItemSpawnPoint[m_NumItemSpawnPoint[nCnt]].y + 200.0f,
+				m_ItemSpawnPoint[m_NumItemSpawnPoint[nCnt]].z }, { 7.0f,7.0f,0.0f }, static_cast<CItem::ItemType>(nType));
 		}
+
 		//アイテムをスポーン
 		m_ItemSpawnTimer = 0;
 	}
