@@ -60,6 +60,7 @@ private:
 	string m_tex_pas;	// テクスチャパス
 	D3DXMATERIAL m_material;		//ポリゴンのマテリアル
 	D3DXMATRIX m_mtx_world;// ワールドマトリックス
+	D3DXCOLOR m_col_glow;	// 輪郭の発光色の色
 	LPDIRECT3DTEXTURE9 m_texture;	// テクスチャ
 	LPDIRECT3DVERTEXBUFFER9 m_vtx_buff;	// 頂点バッファのポインタ
 	LPDIRECT3DINDEXBUFFER9 m_idx_buff; // インデックスバッファへのポインタ
@@ -67,6 +68,7 @@ private:
 	D3DXVECTOR3 m_rot;	// ポリゴンの角度
 	int m_num_vtx;	// 頂点数
 	int m_num_idx;	// インデックス数
+	float m_pow_glow;	//輪郭の強度
 };
 
 #endif // !_SCENE3D_H_

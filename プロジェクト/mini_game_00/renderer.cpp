@@ -192,7 +192,7 @@ HRESULT CRenderer::Init(const HWND &hWnd, const bool &bWindow)
 	if (FAILED(hr) && err_message != nullptr)
 	{
 		// エラーメッセージ表示
-		MessageBoxA(NULL, (LPCSTR)(err_message->GetBufferPointer()), "エラー", MB_OK);
+		MessageBoxA(NULL, (LPCSTR)(err_message->GetBufferPointer()), " ", MB_OK);
 		err_message->Release();
 	}
 
@@ -299,48 +299,13 @@ void CRenderer::Draw(void)
 	CFade *fade = CManager::GetInstance()->GetSceneManager()->GetFade();	// フェードクラス	
 	CCamera *camera = CManager::GetInstance()->GetCamera();	// カメラクラス
 
-	// デバックバッファ&Zバッファのクリア
-	m_pD3DDevice->Clear(0,
-		NULL,
-		(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER),
-		D3DCOLOR_RGBA(255, 255, 255, 255), 1.0f, 0);
-
 	// Direct3Dによる描画の開始
 	if (SUCCEEDED(m_pD3DDevice->BeginScene()))
 	{
-		// カメラクラス
+		// 生成されていたら
 		if (camera != nullptr)
 		{
-			camera->SetCamera();
-		}
-		// オブジェクトの描画処理
-		CObject::DrawAll();
-		// フェードクラス
-		if (fade != nullptr)
-		{
-			fade->Draw();
-		}
-
-#ifdef _DEBUG
-		// FPS表示
-		DrawFPS();
-#endif //!_DEBUG
-		// Direct3Dによる描画の終了
-		m_pD3DDevice->EndScene();
-	}
-	// バックバッファとフロントバッファの入れ替え
-	m_pD3DDevice->Present(nullptr, nullptr, nullptr, nullptr);
-	/*CFade *fade = CManager::GetInstance()->GetSceneManager()->GetFade();	// フェードクラス	
-	CCamera *camera = CManager::GetInstance()->GetCamera();	// カメラクラス
-
-	// Direct3Dによる描画の開始
-	if (SUCCEEDED(m_pD3DDevice->BeginScene()))
-	{
-		//----------------------------------
-		//ライトからの深度値の描画
-		//----------------------------------
-		if (camera != nullptr)
-		{
+			// カメラの設定
 			camera->SetCamera();
 
 			//サーフェイスとステンシルの設定
@@ -365,8 +330,8 @@ void CRenderer::Draw(void)
 		m_pD3DDevice->SetRenderTarget(0, m_default_surf);
 		m_pD3DDevice->SetDepthStencilSurface(m_default_depth_surf);
 
-		// バックバッファ＆Ｚバッファ＆ステンシルバッファのクリア
-		m_pD3DDevice->Clear(0, nullptr, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), m_col_back_buff, 1.0f, 0);	//フォグと同じ色にするといい感じ
+		// バックバッファ＆Ｚバッファのクリア
+		m_pD3DDevice->Clear(0, nullptr, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, 0);
 
 		//Z値バッファ描画中ではない
 		m_draw_tex_z = false;
@@ -391,7 +356,7 @@ void CRenderer::Draw(void)
 		m_pD3DDevice->EndScene();
 	}
 	// バックバッファとフロントバッファの入れ替え
-	m_pD3DDevice->Present(nullptr, nullptr, nullptr, nullptr);*/
+	m_pD3DDevice->Present(nullptr, nullptr, nullptr, nullptr);
 }
 
 //=============================================================================

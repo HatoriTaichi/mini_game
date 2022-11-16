@@ -17,13 +17,15 @@ CObject3D::CObject3D(LAYER_TYPE Layer) : CObject(Layer)
 	m_material.MatD3D.Emissive = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
 	m_material.MatD3D.Specular = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
 	m_material.MatD3D.Power = 1.0f;
+	m_col_glow = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXMatrixIdentity(&m_mtx_world);
-	m_vtx_buff = NULL;
-	m_idx_buff = NULL;
+	m_vtx_buff = nullptr;
+	m_idx_buff = nullptr;
 	m_num_vtx = 0;
 	m_num_idx = 0;
+	m_pow_glow = 2.0f;
 }
 
 //=============================================================================
@@ -82,7 +84,7 @@ void CObject3D::Draw(void)
 	LPDIRECT3DDEVICE9 device = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスの取得
 	D3DXMATRIX mtx_rot, mtx_trans;	// 計算用マトリックス
 	DWORD eable_light = 0;
-	DWORD pass_flag;
+	DWORD pass_flag = 0;
 
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtx_world);
@@ -150,8 +152,11 @@ void CObject3D::Draw(void)
 	CManager::GetInstance()->GetRenderer()->SetEffectMaterialSpecular(m_material.MatD3D.Specular);
 	CManager::GetInstance()->GetRenderer()->SetEffectMaterialPower(m_material.MatD3D.Power);
 
+	//輪郭の発光色の設定
+	CManager::GetInstance()->GetRenderer()->SetEffectGlow(m_col_glow, m_pow_glow);
+
 	// パスの開始
-	CManager::GetInstance()->GetRenderer()->BeginPassEffect(pass_flag);
+	//CManager::GetInstance()->GetRenderer()->BeginPassEffect(pass_flag);
 
 	// ポリゴンの描画
 	device->DrawIndexedPrimitive(	D3DPT_TRIANGLESTRIP,
@@ -162,5 +167,5 @@ void CObject3D::Draw(void)
 									m_num_idx - 2);	// 三角形の数
 
 	// エフェクト終了
-	CManager::GetInstance()->GetRenderer()->EndPassEffect();
+	//CManager::GetInstance()->GetRenderer()->EndPassEffect();
 }
