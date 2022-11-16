@@ -70,7 +70,7 @@ HRESULT CMeshsphere::Init(void)
 					sinf(D3DX_PI * 2 / m_x_num * y_count) * m_radius,
 					sinf(D3DX_PI * 2 / m_x_num * x_count) * sinf(D3DX_PI * 2 / m_x_num * y_count + (D3DX_PI / 2)) * m_radius);
 				vtx[vtx_num].nor = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
-				vtx[vtx_num].col = D3DCOLOR_RGBA(255, 255, 255, 255);
+				//vtx[vtx_num].col = D3DCOLOR_RGBA(255, 255, 255, 255);
 				vtx[vtx_num].tex = D3DXVECTOR2((1.0f / m_x_num) * x_count, (1.0f / m_y_num) * y_count);
 			}
 		}

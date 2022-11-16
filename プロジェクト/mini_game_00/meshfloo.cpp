@@ -71,7 +71,7 @@ HRESULT CMeshFloo::Init(void)
 			{
 				vtx[vtx_num].pos = D3DXVECTOR3(-m_x_radius + (((m_x_radius * 2) / m_x_num) * count_x), 0.0f, m_z_radius - (((m_z_radius * 2) / m_z_num) * count_z));
 				vtx[vtx_num].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-				vtx[vtx_num].col = D3DCOLOR_RGBA(255, 255, 255, 255);
+				//vtx[vtx_num].col = D3DCOLOR_RGBA(255, 255, 255, 255);
 				vtx[vtx_num].tex = D3DXVECTOR2(0.0f + (1.0f * count_x), 0.0f + (1.0f * count_z));
 			}
 		}

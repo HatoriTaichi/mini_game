@@ -116,12 +116,6 @@ void CObject3D::Draw(void)
 	// シェーダにテクスチャを設定
 	CManager::GetInstance()->GetRenderer()->SetEffectTexture(m_texture);
 
-	// 頂点フォーマットの設定
-	device->SetFVF(FVF_VERTEX_3D);
-
-	// テクスチャの設定
-	device->SetTexture(0, m_texture); //テクスチャの設定
-
 	// 頂点バッファをデータストリームに設定
 	device->SetStreamSource(	0,
 								m_vtx_buff,
@@ -152,11 +146,11 @@ void CObject3D::Draw(void)
 	CManager::GetInstance()->GetRenderer()->SetEffectMaterialSpecular(m_material.MatD3D.Specular);
 	CManager::GetInstance()->GetRenderer()->SetEffectMaterialPower(m_material.MatD3D.Power);
 
-	//輪郭の発光色の設定
+	// 輪郭の発光色の設定
 	CManager::GetInstance()->GetRenderer()->SetEffectGlow(m_col_glow, m_pow_glow);
 
 	// パスの開始
-	//CManager::GetInstance()->GetRenderer()->BeginPassEffect(pass_flag);
+	CManager::GetInstance()->GetRenderer()->BeginPassEffect(pass_flag);
 
 	// ポリゴンの描画
 	device->DrawIndexedPrimitive(	D3DPT_TRIANGLESTRIP,
@@ -167,5 +161,5 @@ void CObject3D::Draw(void)
 									m_num_idx - 2);	// 三角形の数
 
 	// エフェクト終了
-	//CManager::GetInstance()->GetRenderer()->EndPassEffect();
+	CManager::GetInstance()->GetRenderer()->EndPassEffect();
 }

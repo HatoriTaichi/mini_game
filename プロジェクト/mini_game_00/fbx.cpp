@@ -91,7 +91,7 @@ HRESULT CFbx::Init(void)
 		{
 			// ’¸ãî•ñ‚ðÝ’è
 			vtx[count_vertex].pos = D3DXVECTOR3(m_mesh_info[count_mesh]->vertex_max_ary[count_vertex].x, m_mesh_info[count_mesh]->vertex_max_ary[count_vertex].y, m_mesh_info[count_mesh]->vertex_max_ary[count_vertex].z);
-			vtx[count_vertex].col = D3DCOLOR_RGBA(255, 255, 255, 255);
+			//vtx[count_vertex].col = D3DCOLOR_RGBA(255, 255, 255, 255);
 			vtx[count_vertex].nor = D3DXVECTOR3(m_mesh_info[count_mesh]->normal_ary[count_vertex].x, m_mesh_info[count_mesh]->normal_ary[count_vertex].y, m_mesh_info[count_mesh]->normal_ary[count_vertex].z);
 			if (uv_max > 0)
 			{
