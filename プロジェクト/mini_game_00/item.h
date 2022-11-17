@@ -47,6 +47,7 @@ public:
 	void Draw(void);	// ポリゴンの描画
 	void Motion(void);//ちょっとした動きの処理
 	void ColisionPlayer(void);//プレイヤーに当たった時
+	void ColisionEnemyPlayer(void);
 	static CItem *Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, ItemType type);	// 生成
 	D3DXVECTOR3 GetPos(void) { return m_pos; }	// ゲッダー
 	D3DXVECTOR3 GetRot(void) { return m_rot; }	// ゲッダー

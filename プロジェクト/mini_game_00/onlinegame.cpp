@@ -363,7 +363,7 @@ void COnlineGame::Matching(void)
 	// “G”•ª‚Ìƒ‹[ƒv
 	for (int count_enemy = 0; count_enemy < MAX_PLAYER - 1; count_enemy++)
 	{
-		m_enemy_player = CEnemyPlayer::Create({ 0.0f,0.0f,0.0f }, {0.0f,0.0f,0.0f}, "data/Txt/player_motion_1.txt");
+		m_enemy_player = CEnemyPlayer::Create({ 0.0f,0.0f,0.0f }, {0.0f,0.0f,0.0f}, "data/Txt/player_motion_1.txt", player_data->player.number);
 	}
 
 	// ‘—M

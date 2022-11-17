@@ -97,8 +97,16 @@ void CEnemyPlayer::Update(void)
 		m_enemy_player_data.can_drop = data->player.can_drop;
 		m_enemy_player_data.operation_lock = data->player.operation_loock;
 		m_enemy_player_data.facing = data->player.facing;
+
 		//モーション
 		m_motion_controller->PlayMotin(data->player.motion);
+		//アイテム発動時の処理
+		Item();
+		//具材ドロップ可能なら
+		if (m_enemy_player_data.can_drop)
+		{
+			DropItem();
+		}
 	}
 
 	// 動いてたら
@@ -160,12 +168,13 @@ void CEnemyPlayer::Draw(void)
 	{
 		m_model[count_model]->Draw();
 	}
+	Drawtext();
 }
 
 //=============================================================================
 // モデルの生成
 //=============================================================================
-CEnemyPlayer *CEnemyPlayer::Create(const D3DXVECTOR3& pos, const D3DXVECTOR3& rot, const string& motion_pas)
+CEnemyPlayer *CEnemyPlayer::Create(const D3DXVECTOR3& pos, const D3DXVECTOR3& rot, const string& motion_pas, const int& number)
 {
 	// 敵のポインタ
 	CEnemyPlayer *enemy = nullptr;
@@ -177,10 +186,43 @@ CEnemyPlayer *CEnemyPlayer::Create(const D3DXVECTOR3& pos, const D3DXVECTOR3& ro
 		enemy->m_enemy_player_data.pos = pos;
 		enemy->m_enemy_player_data.rot = rot;
 		enemy->m_motion_text_pas = motion_pas;
+		enemy->m_number = number;
 		// 初期化
 		enemy->Init();
 	}
 	return enemy;
+}
+//=============================================================================
+// 円の当たり判定
+//=============================================================================
+bool CEnemyPlayer::Collision(const D3DXVECTOR3& pos, const float& fSize)
+{
+	D3DXVECTOR3 vec = pos - m_enemy_player_data.pos;
+	float LengthX = sqrtf((vec.x*vec.x));
+	float LengthZ = sqrtf((vec.z*vec.z));
+
+	if (LengthX <= fSize&&
+		LengthZ <= fSize)
+	{
+		return true;
+	}
+	return false;
+}
+//=============================================================================
+// デバッグ用文字
+//=============================================================================
+void CEnemyPlayer::Drawtext(void)
+{
+	RECT rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+	char str[3000];
+	int nNum = 0;
+
+	nNum = sprintf(&str[0], "\n\n 情報 \n");
+	nNum += sprintf(&str[nNum], " [numPlayer] %d\n", m_number);
+	LPD3DXFONT pFont = CManager::GetInstance()->GetRenderer()->GetFont();
+	// テキスト描画
+	pFont->DrawText(NULL, str, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));
+
 }
 //=============================================================================
 // 具材を落とす処理

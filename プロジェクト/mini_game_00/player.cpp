@@ -23,6 +23,7 @@
 #include "wall.h"
 #include "networkmanager.h"
 #include "onlinegame.h"
+#include "enemyplayer.h"
 static const float MoveSpeed = 5.0f;
 static const float SpeedUpDiameter = 1.5f;//スピードアップ倍率
 static const float PossibleAttackSpeedUpDiameter = 1.2f;//攻撃可能時のスピードアップ倍率
@@ -201,25 +202,22 @@ void CPlayer::Update(void)
 		//攻撃可能な状態で相手プレイヤーに当たると具材を落とす
 		if (m_PlayerData.m_ItemState == PossibleAttack)
 		{
-			vector<CObject *>ObjPlayer = CObject::GetObjTypeObject(CObject::OBJTYPE::PLAYER);
+			vector<CObject *>ObjPlayer = CObject::GetObjTypeObject(CObject::OBJTYPE::ENEMYPLAYER);
 			{
 				int nSize = ObjPlayer.size();
 				if (nSize != 0)
 				{
 					for (int nCnt = 0; nCnt < nSize; nCnt++)
 					{
-						CPlayer *pPlayer = static_cast<CPlayer*>(ObjPlayer[nCnt]);
-						//取得したプレイヤー番号が自分と違ったら
-						if (pPlayer->GetPlayerNum() != m_nNumPlayer)
+						CEnemyPlayer *pEnemyPlayer = (CEnemyPlayer*)ObjPlayer[nSize];
+						//自身が敵プレイヤーに当たったら
+						if (pEnemyPlayer->Collision(m_PlayerData.m_pos, PlayerHitSize))
 						{
-							if (pPlayer->Collision(m_PlayerData.m_pos, PlayerHitSize))
-							{
-								m_PlayerData.m_ItemState = Nown;
-
-								pPlayer->SetDropState();
-							}
+							//アイテム取得状態をなしにする
+							m_PlayerData.m_ItemState = Nown;
+							//敵プレイヤーの状態を具材が落ちる状態にする
+							pEnemyPlayer->SetDropState();
 						}
-					
 					}
 				}
 			}

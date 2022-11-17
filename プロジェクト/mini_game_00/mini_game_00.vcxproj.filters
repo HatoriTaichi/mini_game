@@ -18,38 +18,17 @@
     <Filter Include="ソース ファイル\メイン">
       <UniqueIdentifier>{c44045b5-180b-4c97-b2dc-447a5f98ccdf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\モーション">
-      <UniqueIdentifier>{48dbcdfd-b080-4f86-b015-8c8abb8931b3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\モデル">
-      <UniqueIdentifier>{1ce21b97-4d58-4b03-977e-5d77196b650f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\ライト">
       <UniqueIdentifier>{6bc736eb-7abf-4297-9ba2-aa17cf242032}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\リザルト">
-      <UniqueIdentifier>{fda60ed7-6146-47ef-9c93-1b781c7b73e2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\具材">
-      <UniqueIdentifier>{5bb7feae-e67c-4231-b575-eb0ccc616d1a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\床">
       <UniqueIdentifier>{60a6cca4-ded3-43f1-9be4-d147a7fef62b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\単一モデル生成">
-      <UniqueIdentifier>{c1e7c6b5-ce67-4488-9ba5-e33e419a84f3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\敵">
-      <UniqueIdentifier>{31c695c4-fbf1-4d8e-afd9-aa46dda5a75e}</UniqueIdentifier>
     </Filter>
     <Filter Include="ソース ファイル\入力系">
       <UniqueIdentifier>{e34acde5-74bd-4627-b582-25dbcb78c9ce}</UniqueIdentifier>
     </Filter>
     <Filter Include="ソース ファイル\入力系\DirectXInput">
       <UniqueIdentifier>{4adcd4c3-093d-46f8-b6ba-574ab69bebad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\ゲームシーン">
-      <UniqueIdentifier>{3954b7fa-6891-4211-a431-1e7342d2b105}</UniqueIdentifier>
     </Filter>
     <Filter Include="ソース ファイル\アイテム系/ビルボード">
       <UniqueIdentifier>{f6cf87e5-c742-4aba-ad30-822f222db3a7}</UniqueIdentifier>
@@ -62,9 +41,6 @@
     </Filter>
     <Filter Include="ソース ファイル\カメラ">
       <UniqueIdentifier>{6d5f607a-da9d-408e-a7ed-d466327cf4f9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\タイトル">
-      <UniqueIdentifier>{21a31352-5f03-474e-bb72-0d9b3d6d38ae}</UniqueIdentifier>
     </Filter>
     <Filter Include="ソース ファイル\テクスチャ">
       <UniqueIdentifier>{9e97955c-ab1a-460f-98eb-82c6f5d20695}</UniqueIdentifier>
@@ -81,9 +57,6 @@
     <Filter Include="ソース ファイル\フェード">
       <UniqueIdentifier>{0f886684-6442-4717-91d4-d107438ea5aa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\プレイヤー">
-      <UniqueIdentifier>{867e6b9b-eee0-4a9a-b4fe-a0c122a8e113}</UniqueIdentifier>
-    </Filter>
     <Filter Include="リソース ファイル">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -97,6 +70,36 @@
     <Filter Include="ソース ファイル\テロップ">
       <UniqueIdentifier>{1787db4e-6c98-4f85-adac-1047dea2d16a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\シーン">
+      <UniqueIdentifier>{d720a053-7c90-434e-8f53-1884a1bae0df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\シーン\ゲームシーン">
+      <UniqueIdentifier>{3954b7fa-6891-4211-a431-1e7342d2b105}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\シーン\タイトル">
+      <UniqueIdentifier>{21a31352-5f03-474e-bb72-0d9b3d6d38ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\シーン\リザルト">
+      <UniqueIdentifier>{fda60ed7-6146-47ef-9c93-1b781c7b73e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\キャラクター">
+      <UniqueIdentifier>{d9054d00-614c-4a4e-92ed-052dc217cbbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\キャラクター\プレイヤー">
+      <UniqueIdentifier>{867e6b9b-eee0-4a9a-b4fe-a0c122a8e113}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\キャラクター\敵">
+      <UniqueIdentifier>{31c695c4-fbf1-4d8e-afd9-aa46dda5a75e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\アイテム系/ビルボード\具材">
+      <UniqueIdentifier>{5bb7feae-e67c-4231-b575-eb0ccc616d1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\キャラクター\モーション">
+      <UniqueIdentifier>{48dbcdfd-b080-4f86-b015-8c8abb8931b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\モデル">
+      <UniqueIdentifier>{1ce21b97-4d58-4b03-977e-5d77196b650f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="item.h">
@@ -109,19 +112,19 @@
       <Filter>ソース ファイル\フィールド/ウォール/スフィア\壁</Filter>
     </ClInclude>
     <ClInclude Include="result.h">
-      <Filter>ソース ファイル\リザルト</Filter>
+      <Filter>ソース ファイル\シーン\リザルト</Filter>
     </ClInclude>
     <ClInclude Include="player.h">
-      <Filter>ソース ファイル\プレイヤー</Filter>
+      <Filter>ソース ファイル\キャラクター\プレイヤー</Filter>
     </ClInclude>
     <ClInclude Include="player_ingredient_data.h">
-      <Filter>ソース ファイル\プレイヤー</Filter>
+      <Filter>ソース ファイル\キャラクター\プレイヤー</Filter>
     </ClInclude>
     <ClInclude Include="enemy.h">
-      <Filter>ソース ファイル\敵</Filter>
+      <Filter>ソース ファイル\キャラクター\敵</Filter>
     </ClInclude>
     <ClInclude Include="game.h">
-      <Filter>ソース ファイル\ゲームシーン</Filter>
+      <Filter>ソース ファイル\シーン\ゲームシーン</Filter>
     </ClInclude>
     <ClInclude Include="field.h">
       <Filter>ソース ファイル\床</Filter>
@@ -142,7 +145,7 @@
       <Filter>ソース ファイル\ファイル読み込み</Filter>
     </ClInclude>
     <ClInclude Include="ingredients.h">
-      <Filter>ソース ファイル\具材</Filter>
+      <Filter>ソース ファイル\アイテム系/ビルボード\具材</Filter>
     </ClInclude>
     <ClInclude Include="input.h">
       <Filter>ソース ファイル\入力系</Filter>
@@ -171,11 +174,8 @@
     <ClInclude Include="model.h">
       <Filter>ソース ファイル\モデル</Filter>
     </ClInclude>
-    <ClInclude Include="singlemodel.h">
-      <Filter>ソース ファイル\単一モデル生成</Filter>
-    </ClInclude>
     <ClInclude Include="motion.h">
-      <Filter>ソース ファイル\モーション</Filter>
+      <Filter>ソース ファイル\キャラクター\モーション</Filter>
     </ClInclude>
     <ClInclude Include="mouseinput.h">
       <Filter>ソース ファイル\入力系</Filter>
@@ -196,13 +196,13 @@
       <Filter>ソース ファイル\テクスチャ</Filter>
     </ClInclude>
     <ClInclude Include="title.h">
-      <Filter>ソース ファイル\タイトル</Filter>
+      <Filter>ソース ファイル\シーン\タイトル</Filter>
     </ClInclude>
     <ClInclude Include="move_ui.h">
       <Filter>ソース ファイル\UI</Filter>
     </ClInclude>
     <ClInclude Include="2d_ingredients.h">
-      <Filter>ソース ファイル\具材</Filter>
+      <Filter>ソース ファイル\アイテム系/ビルボード\具材</Filter>
     </ClInclude>
     <ClInclude Include="XInput.h">
       <Filter>ソース ファイル\入力系</Filter>
@@ -217,10 +217,10 @@
       <Filter>ソース ファイル\ネットワーク</Filter>
     </ClInclude>
     <ClInclude Include="enemyplayer.h">
-      <Filter>ソース ファイル\敵</Filter>
+      <Filter>ソース ファイル\キャラクター\敵</Filter>
     </ClInclude>
     <ClInclude Include="onlinegame.h">
-      <Filter>ソース ファイル\ゲームシーン</Filter>
+      <Filter>ソース ファイル\シーン\ゲームシーン</Filter>
     </ClInclude>
     <ClInclude Include="telop.h">
       <Filter>ソース ファイル\テロップ</Filter>
@@ -230,6 +230,9 @@
     </ClInclude>
     <ClInclude Include="move_telop.h">
       <Filter>ソース ファイル\テロップ</Filter>
+    </ClInclude>
+    <ClInclude Include="singlemodel.h">
+      <Filter>ソース ファイル\モデル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -243,19 +246,19 @@
       <Filter>ソース ファイル\フィールド/ウォール/スフィア\壁</Filter>
     </ClCompile>
     <ClCompile Include="result.cpp">
-      <Filter>ソース ファイル\リザルト</Filter>
+      <Filter>ソース ファイル\シーン\リザルト</Filter>
     </ClCompile>
     <ClCompile Include="player.cpp">
-      <Filter>ソース ファイル\プレイヤー</Filter>
+      <Filter>ソース ファイル\キャラクター\プレイヤー</Filter>
     </ClCompile>
     <ClCompile Include="player_ingredient_data.cpp">
-      <Filter>ソース ファイル\プレイヤー</Filter>
+      <Filter>ソース ファイル\キャラクター\プレイヤー</Filter>
     </ClCompile>
     <ClCompile Include="enemy.cpp">
-      <Filter>ソース ファイル\敵</Filter>
+      <Filter>ソース ファイル\キャラクター\敵</Filter>
     </ClCompile>
     <ClCompile Include="game.cpp">
-      <Filter>ソース ファイル\ゲームシーン</Filter>
+      <Filter>ソース ファイル\シーン\ゲームシーン</Filter>
     </ClCompile>
     <ClCompile Include="field.cpp">
       <Filter>ソース ファイル\床</Filter>
@@ -276,7 +279,7 @@
       <Filter>ソース ファイル\ファイル読み込み</Filter>
     </ClCompile>
     <ClCompile Include="ingredients.cpp">
-      <Filter>ソース ファイル\具材</Filter>
+      <Filter>ソース ファイル\アイテム系/ビルボード\具材</Filter>
     </ClCompile>
     <ClCompile Include="input.cpp">
       <Filter>ソース ファイル\入力系</Filter>
@@ -305,11 +308,8 @@
     <ClCompile Include="model.cpp">
       <Filter>ソース ファイル\モデル</Filter>
     </ClCompile>
-    <ClCompile Include="singlemodel.cpp">
-      <Filter>ソース ファイル\単一モデル生成</Filter>
-    </ClCompile>
     <ClCompile Include="motion.cpp">
-      <Filter>ソース ファイル\モーション</Filter>
+      <Filter>ソース ファイル\キャラクター\モーション</Filter>
     </ClCompile>
     <ClCompile Include="mouseinput.cpp">
       <Filter>ソース ファイル\入力系</Filter>
@@ -330,13 +330,13 @@
       <Filter>ソース ファイル\テクスチャ</Filter>
     </ClCompile>
     <ClCompile Include="title.cpp">
-      <Filter>ソース ファイル\タイトル</Filter>
+      <Filter>ソース ファイル\シーン\タイトル</Filter>
     </ClCompile>
     <ClCompile Include="move_ui.cpp">
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
     <ClCompile Include="2d_ingredients.cpp">
-      <Filter>ソース ファイル\具材</Filter>
+      <Filter>ソース ファイル\アイテム系/ビルボード\具材</Filter>
     </ClCompile>
     <ClCompile Include="XInput.cpp">
       <Filter>ソース ファイル\入力系</Filter>
@@ -351,10 +351,10 @@
       <Filter>ソース ファイル\ネットワーク</Filter>
     </ClCompile>
     <ClCompile Include="enemyplayer.cpp">
-      <Filter>ソース ファイル\敵</Filter>
+      <Filter>ソース ファイル\キャラクター\敵</Filter>
     </ClCompile>
     <ClCompile Include="onlinegame.cpp">
-      <Filter>ソース ファイル\ゲームシーン</Filter>
+      <Filter>ソース ファイル\シーン\ゲームシーン</Filter>
     </ClCompile>
     <ClCompile Include="telop.cpp">
       <Filter>ソース ファイル\テロップ</Filter>
@@ -364,6 +364,9 @@
     </ClCompile>
     <ClCompile Include="move_telop.cpp">
       <Filter>ソース ファイル\テロップ</Filter>
+    </ClCompile>
+    <ClCompile Include="singlemodel.cpp">
+      <Filter>ソース ファイル\モデル</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

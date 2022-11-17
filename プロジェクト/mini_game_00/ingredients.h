@@ -63,6 +63,7 @@ public:
 	void Motion(void);//ちょっとした動きの処理
 	void ColisionWall(void);
 	void ColisionPlayer(void);
+	void ColisionEnemyPlayer(void);
 	static CIngredients *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot,
 		D3DXVECTOR3 scale, IngredientsType nType,bool bDoDrop,const int& DropNum);	// 生成(ドロップ用)
 	static CIngredients *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot,

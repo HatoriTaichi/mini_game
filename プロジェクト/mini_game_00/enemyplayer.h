@@ -64,14 +64,17 @@ public:
 	void Uninit(void);	// ポリゴンの終了
 	void Update(void);	// ポリゴンの更新
 	void Draw(void);	// ポリゴンの描画
-	static CEnemyPlayer *Create(const D3DXVECTOR3& pos, const D3DXVECTOR3& rot,const string& motion_pas);	// 生成
-
-private:
-	void DropItem();//具材を落とす
-	void Item(void);//アイテムの処理
+	static CEnemyPlayer *Create(const D3DXVECTOR3& pos, const D3DXVECTOR3& rot,const string& motion_pas,const int& number);	// 生成
+	bool Collision(const D3DXVECTOR3& pos, const float& fSize);
+	void SetDropState(void);//具材を落とす状態にする
 	void SetItemType(int nType);//アイテム取得処理
 	void SetIngredients(int nType);//アイテム取得処理
-	void SetDropState(void);//具材を落とす状態にする
+	ENEMYPLAYER_DATA GetEnemyPlayerData(void) { return m_enemy_player_data; }
+	int GetEnemyPlayerNumber(void) { return m_number; }
+private:
+	void Drawtext(void);
+	void DropItem();//具材を落とす
+	void Item(void);//アイテムの処理
 	void CreateModel(void);	// モデルの生成
 	void InitMotionController(void);	// モーションコントローラーの初期化
 	D3DXMATRIX m_mtx_wld;	// ワールドマトリックス
@@ -82,6 +85,8 @@ private:
 	ENEMYPLAYER_DATA m_enemy_player_data;	//　敵プレイヤー情報
 	float m_speed;//速度
 	int m_item_timer;
+	int m_operation_lock_timer;//操作不可時間
+	int m_number;//識別番号
 };
 
 #endif

@@ -20,6 +20,7 @@
 #include "wall.h"
 #include "onlinegame.h"
 #include "networkmanager.h"
+#include "enemyplayer.h"
 static float Size = 7.0f;
 static float fDropMoveSpeed = 8.0f;
 static const float FallSpeed = 5.0f;
@@ -36,7 +37,6 @@ static const int EndTypeTime3 = 27 * 60;
 static const int EndTypeTime2_1 = 7 * 60;
 static const int EndTypeTime2_2 = 10 * 60;
 static const int EndTypeTime2_3 = 13 * 60;
-
 static const int EndTypeFlashTime1 = 15;
 static const int EndTypeFlashTime2 = 8;
 static const int EndTypeFlashTime3 = 4;
@@ -433,6 +433,40 @@ void CIngredients::ColisionPlayer(void)
 		}
 	}
 
+}
+//=============================================================================
+// 敵プレイヤーに当たった時
+//=============================================================================
+void CIngredients::ColisionEnemyPlayer(void)
+{
+	vector <CObject*> buf = CObject::GetObjTypeObject(CObject::OBJTYPE::ENEMYPLAYER);
+	int nSize = buf.size();
+	if (nSize != 0)
+	{
+		for (int nCnt = 0; nCnt < nSize; nCnt++)
+		{
+			CEnemyPlayer *pEnemyPlayer = static_cast <CEnemyPlayer*> (buf[nCnt]);
+			if (pEnemyPlayer->Collision(m_pos, 50.0f))
+			{
+				if (!m_bDelete)
+				{
+					pEnemyPlayer->SetIngredients(m_Type);
+					if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::OnLine)
+					{
+						CManager::GetInstance()->GetSceneManager()->GetOnloineGame()->AddIngredientsCnt(1, m_Type, nCnt);
+					}
+					if (!m_bDoDrop)
+					{
+						DeleteIngredient();
+					}
+					else
+					{
+						m_bUninit = true;
+					}
+				}
+			}
+		}
+	}
 }
 //=============================================================================
 // モデルの生成

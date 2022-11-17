@@ -13,6 +13,7 @@
 #include "player.h"
 #include "manager.h"
 #include "billboard.h"
+#include "enemyplayer.h"
 static float ItemDropMoveSpeed = 8.0f;
 static const float ItemFallSpeed = 5.0f;
 static const float ItemUpLimit = 2.0f;
@@ -258,6 +259,30 @@ void CItem::ColisionPlayer(void)
 				}
 			}
 
+		}
+	}
+}
+//=============================================================================
+// 敵プレイヤーに当たった時
+//=============================================================================
+void CItem::ColisionEnemyPlayer(void)
+{
+	vector <CObject*> buf = CObject::GetObjTypeObject(CObject::OBJTYPE::ENEMYPLAYER);
+	int nSize = buf.size();
+	if (nSize != 0)
+	{
+		for (int nCnt = 0; nCnt < nSize; nCnt++)
+		{
+			CEnemyPlayer *pEnemyPlayer = static_cast <CEnemyPlayer*> (buf[nCnt]);
+			//プレイヤーがアイテム持っていなかったら
+			if (pEnemyPlayer->GetEnemyPlayerData().item_state == CEnemyPlayer::ITEM_GETSTATE::NONE)
+			{
+				if (pEnemyPlayer->Collision(m_pos, 50.0f))
+				{
+					pEnemyPlayer->SetItemType(m_type);
+					m_bUninit = true;
+				}
+			}
 		}
 	}
 }
