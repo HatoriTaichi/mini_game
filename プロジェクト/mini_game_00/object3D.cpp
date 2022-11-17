@@ -23,6 +23,7 @@ CObject3D::CObject3D(LAYER_TYPE Layer) : CObject(Layer)
 	D3DXMatrixIdentity(&m_mtx_world);
 	m_vtx_buff = nullptr;
 	m_idx_buff = nullptr;
+	m_texture = nullptr;
 	m_num_vtx = 0;
 	m_num_idx = 0;
 	m_pow_glow = 2.0f;
@@ -41,8 +42,11 @@ CObject3D::~CObject3D()
 //=============================================================================
 HRESULT CObject3D::Init(void)
 {
-	// テクスチャ取得
-	m_texture = CManager::GetInstance()->GetTexture()->GetTexture(m_tex_pas);
+	if (m_tex_pas != " ")
+	{
+		// テクスチャ取得
+		m_texture = CManager::GetInstance()->GetTexture()->GetTexture(m_tex_pas);
+	}
 
 	return S_OK;
 }
@@ -83,7 +87,7 @@ void CObject3D::Draw(void)
 {
 	LPDIRECT3DDEVICE9 device = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスの取得
 	D3DXMATRIX mtx_rot, mtx_trans;	// 計算用マトリックス
-	DWORD eable_light = 0;
+	DWORD enable_light = 0;
 	DWORD pass_flag = 0;
 
 	// ワールドマトリックスの初期化
@@ -119,7 +123,7 @@ void CObject3D::Draw(void)
 	// 頂点バッファをデータストリームに設定
 	device->SetStreamSource(	0,
 								m_vtx_buff,
-								0, 
+								0,
 								sizeof(VERTEX_3D));
 	// インデックスバッファをデータストリームに設定
 	device->SetIndices(m_idx_buff);
@@ -128,8 +132,9 @@ void CObject3D::Draw(void)
 	CManager::GetInstance()->GetRenderer()->SetVtxDecl3D();
 
 	// ライトの状態取得
-	device->GetRenderState(D3DRS_LIGHTING, &eable_light);
+	device->GetRenderState(D3DRS_LIGHTING, &enable_light);
 
+	// 3Dオブジェクト
 	pass_flag = PASS_3D;
 
 	// テクスチャがある場合フラグを追加
@@ -140,7 +145,7 @@ void CObject3D::Draw(void)
 	// ライトがある場合フラグを追加
 	pass_flag |= PASS_LIGHT;
 
-	// モデルが設定したマテリアルの影響を受けないようにマテリアルの設定
+	// マテリアルの設定
 	CManager::GetInstance()->GetRenderer()->SetEffectMaterialDiffuse(m_material.MatD3D.Diffuse);
 	CManager::GetInstance()->GetRenderer()->SetEffectMaterialEmissive(m_material.MatD3D.Emissive);
 	CManager::GetInstance()->GetRenderer()->SetEffectMaterialSpecular(m_material.MatD3D.Specular);

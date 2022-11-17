@@ -124,6 +124,12 @@ void CCamera::SetCamera(void)
 	//ビューマトリックスの設定
 	pDevice->SetTransform(	D3DTS_VIEW,
 							&m_mtx_view);
+
+	//シェーダにプロジェクションマトリックスを設定
+	CManager::GetInstance()->GetRenderer()->SetEffectMatrixProj(m_mtx_projection);
+
+	//シェーダにビューマトリックスを設定
+	CManager::GetInstance()->GetRenderer()->SetEffectMatrixView(m_mtx_view);
 }
 
 //=============================================================================

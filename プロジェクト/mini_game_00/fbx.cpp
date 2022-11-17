@@ -78,10 +78,10 @@ HRESULT CFbx::Init(void)
 		// 頂点バッファの生成
 		device->CreateVertexBuffer(	sizeof(VERTEX_3D) * vertex_max,
 									D3DUSAGE_WRITEONLY,
-									FVF_VERTEX_3D,
+									0,
 									D3DPOOL_MANAGED,
 									&buf,
-									NULL);
+									nullptr);
 
 		// 頂点バッファをロックし、頂点データへのポインタを取得
 		buf->Lock(0, 0, (void**)&vtx, 0);
@@ -199,8 +199,10 @@ void CFbx::Update(void)
 //=============================================================================
 void CFbx::Draw(void)
 {
-	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();	//デバイスのポインタ
+	LPDIRECT3DDEVICE9 device = CManager::GetRenderer()->GetDevice();	//デバイスのポインタ
 	D3DXMATRIX mtx_scale, mtx_rot, mtx_trans, mtx_parent;	// 計算用マトリックス
+	DWORD enable_light = 0;	// ライトの番号
+	DWORD pass_flag = PASS_3D | PASS_LIGHT;	// シェーダーに渡す処理種類
 	int mesh_num = m_mesh.size();	// メッシュ数を取得
 
 	// マトリックス初期化
@@ -235,7 +237,7 @@ void CFbx::Draw(void)
 						&m_mtx_wold,
 						&mtx_trans);
 
-	pDevice->GetTransform(	D3DTS_WORLD, 
+	device->GetTransform(	D3DTS_WORLD,
 							&mtx_parent);
 
 	// パーツのワールドマトリックスと親のワールドマトリックスを掛け合わせる
@@ -244,8 +246,11 @@ void CFbx::Draw(void)
 						&mtx_parent);
 
 	// マトリックスの設定
-	pDevice->SetTransform(	D3DTS_WORLD,
+	device->SetTransform(	D3DTS_WORLD,
 							&m_mtx_wold);
+
+	// シェーダにマトリックスを設定
+	CManager::GetInstance()->GetRenderer()->SetEffectMatrixWorld(m_mtx_wold);
 
 	// メッシュ数分のループ
 	for (int count_mesh = 0; count_mesh < mesh_num; count_mesh++)
@@ -270,17 +275,20 @@ void CFbx::Draw(void)
 			}
 		}
 
-		// 頂点フォーマットの設定
-		pDevice->SetFVF(FVF_VERTEX_3D);
-
 		// テクスチャのサイズを取得
 		int tex_num = m_mesh_info[count_mesh]->tex.size();
 
 		//テクスチャ数分のループ
 		for (int count_tex = 0; count_tex < tex_num; count_tex++)
 		{
-			// テクスチャの設定
-			pDevice->SetTexture(0, m_mesh_info[count_mesh]->tex[count_tex]);
+			// テクスチャが1つでもあったら
+			if (count_tex == 0)
+			{
+				// テクスチャがある場合フラグを追加
+				pass_flag |= PASS_TEXTURE;
+			}
+			// シェーダにテクスチャを設定
+			CManager::GetInstance()->GetRenderer()->SetEffectTexture(m_mesh_info[count_mesh]->tex[count_tex]);
 		}
 
 		// マテリアル数の取得
@@ -290,26 +298,43 @@ void CFbx::Draw(void)
 		for (int count_mat= 0; count_mat < material_num; count_mat++)
 		{
 			// マテリアルの設定
-			pDevice->SetMaterial(&m_mesh_info[count_mesh]->material[count_mat].MatD3D);
+			CManager::GetInstance()->GetRenderer()->SetEffectMaterialDiffuse(m_mesh_info[count_mesh]->material[count_mat].MatD3D.Diffuse);
+			CManager::GetInstance()->GetRenderer()->SetEffectMaterialEmissive(m_mesh_info[count_mesh]->material[count_mat].MatD3D.Emissive);
+			CManager::GetInstance()->GetRenderer()->SetEffectMaterialSpecular(m_mesh_info[count_mesh]->material[count_mat].MatD3D.Specular);
+			CManager::GetInstance()->GetRenderer()->SetEffectMaterialPower(m_mesh_info[count_mesh]->material[count_mat].MatD3D.Power);
 		}
+
 		// 頂点バッファをデータストリームに設定
-		pDevice->SetStreamSource(	0,
+		device->SetStreamSource(	0,
 									m_mesh_info[count_mesh]->vtx_buff,
 									0,
 									sizeof(VERTEX_3D));
+
 		// インデックスバッファをデータストリームに設定
-		pDevice->SetIndices(m_mesh_info[count_mesh]->idx_buff);
+		device->SetIndices(m_mesh_info[count_mesh]->idx_buff);
+
+		// 頂点定義を設定
+		CManager::GetInstance()->GetRenderer()->SetVtxDecl3D();
+
+		// ライトの状態取得
+		device->GetRenderState(D3DRS_LIGHTING, &enable_light);
 
 		int vtx_num = m_mesh_info[count_mesh]->vertex_max_ary.size();	// 頂点数
 		int polygon_num = m_mesh_info[count_mesh]->index_number.size();	// ポリゴン数
 
+		// パスの開始
+		CManager::GetInstance()->GetRenderer()->BeginPassEffect(pass_flag);
+
 		// ポリゴンの描画
-		pDevice->DrawIndexedPrimitive(	D3DPT_TRIANGLELIST,
+		device->DrawIndexedPrimitive(	D3DPT_TRIANGLELIST,
 										0,
 										0,
 										vtx_num,	// 使用する頂点数
 										0,	// ここの値が最初のインデックス
 										polygon_num);	// 三角形の数
+
+		// エフェクト終了
+		CManager::GetInstance()->GetRenderer()->EndPassEffect();
 	}
 }
 

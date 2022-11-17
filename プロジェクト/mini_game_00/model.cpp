@@ -113,7 +113,7 @@ void CModel::Uninit(void)
 //=============================================================================
 void CModel::UnLoad(void)
 {
-	m_model_data.clear();;
+	m_model_data.clear();
 }
 
 //=============================================================================
@@ -130,6 +130,7 @@ void CModel::Update(void)
 void CModel::Draw(void)
 {
 	LPDIRECT3DDEVICE9 device = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスの取得
+	DWORD pass_flag = PASS_3D | PASS_LIGHT;
 
 	//--------------------------------------
 	// マトリックスの設定
@@ -187,6 +188,9 @@ void CModel::Draw(void)
 	device->SetTransform(	D3DTS_WORLD,
 							&m_mtx_wold);
 
+	// シェーダにマトリックスを設定
+	CManager::GetInstance()->GetRenderer()->SetEffectMatrixWorld(m_mtx_wold);
+
 	// 透明にするか
 	if (!m_transparent)
 	{
@@ -204,15 +208,29 @@ void CModel::Draw(void)
 
 		for (int nCntMat = 0; nCntMat < (int)m_model_data[static_cast<int>(m_file_data.type[m_pas])].num_mat; nCntMat++)
 		{
-			// マテリアルの設定
-			device->SetMaterial(&pMat[nCntMat].MatD3D);
-
 			// テクスチャの設定
-			device->SetTexture(	0,
-								m_texture[nCntMat]);
+			CManager::GetInstance()->GetRenderer()->SetEffectTexture(m_texture[nCntMat]);
+
+			// マテリアルの設定
+			CManager::GetInstance()->GetRenderer()->SetEffectMaterialDiffuse(pMat[nCntMat].MatD3D.Diffuse);
+			CManager::GetInstance()->GetRenderer()->SetEffectMaterialEmissive(pMat[nCntMat].MatD3D.Emissive);
+			CManager::GetInstance()->GetRenderer()->SetEffectMaterialSpecular(pMat[nCntMat].MatD3D.Specular);
+			CManager::GetInstance()->GetRenderer()->SetEffectMaterialPower(pMat[nCntMat].MatD3D.Power);
+
+			// テクスチャがある場合フラグを追加
+			if (m_texture[nCntMat] != nullptr)
+			{
+				pass_flag |= PASS_TEXTURE;
+			}
+
+			// パスの開始
+			CManager::GetInstance()->GetRenderer()->BeginPassEffect(pass_flag);
 
 			// モデルパーツの描画
 			m_model_data[static_cast<int>(m_file_data.type[m_pas])].mesh->DrawSubset(nCntMat);
+
+			// エフェクト終了
+			CManager::GetInstance()->GetRenderer()->EndPassEffect();
 		}
 		// 一時保存してたやつをもどす
 		device->SetMaterial(&matDef);
