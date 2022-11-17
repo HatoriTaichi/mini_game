@@ -149,7 +149,7 @@ void CIngredients::Update(void)
 		//‚¿‚å‚Á‚Æ‚µ‚½“®‚«
 		Motion();
 		ColisionPlayer();
-
+		ColisionEnemyPlayer();
 		if (m_nTimer >= m_nEndTypeTime[0][m_bDoDrop])
 		{
 			m_State = EndType1;
@@ -159,7 +159,7 @@ void CIngredients::Update(void)
 		//‚¿‚å‚Á‚Æ‚µ‚½“®‚«
 		Motion();
 		ColisionPlayer();
-
+		ColisionEnemyPlayer();
 		if (m_nTimer >= m_nEndTypeTime[1][m_bDoDrop])
 		{
 			m_State = EndType2;
@@ -169,7 +169,7 @@ void CIngredients::Update(void)
 		//‚¿‚å‚Á‚Æ‚µ‚½“®‚«
 		Motion();
 		ColisionPlayer();
-
+		ColisionEnemyPlayer();
 		if (m_nTimer >= m_nEndTypeTime[2][m_bDoDrop])
 		{
 			m_State = EndType3;
@@ -178,7 +178,7 @@ void CIngredients::Update(void)
 		//‚¿‚å‚Á‚Æ‚µ‚½“®‚«
 		Motion();
 		ColisionPlayer();
-
+		ColisionEnemyPlayer();
 
 		break;
 	}
@@ -453,7 +453,7 @@ void CIngredients::ColisionEnemyPlayer(void)
 					pEnemyPlayer->SetIngredients(m_Type);
 					if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::OnLine)
 					{
-						CManager::GetInstance()->GetSceneManager()->GetOnloineGame()->AddIngredientsCnt(1, m_Type, nCnt);
+						CManager::GetInstance()->GetSceneManager()->GetOnloineGame()->AddIngredientsCnt(1, m_Type, nCnt -1);
 					}
 					if (!m_bDoDrop)
 					{

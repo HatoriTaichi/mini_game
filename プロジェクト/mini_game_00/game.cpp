@@ -20,6 +20,7 @@
 #include "field.h"
 #include "object2D.h"
 #include "counter.h"
+#include "camera.h"
 static const int IngredientsSpawnInterval = 30 * 60;
 static const int NormalItemSpawnInterval = 17 * 60;
 static const int ClimaxItemSpawnInterval = 12 * 60;
@@ -48,6 +49,7 @@ static const D3DXVECTOR3 IngredientsPos2 = { 820.0f ,40.0f ,0.0f };//ƒ‰ƒXƒgƒXƒp
 static const D3DXVECTOR3 NumberSize = { 15.0f ,20.0f ,0.0f };//ƒ‰ƒXƒgƒXƒp[ƒgUI
 static const D3DXVECTOR3 NumberPos = { 45.0f ,40.0f ,0.0f };//ƒ‰ƒXƒgƒXƒp[ƒgUI
 static const D3DXVECTOR3 NumberPos2 = { 805.0f ,40.0f ,0.0f };//ƒ‰ƒXƒgƒXƒp[ƒgUI
+#define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(180.0f), D3DXToRadian(-90.0f),D3DXToRadian(0.0f)))	// ƒJƒƒ‰‚ÌŒü‚«
 
 //=============================================================================
 // ƒfƒtƒHƒ‹ƒgƒRƒ“ƒXƒgƒ‰ƒNƒ^
@@ -75,6 +77,8 @@ CGame::CGame(CObject::LAYER_TYPE layer) :CObject(layer)
 	m_pFinishUI = nullptr;
 	m_pLastSpurtUI = nullptr;
 	memset(m_pIngredientsUI, NULL, sizeof(m_pIngredientsUI));
+	CManager::GetInstance()->GetCamera()->SetRot(CAMERA_ROT);
+
 }
 
 //=============================================================================

@@ -24,6 +24,8 @@
 #include "field.h"
 #include "object2D.h"
 #include "counter.h"
+#include "camera.h"
+#define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(0.0f), D3DXToRadian(90.0f),D3DXToRadian(0.0f)))	// ƒJƒƒ‰‚ÌŒü‚«
 
 //=============================================================================
 // Ã“Iƒƒ“ƒo•Ï”éŒ¾
@@ -88,6 +90,8 @@ COnlineGame::COnlineGame(CObject::LAYER_TYPE layer) :CObject(layer)
 	m_pFinishUI = nullptr;
 	m_pLastSpurtUI = nullptr;
 	memset(m_pIngredientsUI, NULL, sizeof(m_pIngredientsUI));
+	CManager::GetInstance()->GetCamera()->SetRot(CAMERA_ROT);
+
 }
 
 //=============================================================================
