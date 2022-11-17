@@ -52,16 +52,14 @@ HRESULT CTitle::Init(void)
 	D3DXVECTOR3 pos_light_v = D3DXVECTOR3(0.0f, 1200.0f, -1000.0f);	// ライトの視点の位置
 	D3DXVECTOR3 pos_light_r = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// ライトの注視点の位置
 	D3DXVECTOR3 vec_light = -D3DXVECTOR3(pos_light_v - pos_light_r);	// ライトのベクトル
+	float light_length = D3DXVec3Length(&pos_light_v);
 
 	// ライトのプロジェクションマトリックスを生成
 	D3DXMatrixPerspectiveFovLH(	&mtx_light_proj,
 								D3DXToRadian(45.0f),
 								1.0f,
-								200.0f,
-								1800.0f);
-
-	int test = 1800.0f - 200.0f;
-	int test2 = D3DXVec3Length(&pos_light_v);
+								0.0f,
+								light_length);
 
 	// ベクトルを正規化
 	D3DXVec3Normalize(&vec_light, &vec_light);
