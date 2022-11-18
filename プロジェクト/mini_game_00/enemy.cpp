@@ -15,9 +15,13 @@
 #include "keyinput.h"
 #include "ingredients.h"
 #include "singlemodel.h"
+#include "wall.h"
 static const float MoveSpeed = 2.0f;
 static const float NoDropSize = 35.0f;
-static const float HitDistance = 50.0f;
+static const float HitDistance = 65.0f;
+static const int AutoSwingTimeMin = 90;
+static const int AutoSwingTimeMax = 300;
+
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
@@ -27,6 +31,11 @@ CEnemy::CEnemy(LAYER_TYPE layer) : CObject(layer)
 	memset(m_pColliNoDrop, NULL, sizeof(m_pColliNoDrop));
 	m_nFacing = DOWN;
 	m_bSwing = false;
+	m_nAutoSwingTimer = 0;
+	std::random_device random;	// 非決定的な乱数生成器
+	std::mt19937_64 mt(random());            // メルセンヌ・ツイスタの64ビット版、引数は初期シード
+	std::uniform_real_distribution<> randAutoSwingTime(AutoSwingTimeMin, AutoSwingTimeMax);
+	m_nAutoSwingMaxTime = static_cast <int>(randAutoSwingTime(mt));
 }
 
 //=============================================================================
@@ -147,6 +156,7 @@ void CEnemy::Update(void)
 	//移動処理
 	CEnemy::Move();
 	//CEnemy::KeyMove();
+
 	// サイズの取得@
 	int size = m_model.size();
 	for (int count_model = 0; count_model < size; count_model++)
@@ -200,14 +210,6 @@ void CEnemy::Draw(void)
 		m_model[count_model]->Draw();
 	}
 
-	//for (int nCnt = 0; nCnt < RotColli; nCnt++)
-	//{
-	//	if (m_pColliNoDrop[nCnt])
-	//	{
-	//		m_pColliNoDrop[nCnt]->Draw();
-	//		m_pColliNoDrop[nCnt]->SetOldPos(m_pos);
-	//	}
-	//}
 #ifdef _DEBUG
 	//Drawtxt();
 
@@ -327,7 +329,16 @@ void CEnemy::Move(void)
 	std::random_device random;	// 非決定的な乱数生成器
 	std::mt19937_64 mt(random());            // メルセンヌ・ツイスタの64ビット版、引数は初期シード
 	std::uniform_real_distribution<> randPassive(0, 4);
+	m_nAutoSwingTimer++;
 
+	//一定時間過ぎたら自動で振り向くようにする
+	if (m_nAutoSwingTimer >= m_nAutoSwingMaxTime)
+	{
+		m_nAutoSwingTimer = 0;
+		std::uniform_real_distribution<> randAutoSwingTime(AutoSwingTimeMin, AutoSwingTimeMax);
+		m_nAutoSwingMaxTime = static_cast <int>(randAutoSwingTime(mt));
+		m_bSwing = true;
+	}
 	//向いてる方向に移動
 	m_pos.x -= sinf(m_rot.y)*MoveSpeed;
 	m_pos.z -= cosf(m_rot.y)*MoveSpeed;
@@ -338,6 +349,7 @@ void CEnemy::Move(void)
 	int nSize = Obj.size();
 	if (nSize != 0)
 	{
+		//モデルとの当たり判定
 		for (int nModel = 0; nModel < nSize; nModel++)
 		{
 			CSingleModel *pSModel = static_cast<CSingleModel*>(Obj[nModel]);
@@ -358,78 +370,90 @@ void CEnemy::Move(void)
 						m_bSwing = true;
 					}
 				}
-				//if (pSModel->CircleCollision(m_pColliNoDrop[nCnt]->GetPos(), NoDropSize))
-				//{
-				//	//ドロップしないようにする
-				//		m_bHit[nCnt] = true;
-				//		if (m_bHit[m_nFacing])
-				//		{
-				//			m_bSwing = true;
-				//		}
-				//}
 			}
 		}
-		if (m_bSwing)
+	}
+	//壁との当たり判定
+	vector<CObject *>ObjWall = CObject::GetObjTypeObject(CObject::OBJTYPE::WALL);
+	int nWallSize = ObjWall.size();
+	if (nWallSize != 0)
+	{
+		for (int nCntWall = 0; nCntWall < nWallSize; nCntWall++)
 		{
-
-			m_bSwing = false;
-			float Rot = 0.0f;
-			bool bOK = false;
-			int nSwing = 0;
-
-			while (!bOK)
+			CWall *pWall = static_cast<CWall*>(ObjWall[nCntWall]);
+			for (int nCnt = 0; nCnt < RotColli; nCnt++)
 			{
-				nSwing = (int)randPassive(mt);
-				for (int nCnt = 0; nCnt < RotColli; nCnt++)
+				if (pWall->Collision2(m_pColliNoDrop[nCnt]->GetPos(), m_pColliNoDrop[nCnt]->GetOldPos(), NoDropSize))
 				{
-					if (!m_bHit[nSwing])
+					m_bHit[nCnt] = true;
+					if (m_bHit[m_nFacing])
 					{
-						bOK = true;
+						m_bSwing = true;
 					}
-					else
-					{
-						bOK = false;
-					}
-
 				}
-				if (m_bHit[0] && m_bHit[1] &&
-					m_bHit[2] && m_bHit[3])
+			}
+		}
+	}
+	if (m_bSwing)
+	{
+
+		m_bSwing = false;
+		float Rot = 0.0f;
+		bool bOK = false;
+		int nSwing = 0;
+
+		while (!bOK)
+		{
+			nSwing = (int)randPassive(mt);
+			for (int nCnt = 0; nCnt < RotColli; nCnt++)
+			{
+				if (!m_bHit[nSwing])
 				{
 					bOK = true;
 				}
+				else
+				{
+					bOK = false;
+				}
+
 			}
-
-			switch (nSwing)
+			if (m_bHit[0] && m_bHit[1] &&
+				m_bHit[2] && m_bHit[3])
 			{
-			case CEnemy::UP:
-				Rot = D3DXToRadian(180.0f);
-				m_nFacing = UP;
-
-				break;
-			case CEnemy::DOWN:
-				Rot = D3DXToRadian(0.0f);
-				m_nFacing = DOWN;
-
-				break;
-			case CEnemy::RIGHT:
-				Rot = D3DXToRadian(-90.0f);
-				m_nFacing = RIGHT;
-
-				break;
-			case CEnemy::LEFT:
-				Rot = D3DXToRadian(90.0f);
-				m_nFacing = LEFT;
-
-				break;
-			}
-			m_rot.y = Rot;
-			for (int nCnt = 0; nCnt < RotColli; nCnt++)
-			{
-				m_bHit[nCnt] = false;
+				bOK = true;
 			}
 		}
 
+		switch (nSwing)
+		{
+		case CEnemy::UP:
+			Rot = D3DXToRadian(180.0f);
+			m_nFacing = UP;
+
+			break;
+		case CEnemy::DOWN:
+			Rot = D3DXToRadian(0.0f);
+			m_nFacing = DOWN;
+
+			break;
+		case CEnemy::RIGHT:
+			Rot = D3DXToRadian(-90.0f);
+			m_nFacing = RIGHT;
+
+			break;
+		case CEnemy::LEFT:
+			Rot = D3DXToRadian(90.0f);
+			m_nFacing = LEFT;
+
+			break;
+		}
+		m_rot.y = Rot;
+		for (int nCnt = 0; nCnt < RotColli; nCnt++)
+		{
+			m_bHit[nCnt] = false;
+		}
 	}
+
 }
 //=============================================================================
 // 円の当たり判定

@@ -13,7 +13,7 @@
 // 静的メンバ変数宣言
 //=============================================================================
 LPDIRECTINPUT8 CInput::m_input = NULL;
-LPDIRECTINPUTDEVICE8 CInput::m_joy_stick = NULL;
+LPDIRECTINPUTDEVICE8 CInput::m_joy_stick[MAX_INPUT_PLAYER];
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -56,13 +56,17 @@ void CInput::Uninit(void)
 		m_device->Release();
 		m_device = NULL;
 	}
-	//入力デバイスの開放
-	if (m_joy_stick != NULL)
+	for (int nCnt = 0; nCnt < MAX_INPUT_PLAYER; nCnt++)
 	{
-		m_joy_stick->Unacquire();
-		m_joy_stick->Release();
-		m_joy_stick = NULL;
+		//入力デバイスの開放
+		if (m_joy_stick[nCnt] != NULL)
+		{
+			m_joy_stick[nCnt]->Unacquire();
+			m_joy_stick[nCnt]->Release();
+			m_joy_stick[nCnt] = NULL;
+		}
 	}
+
 	//DirectInputオブジェクトの開放
 	if (m_input != NULL)
 	{

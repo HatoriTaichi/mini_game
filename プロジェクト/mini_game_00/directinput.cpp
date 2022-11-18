@@ -12,9 +12,6 @@ LPDIDEVICEOBJECTINSTANCE CDirectInput::m_Instance;
 
 CDirectInput::CDirectInput()
 {
-	m_aButtonState = new DIJOYSTATE2[MaxPlayer];
-	m_aButtonStateTrigger = new DIJOYSTATE2[MaxPlayer];
-	m_aButtonStateRelease = new DIJOYSTATE2[MaxPlayer];
 
 }
 //----------------------------------------
@@ -28,33 +25,44 @@ CDirectInput::~CDirectInput()
 
 BOOL CALLBACK CDirectInput::EnumJoysticksCallback(const LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 {
-	if (FAILED(m_input->CreateDevice(lpddi->guidInstance, &m_joy_stick, NULL)))
+	for (int nCnt = 0; nCnt < MAX_INPUT_PLAYER; nCnt++)
 	{
-		return DIENUM_STOP;
+		if (FAILED(m_input->CreateDevice(lpddi->guidInstance, &m_joy_stick[nCnt], NULL)))
+		{
+			return DIENUM_STOP;
+		}
+		// データフォーマットを設定
+		if (FAILED(m_joy_stick[nCnt]->SetDataFormat(&c_dfDIJoystick2)))
+		{
+			m_joy_stick[nCnt]->Release();
+			return DIENUM_STOP;
+		}
 	}
-	// データフォーマットを設定
-	if (FAILED(m_joy_stick->SetDataFormat(&c_dfDIJoystick2)))
-	{
-		m_joy_stick->Release();
-		return DIENUM_STOP;
-	}
+
 	return DIENUM_STOP;
 }
 
 BOOL CALLBACK CDirectInput::EnumAxesCallback(const DIDEVICEOBJECTINSTANCE *pdidoi, VOID *pContext)
 {
 	HRESULT     hr;
-	DIPROPRANGE diprg;
+	DIPROPRANGE diprg[MAX_INPUT_PLAYER];
 	m_Instance = (LPDIDEVICEOBJECTINSTANCE)pdidoi;
 
-	diprg.diph.dwSize = sizeof(DIPROPRANGE);
-	diprg.diph.dwHeaderSize = sizeof(DIPROPHEADER);
-	diprg.diph.dwHow = DIPH_BYID;
-	diprg.diph.dwObj = pdidoi->dwType;
-	//デッドゾーンの設定
-	diprg.lMin = 0 - 1000;
-	diprg.lMax = 0 + 1000;
-	hr = m_joy_stick->SetProperty(DIPROP_RANGE, &diprg.diph);
+
+	for (int nCnt = 0; nCnt < MAX_INPUT_PLAYER; nCnt++)
+	{
+
+		diprg[nCnt].diph.dwSize = sizeof(DIPROPRANGE);
+		diprg[nCnt].diph.dwHeaderSize = sizeof(DIPROPHEADER);
+		diprg[nCnt].diph.dwHow = DIPH_BYID;
+		diprg[nCnt].diph.dwObj = pdidoi->dwType;
+		//デッドゾーンの設定
+		diprg[nCnt].lMin = 0 - 1000;
+		diprg[nCnt].lMax = 0 + 1000;
+
+		hr = m_joy_stick[nCnt]->SetProperty(DIPROP_RANGE, &diprg[nCnt].diph);
+
+	}
 
 	if (FAILED(hr))
 	{
@@ -73,18 +81,21 @@ HRESULT CDirectInput::Init(HINSTANCE hInstance, HWND hWnd)
 						  EnumJoysticksCallback,
 							NULL, 
 							DIEDFL_ATTACHEDONLY);
-
-	// 協調モードを設定
-	if (m_joy_stick != nullptr)
+	for (int nCnt = 0; nCnt < MAX_INPUT_PLAYER; nCnt++)
 	{
-		if (FAILED(m_joy_stick->SetCooperativeLevel(hWnd, (DISCL_FOREGROUND | DISCL_NONEXCLUSIVE))))
+		// 協調モードを設定
+		if (m_joy_stick[nCnt] != nullptr)
 		{
-			return E_FAIL;
+			if (FAILED(m_joy_stick[nCnt]->SetCooperativeLevel(hWnd, (DISCL_FOREGROUND | DISCL_NONEXCLUSIVE))))
+			{
+				return E_FAIL;
+			}
+			m_joy_stick[nCnt]->GetCapabilities(&m_diDevCaps[nCnt]);
+			m_joy_stick[nCnt]->EnumObjects(EnumAxesCallback, (VOID*)hWnd, DIDFT_AXIS);
+			m_joy_stick[nCnt]->Poll();
+			m_joy_stick[nCnt]->Acquire();
 		}
-		m_joy_stick->GetCapabilities(&m_diDevCaps);
-		m_joy_stick->EnumObjects(EnumAxesCallback, (VOID*)hWnd, DIDFT_AXIS);
-		m_joy_stick->Poll();
-		m_joy_stick->Acquire();
+
 	}
 	return S_OK;
 
@@ -102,23 +113,24 @@ void CDirectInput::Uninit(void)
 void CDirectInput::Update(void)
 {
 	DIJOYSTATE2 aButtonState[MaxPlayer];
+	DWORD dwObj[MaxPlayer];
+	memset(dwObj, NULL, sizeof(dwObj));
 	for (int nCntPlayer = 0; nCntPlayer < MaxPlayer; nCntPlayer++)
 	{
 		int nCntKey;
-		DWORD dwObj = NULL;
 
-		if (m_joy_stick != nullptr)
+		if (m_joy_stick[nCntPlayer] != nullptr)
 		{
 			m_Instance->dwSize = NULL;
 
-			if (m_joy_stick->GetObjectInfo(m_Instance, dwObj, DIPH_BYID) != DIERR_INVALIDPARAM)
+			if (m_joy_stick[nCntPlayer]->GetObjectInfo(m_Instance, dwObj[nCntPlayer], DIPH_BYID) != DIERR_INVALIDPARAM)
 			{
-				m_aButtonState[nCntPlayer].rglSlider[0] = m_joy_stick->GetObjectInfo(m_Instance, dwObj, DIPH_BYID);
-				m_aButtonState[nCntPlayer].rglSlider[1] = m_joy_stick->GetObjectInfo(m_Instance, dwObj, DIPH_BYID);
+				m_aButtonState[nCntPlayer].rglSlider[0] = m_joy_stick[nCntPlayer]->GetObjectInfo(m_Instance, dwObj[nCntPlayer], DIPH_BYID);
+				m_aButtonState[nCntPlayer].rglSlider[1] = m_joy_stick[nCntPlayer]->GetObjectInfo(m_Instance, dwObj[nCntPlayer], DIPH_BYID);
 			}
 
 			//入力デバイスからデータを取得
-			if (SUCCEEDED(m_joy_stick->GetDeviceState(sizeof(aButtonState[nCntPlayer]), &aButtonState[nCntPlayer])))
+			if (SUCCEEDED(m_joy_stick[nCntPlayer]->GetDeviceState(sizeof(aButtonState[nCntPlayer]), &aButtonState[nCntPlayer])))
 			{
 				for (nCntKey = 0; nCntKey < D_BUTTON_MAX;
 					nCntKey++)
@@ -136,7 +148,7 @@ void CDirectInput::Update(void)
 			}
 			else
 			{
-				m_joy_stick->Acquire();
+				m_joy_stick[nCntPlayer]->Acquire();
 			}
 
 		}

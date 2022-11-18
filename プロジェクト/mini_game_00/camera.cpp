@@ -25,13 +25,13 @@
 //=============================================================================
 CCamera::CCamera()
 {
-	m_pos_v = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_pos_v = D3DXVECTOR3(0.0f, 0.0f, CAMERA_DESTAANCE);
 	m_pos_r = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_vec_u = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXMatrixIdentity(&m_mtx_projection);
 	D3DXMatrixIdentity(&m_mtx_view);
-	m_long = 0.0f;
+	m_long = CAMERA_DESTAANCE;
 	m_zoom = CAMERA_ZOOM_NORMAL;
 }
 
@@ -53,17 +53,17 @@ HRESULT CCamera::Init(D3DXVECTOR3 PosV, D3DXVECTOR3 PosR, D3DXVECTOR3 Rot)
 	m_rot = Rot;
 	m_vec_u = (D3DXVECTOR3(0.0f, 1.0f, 0.0f));
 	m_long = CAMERA_DESTAANCE;
-	if (m_rot.y >= D3DX_PI - 0.1f)
-	{
-		m_rot.y = D3DX_PI - 0.1f;
-	}
-	else if (m_rot.y <= -0.0f + 0.1f)
-	{
-		m_rot.y = -0.0f + 0.1f;
-	}
-	m_pos_r.x = m_pos_v.x + (sinf(m_rot.y) * sinf(m_rot.x)) * m_long;
-	m_pos_r.y = m_pos_v.y + cosf(m_rot.y)				  * m_long;
-	m_pos_r.z = m_pos_v.z + (sinf(m_rot.y) * cosf(m_rot.x)) * m_long;
+	//if (m_rot.y >= D3DX_PI - 0.1f)
+	//{
+	//	m_rot.y = D3DX_PI - 0.1f;
+	//}
+	//else if (m_rot.y <= -0.0f + 0.1f)
+	//{
+	//	m_rot.y = -0.0f + 0.1f;
+	//}
+	m_pos_v.x = m_pos_r.x + (sinf(m_rot.y) * sinf(m_rot.x)) * m_long;
+	m_pos_v.y = m_pos_r.y + cosf(m_rot.y)				  * m_long;
+	m_pos_v.z = m_pos_r.z + (sinf(m_rot.y) * cosf(m_rot.x)) * m_long;
 
 	return S_OK;
 }
@@ -81,22 +81,22 @@ void CCamera::Uninit(void)
 //=============================================================================
 void CCamera::Update(void)
 {
-	//CMouse *mouse = CManager::GetMouse();
+	//CMouse *mouse = CManager::GetInstance()->GetMouse();
 
 	//m_rot.x += mouse->GetMouseState().lX * 0.01f;
 	//m_rot.y += mouse->GetMouseState().lY * 0.01f;
 
-	//if (m_rot.y >= D3DX_PI - 0.1f)
-	//{
-	//	m_rot.y = D3DX_PI - 0.1f;
-	//}
-	//else if (m_rot.y <= -0.0f + 0.1f)
-	//{
-	//	m_rot.y = -0.0f + 0.1f;
-	//}
-	//m_pos_r.x = m_pos_v.x + (sinf(m_rot.y) * sinf(m_rot.x)) * m_long;
-	//m_pos_r.y = m_pos_v.y + cosf(m_rot.y)				  * m_long;
-	//m_pos_r.z = m_pos_v.z + (sinf(m_rot.y) * cosf(m_rot.x)) * m_long;
+	if (m_rot.y >= D3DX_PI - 0.1f)
+	{
+		m_rot.y = D3DX_PI - 0.1f;
+	}
+	else if (m_rot.y <= -0.0f + 0.1f)
+	{
+		m_rot.y = -0.0f + 0.1f;
+	}
+	m_pos_v.x = m_pos_r.x + (sinf(m_rot.y) * sinf(m_rot.x)) * m_long;
+	m_pos_v.y = m_pos_r.y + cosf(m_rot.y)				  * m_long;
+	m_pos_v.z = m_pos_r.z + (sinf(m_rot.y) * cosf(m_rot.x)) * m_long;
 }
 
 //=============================================================================

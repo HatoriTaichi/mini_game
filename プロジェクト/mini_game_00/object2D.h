@@ -38,7 +38,7 @@ typedef struct
 class CObject2D : public CObject
 {
 public:
-	CObject2D(LAYER_TYPE Layer = LAYER_TYPE::LAYER_00);	// デフォルトコンストラクタ
+	CObject2D(LAYER_TYPE Layer = LAYER_TYPE::LAYER_02);	// デフォルトコンストラクタ
 	~CObject2D();	// デフォルトデストラクタ
 	virtual HRESULT Init(void);	// ポリゴンの初期化
 	virtual void Uninit(void);	// ポリゴンの終了
@@ -46,6 +46,7 @@ public:
 	virtual void Draw(void);	// ポリゴンの描画
 	D3DXVECTOR3 GetPos(void) { return m_pos; }		// 位置のゲッダー
 	D3DXVECTOR3 GetSize(void) { return m_size; }	// サイズのゲッダー
+	D3DXCOLOR GetCol(void) { return m_col; }//色のゲッター
 	void SetPos(D3DXVECTOR3 pos);	// 位置のセッター
 	void SetSize(D3DXVECTOR3 size);	// サイズのセッター
 	void ChangeTexture(string type) { m_tex_pas = type; m_texture = CManager::GetInstance()->GetTexture()->GetTexture(m_tex_pas); }	// テクスチャパスの設定
@@ -59,6 +60,7 @@ private:
 	D3DXVECTOR3 m_pos;	// ポリゴンの原点
 	D3DXVECTOR3 m_size;	// サイズ
 	string m_tex_pas;	// テクスチャタイプ
+	D3DXCOLOR m_col;//色
 };
 
 #endif

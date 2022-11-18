@@ -19,6 +19,9 @@
 #include "model.h"
 #include "directinput.h"
 #include "player_ingredient_data.h"
+#include "XInput.h"
+#include "networkmanager.h"
+
 //=============================================================================
 // マクロ定義
 //=============================================================================
@@ -28,10 +31,10 @@
 #define LIGHT_DIR_00 (D3DXVECTOR3(0.2f, -0.8f, 0.4f))	// ライトの向き
 #define LIGHT_DIR_01 (D3DXVECTOR3(0.0f, -1.0f, 0.0f))	// ライトの向き
 #define LIGHT_DIR_02 (D3DXVECTOR3(-0.2f, 0.8f, -0.4f))	// ライトの向き
-#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 1005.0f, -100.0f))	// カメラの位置
-#define CAMERA_POS_R (D3DXVECTOR3(0.0f, 0.0f, 0.0f))	// カメラの注視点
-#define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(0.0f), D3DXToRadian(180.0f),D3DXToRadian(0.0f)))	// カメラの向き
-
+#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 0.0f, -0.0f))	// カメラの位置
+#define CAMERA_POS_R (D3DXVECTOR3(0.0f, 80.0f, 0.0f))	// カメラの注視点
+#define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(0.0f), D3DXToRadian(-90.0f),D3DXToRadian(0.0f)))	// カメラの向き
+static const CSceneManager::MODE mode = CSceneManager::MODE::TITLE;//最初のモード
 //=============================================================================
 // 静的メンバ変数宣言
 //=============================================================================
@@ -49,13 +52,14 @@ CManager::CManager()
 	m_camera = nullptr;
 	m_scene_manager = nullptr;
 	m_texture = nullptr;
-	for (int nPlayer = 0; nPlayer < MAX_PLAYER; nPlayer++)
-	{
-		m_player_ingredient_data[nPlayer] = nullptr;
-
-	}
+	m_xinput = nullptr;
+	m_net_work_manager = nullptr;
 	m_directInput = nullptr;
 	m_hwnd = NULL;
+	for (int count_player = 0; count_player < MAX_PLAYER; count_player++)
+	{
+		m_player_ingredient_data[count_player] = nullptr;
+	}
 	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
 	{
 		m_light[count_liht] = NULL;
@@ -100,6 +104,11 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 		m_directInput = new CDirectInput;
 		m_directInput->Init(hInstance, hWnd);
 	}
+	//Xinput
+	if (!m_xinput)
+	{
+		m_xinput = new CXInput;
+	}
 	// マウスクラスの生成
 	m_mouse = new CMouse;
 	if (m_mouse != nullptr)
@@ -114,6 +123,14 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 		m_texture->Init();
 	}
 
+	// ネットワークマネージャーの生成
+	m_net_work_manager = new CNetWorkManager;
+	if (m_net_work_manager != nullptr)
+	{
+		m_net_work_manager->Init();
+	}
+
+
 	for (int nPlayer = 0; nPlayer < MAX_PLAYER; nPlayer++)
 	{
 		//プレイヤーの具材情報クラス
@@ -123,7 +140,6 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 		}
 	}
 
-
 	// シーンマネージャークラスの生成
 	m_scene_manager = new CSceneManager;
 	if (m_scene_manager != nullptr)
@@ -132,7 +148,6 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	}
 
 	// ライトとカメラの生成
-
 	m_camera = CCamera::Create(CAMERA_POS_V, CAMERA_POS_R, CAMERA_ROT);
 	m_light[0] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_00, LIGHT_DIR_00);
 	m_light[1] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_01, LIGHT_DIR_01);
@@ -146,7 +161,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	m_key->BindKey(CKey::KEYBIND::SPACE, DIK_SPACE);
 
 	// 初期シーン
-	m_scene_manager->ChangeScene(CSceneManager::MODE::GAME);
+	m_scene_manager->ChangeScene(mode);
 
 	return S_OK;
 }
@@ -194,6 +209,7 @@ void CManager::Uninit(void)
 		delete m_key;
 		m_key = nullptr;
 	}
+
 	// ゲームパッドの破棄
 	if (m_directInput != NULL)
 	{
@@ -201,6 +217,23 @@ void CManager::Uninit(void)
 		delete m_directInput;
 		m_directInput = NULL;
 	}
+	if (m_xinput != nullptr) 
+	{
+		delete m_xinput;
+		m_xinput = nullptr;
+	}
+
+	//ネットワークマネージャーの生成
+	if (m_net_work_manager != nullptr)
+	{
+		//終了処理
+		m_net_work_manager->Uninit();
+
+		//メモリの開放
+		delete m_net_work_manager;
+		m_net_work_manager = nullptr;
+	}
+
 	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
 	{
 		// ライトクラスの破棄
@@ -272,6 +305,10 @@ void CManager::Update(void)
 	if (m_directInput != nullptr)
 	{
 		m_directInput->Update();
+	}
+	if (m_xinput != nullptr)
+	{
+		m_xinput->UpdateGamepad();
 	}
 	// マウスクラス
 	if (m_mouse != nullptr)

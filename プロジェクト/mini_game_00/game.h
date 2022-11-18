@@ -12,10 +12,17 @@
 //*****************************************************************************
 #include "object.h"
 static const int MaxPlayer = 2;
+static const int MaxIngredients = 5;
+#define MAXINGREDIENTS (5)
+
 //*****************************************************************************
 // 前方宣言
 //*****************************************************************************
 class CPlayer;
+class CObject2D;
+class CCounter;
+class CMove_UI;
+
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
@@ -37,16 +44,25 @@ public:
 	void ItemSpawn(void);
 	void EnemySpawn(void);
 	void IngredientsSpawn(void);
+	void AddIngredientsCnt(int nNumAdd,int nIngredients, int nPlayer);//具材の加算
 private:
 	vector<D3DXVECTOR3> m_IngredientsSpawnPoint;//具材のスポーンポイント
 	vector<D3DXVECTOR3> m_ItemSpawnPoint;//アイテムのスポーンポイント
 	GameMode m_Mode;//ゲーム中のモード
-	CPlayer *m_player[MaxPlayer];
+	CPlayer *m_pPlayer[MaxPlayer];
+	CObject2D *m_pBandUI;
+	CObject2D *m_pIngredientsUI[MaxIngredients][MaxPlayer];//具材のUI 
+	CCounter *m_pIngredientsCnt[MaxIngredients][MaxPlayer];//具材のカウント
+	CCounter *m_pGameTimer;//ゲームのたいまー
+	CMove_UI *m_pStartUI;
+	CMove_UI *m_pFinishUI;
+	CMove_UI *m_pLastSpurtUI;
 	int *m_NumIngredientsSpawnPoint;
 	int *m_NumItemSpawnPoint;
 	int m_MaxIngredientsSpawn;
 	int m_MaxItemSpawn;
 	int m_MaxEnemySpawn;
+	int m_nGameTimeSeconds;//秒数を数えるやつ
 	int m_IngredientsSpawnTimer;//具材の出現タイマー
 	int m_ItemSpawnTimer;//アイテムの出現タイマー
 	int m_ItemSpawnInterval[ModeMax];//アイテムの出現間隔

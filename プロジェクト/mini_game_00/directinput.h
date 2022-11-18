@@ -57,11 +57,11 @@ public:
 	static BOOL CALLBACK EnumAxesCallback(const DIDEVICEOBJECTINSTANCE *pdidoi, VOID *pContext);
 private:
 	static LPDIDEVICEOBJECTINSTANCE m_Instance;
-	LPDIRECTINPUT8       m_lpDI;
-	DIDEVCAPS            m_diDevCaps;
-	DIJOYSTATE2 *m_aButtonState;//キーボードの入力情報（プレス情報）
-	DIJOYSTATE2 *m_aButtonStateTrigger;
-	DIJOYSTATE2 *m_aButtonStateRelease;
+	LPDIRECTINPUT8       m_lpDI[MAX_INPUT_PLAYER];
+	DIDEVCAPS            m_diDevCaps[MAX_INPUT_PLAYER];
+	DIJOYSTATE2 m_aButtonState[MAX_INPUT_PLAYER];//キーボードの入力情報（プレス情報）
+	DIJOYSTATE2 m_aButtonStateTrigger[MAX_INPUT_PLAYER];
+	DIJOYSTATE2 m_aButtonStateRelease[MAX_INPUT_PLAYER];
 
 };
 #endif _DIRECTINPUT_H_

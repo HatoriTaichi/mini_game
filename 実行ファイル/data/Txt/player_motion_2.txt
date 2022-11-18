@@ -14,10 +14,10 @@ NUM_MODEL = 4
 #------------------------------------------------------------------------------
 # モデルファイル名
 #------------------------------------------------------------------------------
-MODEL_FILENAME = data/Model/player_body_2.x		# [0]体
-MODEL_FILENAME = data/Model/player_head_2.x		# [1]頭
-MODEL_FILENAME = data/Model/player_right_2.x	# [2]右手
-MODEL_FILENAME = data/Model/player_left_2.x		# [3]左手
+MODEL_FILENAME = data/Model/Player/player_body_2.x		# [0]体
+MODEL_FILENAME = data/Model/Player/player_head_2.x		# [1]頭
+MODEL_FILENAME = data/Model/Player/player_right_2.x	# [2]右手
+MODEL_FILENAME = data/Model/Player/player_left_2.x		# [3]左手
 
 #------------------------------------------------------------------------------
 # キャラクター情報
@@ -64,6 +64,8 @@ END_CHARACTERSET
 # [0] 待機モーション
 #---------------------------------------
 MOTIONSET
+	MOTIONNAME = NUTLARAL
+
 	LOOP = 1		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 2		# キー数
 
@@ -118,6 +120,8 @@ END_MOTIONSET
 # [1] 走るモーション
 #---------------------------------------
 MOTIONSET
+	MOTIONNAME = RUN
+
 	LOOP = 1		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 4		# キー数
 
@@ -218,6 +222,8 @@ END_MOTIONSET
 # [2] めまいモーション
 #---------------------------------------
 MOTIONSET
+	MOTIONNAME = DIZZY
+
 	LOOP = 1		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 8		# キー数
 
@@ -410,6 +416,8 @@ END_MOTIONSET
 # [3] 首振りモーション
 #---------------------------------------
 MOTIONSET
+	MOTIONNAME = NECKSWING
+
 	LOOP = 0		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 9		# キー数
 
@@ -625,6 +633,8 @@ END_MOTIONSET
 # [4] 勝利モーション
 #---------------------------------------
 MOTIONSET
+	MOTIONNAME = WIN
+
 	LOOP = 1		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 4		# キー数
 
@@ -725,6 +735,8 @@ END_MOTIONSET
 # [5] 敗北モーション
 #---------------------------------------
 MOTIONSET
+	MOTIONNAME = LOSE
+
 	LOOP = 1		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 4		# キー数
 

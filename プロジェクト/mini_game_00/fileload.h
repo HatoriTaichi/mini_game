@@ -62,13 +62,14 @@ public:
 
 	typedef struct
 	{
-		vector<D3DXVECTOR3> pos;	// ˆÊ’u
-		vector<D3DXVECTOR3> rot;	// ‰ñ“]
-		vector<float> radius_x_or_z;	// ”¼ŒaX‚©Z
-		vector<float> radius_y_or_z;	// ”¼ŒaY‚©Z
-		vector<int> division_x_or_z;	// •ªŠ„”X‚©Z
-		vector<int> division_y_or_z;	// •ªŠ„”Y‚©Z
-		int all_mesh;	// ‘”
+		map<string, vector<D3DXVECTOR3>> pos;	// ˆÊ’u
+		map<string, vector<D3DXVECTOR3>> rot;	// ‰ñ“]
+		map<string, vector<float>> radius_x_or_z;	// ”¼ŒaX‚©Z
+		map<string, vector<float>> radius_y_or_z;	// ”¼ŒaY‚©Z
+		map<string, vector<int>> division_x_or_z;	// •ªŠ„”X‚©Z
+		map<string, vector<int>> division_y_or_z;	// •ªŠ„”Y‚©Z
+		int all_floor_mesh;	// °‚Ì‘”
+		int all_wall_mesh;	// •Ç‚Ì‘”
 	} STAGE_MESH_INFO;
 
 	typedef struct

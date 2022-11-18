@@ -45,7 +45,7 @@ HRESULT CCounter::Init(void)
 {
 	for (int nNumber = 0; nNumber < m_number_max; nNumber++)
 	{
-		m_number.push_back(CObject2D::Create(D3DXVECTOR3(m_pos.x + m_size.x * nNumber, m_pos.y, 0.0f), m_size, m_tex_pas));
+		m_number.push_back(CObject2D::Create(D3DXVECTOR3(m_pos.x + (m_size.x * 2.0f) * nNumber, m_pos.y, 0.0f), m_size, m_tex_pas));
 		m_number[nNumber]->ChangeTexture(m_tex_pas);
 	}
 
