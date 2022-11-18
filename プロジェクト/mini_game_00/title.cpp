@@ -49,17 +49,17 @@ HRESULT CTitle::Init(void)
 	//------------------------------
 	D3DXMATRIX mtx_light_proj;	// ライトの射影変換
 	D3DXMATRIX mtx_light_view;	// ライトビュー変換
-	D3DXVECTOR3 pos_light_v = D3DXVECTOR3(0.0f, 1200.0f, -1000.0f);	// ライトの視点の位置
+	D3DXVECTOR3 pos_light_v = D3DXVECTOR3(0.0f, 3200.0f, -3200.0f);	// ライトの視点の位置
 	D3DXVECTOR3 pos_light_r = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// ライトの注視点の位置
 	D3DXVECTOR3 vec_light = -D3DXVECTOR3(pos_light_v - pos_light_r);	// ライトのベクトル
 	float light_length = D3DXVec3Length(&pos_light_v);
 
 	// ライトのプロジェクションマトリックスを生成
 	D3DXMatrixPerspectiveFovLH(	&mtx_light_proj,
-								D3DXToRadian(45.0f),
-								1.0f,
-								0.0f,
-								light_length);
+								D3DXToRadian(90.0f),
+								(float)SCREEN_WIDTH / (float)SCREEN_HEIGHT,
+								50.0f,
+		light_length);
 
 	// ベクトルを正規化
 	D3DXVec3Normalize(&vec_light, &vec_light);
@@ -68,7 +68,7 @@ HRESULT CTitle::Init(void)
 	D3DXMatrixLookAtLH(	&mtx_light_view,
 						&pos_light_v,
 						&D3DXVECTOR3(pos_light_v + vec_light),
-						&D3DXVECTOR3(0, 1, 0));
+						&D3DXVECTOR3(0.0f, 1.0f, 0.0f));
 
 	//シェーダのライトを設定
 	CManager::GetInstance()->GetRenderer()->SetEffectLightMatrixView(mtx_light_view);
@@ -91,12 +91,12 @@ HRESULT CTitle::Init(void)
 	//CSingleModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/boneanim.fbx", CSingleModel::MODEL_FILE::FBX);
 	//CSingleModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/anim_my_mdoel.fbx", CSingleModel::MODEL_FILE::FBX);
 	//CSingleModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/witch_hat000.fbx", CSingleModel::MODEL_FILE::FBX);
-	CSingleModel::Create(D3DXVECTOR3(25.0f, 25.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "Player000.x", CSingleModel::MODEL_FILE::X);
+	CSingleModel::Create(D3DXVECTOR3(100.0f, 25.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "Player000.x", CSingleModel::MODEL_FILE::X);
 	CSingleModel::Create(D3DXVECTOR3(0.0f, 25.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Loika.fbx", CSingleModel::MODEL_FILE::FBX);
 
 	//CSprite::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), "服.png");
 
-	m_letter_array = CLetterArray::Create(D3DXVECTOR3(SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f, 0.0f), 100, 50, FPS / 2, "TAICHI");
+	//m_letter_array = CLetterArray::Create(D3DXVECTOR3(SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f, 0.0f), 100, 50, FPS / 2, "TAICHI");
 
 	return S_OK;
 }
@@ -106,7 +106,7 @@ HRESULT CTitle::Init(void)
 //=============================================================================
 void CTitle::Uninit(void)
 {
-	m_letter_array->Uninit();
+	//m_letter_array->Uninit();
 	//オブジェクトの破棄
 	Release();
 }
@@ -123,7 +123,7 @@ void CTitle::Update(void)
 		CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::GAME);
 	}
 
-	m_letter_array->Update();
+	//m_letter_array->Update();
 }
 
 //=============================================================================

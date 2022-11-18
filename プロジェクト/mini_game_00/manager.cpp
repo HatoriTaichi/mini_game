@@ -29,7 +29,7 @@
 #define LIGHT_DIR_01 (D3DXVECTOR3(0.0f, -1.0f, 0.0f))	// ライトの向き
 #define LIGHT_DIR_02 (D3DXVECTOR3(-0.2f, 0.8f, -0.4f))	// ライトの向き
 //#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 50.0f, 25.0f))	// カメラの位置
-#define CAMERA_POS_V (D3DXVECTOR3(50.0f, 50.0f, 25.0f))	// カメラの位置
+#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 50.0f, 100.0f))	// カメラの位置
 //#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 1500.0f, -1500.0f))	// カメラの位置
 //#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 800.0f, 800.0f))	// カメラの位置
 #define CAMERA_POS_R (D3DXVECTOR3(0.0f, 0.0f, 500.0f))	// カメラの注視点
@@ -60,10 +60,10 @@ CManager::CManager()
 	m_camera = nullptr;
 	m_scene_manager = nullptr;
 	m_texture = nullptr;
-	m_hwnd = NULL;
+	m_hwnd = nullptr;
 	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
 	{
-		m_light[count_liht] = NULL;
+		m_light[count_liht] = nullptr;
 	}
 }
 
@@ -126,9 +126,9 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 
 	// ライトとカメラの生成
 	m_camera = CCamera::Create(CAMERA_POS_V, CAMERA_POS_R, CAMERA_ROT);
-	m_light[0] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_00, LIGHT_DIR_00);
-	m_light[1] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_01, LIGHT_DIR_01);
-	m_light[2] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_02, LIGHT_DIR_02);
+	//m_light[0] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_00, LIGHT_DIR_00);
+	//m_light[1] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_01, LIGHT_DIR_01);
+	//m_light[2] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_02, LIGHT_DIR_02);
 
 	// キーバインド
 	m_key->BindKey(CKey::KEYBIND::W, DIK_W);
