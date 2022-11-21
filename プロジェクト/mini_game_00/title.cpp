@@ -22,13 +22,13 @@
 #include "select_botton.h"
 #include "object2D.h"
 #define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(0.0f), D3DXToRadian(30.0f),D3DXToRadian(0.0f)))	// カメラの向き
-#define TITLELOGO_POS (D3DXVECTOR3(500.0f, 100.0f,0.0f))	// タイトルロゴの位置
+#define TITLELOGO_POS (D3DXVECTOR3(640.0f, 200.0f,0.0f))	// タイトルロゴの位置
 #define TITLELOGO_SIZE (D3DXVECTOR3(200.0f, 200.0f,0.0f))	// タイトルロゴの位置
-#define TITLEMENU_POS (D3DXVECTOR3(500.0f, 300.0f,0.0f))	// タイトルロゴの位置
-#define TITLEMENU_SIZE (D3DXVECTOR3(720.0f, 360.0f,0.0f))	// タイトルロゴの位置
-#define PUSHSTART_POS (D3DXVECTOR3(300.0f, 300.0f,0.0f))	// スタートボタンの位置
+#define TITLEMENU_POS (D3DXVECTOR3(640.0f, 360.0f,0.0f))	// タイトルロゴの位置
+#define TITLEMENU_SIZE (D3DXVECTOR3(640.0f, 360.0f,0.0f))	// タイトルロゴの位置
+#define PUSHSTART_POS (D3DXVECTOR3(300.0f, 500.0f,0.0f))	// スタートボタンの位置
 #define PUSHSTART_SIZE (D3DXVECTOR3(150.0f, 100.0f,0.0f))	// スタートボタンの位置
-#define PUSHMENU_POS (D3DXVECTOR3(800.0f, 300.0f,0.0f))	// 具材のメニューの位置
+#define PUSHMENU_POS (D3DXVECTOR3(800.0f, 500.0f,0.0f))	// 具材のメニューの位置
 #define PUSHMENU_SIZE (D3DXVECTOR3(150.0f, 100.0f,0.0f))	// 具材のメニューの位置
 
 #define ENDTIME (40)
@@ -79,7 +79,7 @@ HRESULT CTitle::Init(void)
 	}
 	if (!m_pTitleMenu)
 	{
-		m_pTitleMenu = CObject2D::Create(TITLEMENU_POS, TITLEMENU_SIZE, "logo.png");
+		m_pTitleMenu = CObject2D::Create(TITLEMENU_POS, TITLEMENU_SIZE, "menu.png");
 		m_pTitleMenu->SetCol({ 1.0,1.0,1.0,0.0f });
 	}
 	m_bEnd = false;
