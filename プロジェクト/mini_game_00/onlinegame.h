@@ -74,6 +74,7 @@ private:
 	int m_IngredientsSpawnMax[ModeMax];//具材の出現個数（大）
 	int m_ItemSpawnMin[ModeMax];//アイテムの出現個数（小）
 	int m_ItemSpawnMax[ModeMax];//アイテムの出現個数（大）
+	int m_nPlayerNumber;//プレイヤー識別番号
 	static bool m_is_onece;
 
 };

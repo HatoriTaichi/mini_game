@@ -19,13 +19,18 @@
 #include "wall.h"
 #include "field.h"
 #include "camera.h"
-#include "move_ui.h"
+#include "select_botton.h"
 #include "object2D.h"
 #define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(0.0f), D3DXToRadian(30.0f),D3DXToRadian(0.0f)))	// カメラの向き
-#define TITLELOGO_POS (D3DXVECTOR3(400.0f, 300.0f,0.0f))	// タイトルロゴの位置
+#define TITLELOGO_POS (D3DXVECTOR3(500.0f, 100.0f,0.0f))	// タイトルロゴの位置
 #define TITLELOGO_SIZE (D3DXVECTOR3(200.0f, 200.0f,0.0f))	// タイトルロゴの位置
-#define PUSHSTART_POS (D3DXVECTOR3(800.0f, 300.0f,0.0f))	// タイトルロゴの位置
-#define PUSHSTART_SIZE (D3DXVECTOR3(250.0f, 50.0f,0.0f))	// タイトルロゴの位置
+#define TITLEMENU_POS (D3DXVECTOR3(500.0f, 300.0f,0.0f))	// タイトルロゴの位置
+#define TITLEMENU_SIZE (D3DXVECTOR3(720.0f, 360.0f,0.0f))	// タイトルロゴの位置
+#define PUSHSTART_POS (D3DXVECTOR3(300.0f, 300.0f,0.0f))	// スタートボタンの位置
+#define PUSHSTART_SIZE (D3DXVECTOR3(150.0f, 100.0f,0.0f))	// スタートボタンの位置
+#define PUSHMENU_POS (D3DXVECTOR3(800.0f, 300.0f,0.0f))	// 具材のメニューの位置
+#define PUSHMENU_SIZE (D3DXVECTOR3(150.0f, 100.0f,0.0f))	// 具材のメニューの位置
+
 #define ENDTIME (40)
 //=============================================================================
 // デフォルトコンストラクタ
@@ -35,6 +40,11 @@ CTitle::CTitle(CObject::LAYER_TYPE layer) :CObject(layer)
 	m_pTitleLogo = nullptr;
 	m_bNextMode = false;
 	m_pPushStart = nullptr;
+	m_pPushMenu = nullptr;
+	m_nSelectBottonType = CTitle::BOTTON_TYPE::Start;
+	m_bBottonPush = false;
+	m_bMoveStop = false;
+	m_pTitleMenu = nullptr;
 }
 
 //=============================================================================
@@ -58,9 +68,19 @@ HRESULT CTitle::Init(void)
 	{
 		m_pTitleLogo = CObject2D::Create(TITLELOGO_POS, TITLELOGO_SIZE, "logo.png");
 	}
+
 	if (!m_pPushStart)
 	{
-		m_pPushStart = CMove_UI::Create(PUSHSTART_POS, PUSHSTART_SIZE, 0, 0, "brick_wall.jpg", CMove_UI::UI_Type::Type_PushStart);
+		m_pPushStart = CSelect_Botton::Create(PUSHSTART_POS, PUSHSTART_SIZE, "Game_start000.png");
+	}
+	if (!m_pPushMenu)
+	{
+		m_pPushMenu = CSelect_Botton::Create(PUSHMENU_POS, PUSHMENU_SIZE, "TitleMenu000.png");
+	}
+	if (!m_pTitleMenu)
+	{
+		m_pTitleMenu = CObject2D::Create(TITLEMENU_POS, TITLEMENU_SIZE, "logo.png");
+		m_pTitleMenu->SetCol({ 1.0,1.0,1.0,0.0f });
 	}
 	m_bEnd = false;
 	return S_OK;
@@ -76,10 +96,20 @@ void CTitle::Uninit(void)
 		m_pPushStart->Uninit();
 		m_pPushStart = nullptr;
 	}
+	if (m_pPushMenu)
+	{
+		m_pPushMenu->Uninit();
+		m_pPushMenu = nullptr;
+	}
 	if(m_pTitleLogo)
 	{
 		m_pTitleLogo->Uninit();
 		m_pTitleLogo = nullptr;
+	}
+	if (m_pTitleMenu)
+	{
+		m_pTitleMenu->Uninit();
+		m_pTitleMenu= nullptr;
 	}
 	//オブジェクトの破棄
 	Release();
@@ -90,22 +120,95 @@ void CTitle::Uninit(void)
 //=============================================================================
 void CTitle::Update(void)
 {
-	CameraRotMove();
+	CameraRotMove();//カメラが回転する処理
+	BottonSelect();//選択処理
 	CKey *key = CManager::GetInstance()->GetKey();
 
-	if (key->GetTrigger(CKey::KEYBIND::SPACE) == true&& !m_bEnd)
+	if (!m_bBottonPush)
 	{
-		m_bEnd = true;
+		//決定ボタンを押すと
+		if (key->GetTrigger(CKey::KEYBIND::SPACE) == true)
+		{
+			m_bBottonPush = true;
+		}
+		switch (m_nSelectBottonType)
+		{
+		case CTitle::BOTTON_TYPE::Start:
+			//選択状態にする
+			if (m_pPushStart)
+			{
+				m_pPushStart->SetState(CSelect_Botton::State::Select);
+			}
+			//通常状態にする
+			if (m_pPushMenu)
+			{
+				m_pPushMenu->SetState(CSelect_Botton::State::Normal);
+			}
+			break;
+		case CTitle::BOTTON_TYPE::Menu:
+			//通常状態にする
+			if (m_pPushStart)
+			{
+				m_pPushStart->SetState(CSelect_Botton::State::Normal);
+			}
+			//選択状態にする
+			if (m_pPushMenu)
+			{
+				m_pPushMenu->SetState(CSelect_Botton::State::Select);
+			}
+			break;
 
+		}
 	}
+	else
+	{
+
+		switch (m_nSelectBottonType)
+		{
+		case CTitle::BOTTON_TYPE::Start:
+			if (!m_bMoveStop)
+			{
+				//選択状態にする
+				if (m_pPushStart)
+				{
+					m_pPushStart->SetState(CSelect_Botton::State::Push);
+					m_bEnd = true;
+					m_bMoveStop = true;
+
+				}
+			}
+
+			break;
+		case CTitle::BOTTON_TYPE::Menu:
+
+			//選択状態にする
+			if (!m_bMoveStop)
+			{
+				if (m_pPushMenu)
+				{
+					m_pPushMenu->SetState(CSelect_Botton::State::Push);
+					m_bMoveStop = true;
+					m_pTitleMenu->SetCol({ 1.0,1.0,1.0,1.0f });
+
+				}
+			}
+
+			//決定ボタンを押すと選択解除する
+			if (key->GetTrigger(CKey::KEYBIND::SPACE) == true)
+			{
+				m_bBottonPush = false;
+				m_bMoveStop = false;
+				m_pTitleMenu->SetCol({ 1.0,1.0,1.0,0.0f });
+
+			}
+			break;
+
+		}
+	}
+	//終了状態になったら
 	if (m_bEnd)
 	{
 		m_bEndTimer++;
-		if (m_pPushStart)
-		{
-			m_pPushStart->SetState(CMove_UI::State::End);
-		}
-
 		if (m_bEndTimer >= ENDTIME)
 		{
 			m_bNextMode = true;
@@ -121,6 +224,24 @@ void CTitle::Update(void)
 void CTitle::Draw(void)
 {
 
+}
+//=============================================================================
+// 選択処理
+//=============================================================================
+void CTitle::BottonSelect(void)
+{
+	CKey *key = CManager::GetInstance()->GetKey();
+
+	//左のキーを押すとstartに行く
+	if (key->GetTrigger(CKey::KEYBIND::A) == true)
+	{
+		m_nSelectBottonType = CTitle::BOTTON_TYPE::Start;
+	}
+	else if (key->GetTrigger(CKey::KEYBIND::D) == true)
+	{
+		m_nSelectBottonType = CTitle::BOTTON_TYPE::Menu;
+
+	}
 }
 //=============================================================================
 // ステージ生成処理
