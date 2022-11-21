@@ -234,6 +234,9 @@
     <ClInclude Include="singlemodel.h">
       <Filter>ソース ファイル\モデル</Filter>
     </ClInclude>
+    <ClInclude Include="select_botton.h">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="item.cpp">
@@ -367,6 +370,9 @@
     </ClCompile>
     <ClCompile Include="singlemodel.cpp">
       <Filter>ソース ファイル\モデル</Filter>
+    </ClCompile>
+    <ClCompile Include="select_button.cpp">
+      <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

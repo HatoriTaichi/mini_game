@@ -191,6 +191,7 @@
     <ClInclude Include="object3D.h" />
     <ClInclude Include="result.h" />
     <ClInclude Include="scenemanager.h" />
+    <ClInclude Include="select_botton.h" />
     <ClInclude Include="singlemodel.h" />
     <ClInclude Include="tcp_client.h" />
     <ClInclude Include="telop.h" />
@@ -237,6 +238,7 @@
     <ClCompile Include="object3D.cpp" />
     <ClCompile Include="result.cpp" />
     <ClCompile Include="scenemanager.cpp" />
+    <ClCompile Include="select_button.cpp" />
     <ClCompile Include="singlemodel.cpp" />
     <ClCompile Include="tcp_client.cpp" />
     <ClCompile Include="telop.cpp" />
