@@ -115,6 +115,8 @@ private:
 	D3DXVECTOR3 m_box_vtx[BOXVTX_MAX];	// 箱の頂点
 	D3DXVECTOR3 m_nor[BOX_SURFACE];	// 箱の面の法線
 	D3DXVECTOR3 m_center_vtx[BOX_SURFACE];	// 箱の面の中心点
+	D3DXCOLOR m_col_glow;	//輪郭の発光色の色
+	float m_pow_glow;	//輪郭の強度
 	bool m_transparent;	// 透明フラグ
 };
 

@@ -22,14 +22,14 @@
 //=============================================================================
 // マクロ定義
 //=============================================================================
-#define LIGHT_POS_00 (D3DXVECTOR3(-1000.0f, 1000.0f, 1000.0f))	// ライトの位置
-#define LIGHT_POS_01 (D3DXVECTOR3(0.0f, 1000.0f, 0.0f))	// ライトの位置
-#define LIGHT_POS_02 (D3DXVECTOR3(1000.0f, -1000.0f, -1000.0f))	// ライトの位置
+#define LIGHT_POS_00 (D3DXVECTOR3(-3200.0f, 3200.0f, 3200.0f))	// ライトの位置
+#define LIGHT_POS_01 (D3DXVECTOR3(0.0f, 3200.0f, 0.0f))	// ライトの位置
+#define LIGHT_POS_02 (D3DXVECTOR3(3200.0f, -3200.0f, -3200.0f))	// ライトの位置
 #define LIGHT_DIR_00 (D3DXVECTOR3(0.2f, -0.8f, 0.4f))	// ライトの向き
 #define LIGHT_DIR_01 (D3DXVECTOR3(0.0f, -1.0f, 0.0f))	// ライトの向き
 #define LIGHT_DIR_02 (D3DXVECTOR3(-0.2f, 0.8f, -0.4f))	// ライトの向き
 //#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 50.0f, 25.0f))	// カメラの位置
-#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 50.0f, 100.0f))	// カメラの位置
+#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 2000.0f, 0.0f))	// カメラの位置
 //#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 1500.0f, -1500.0f))	// カメラの位置
 //#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 800.0f, 800.0f))	// カメラの位置
 #define CAMERA_POS_R (D3DXVECTOR3(0.0f, 0.0f, 500.0f))	// カメラの注視点
@@ -126,9 +126,9 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 
 	// ライトとカメラの生成
 	m_camera = CCamera::Create(CAMERA_POS_V, CAMERA_POS_R, CAMERA_ROT);
-	//m_light[0] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_00, LIGHT_DIR_00);
-	//m_light[1] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_01, LIGHT_DIR_01);
-	//m_light[2] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_02, LIGHT_DIR_02);
+	m_light[0] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_00, LIGHT_DIR_00);
+	m_light[1] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_01, LIGHT_DIR_01);
+	m_light[2] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_02, LIGHT_DIR_02);
 
 	// キーバインド
 	m_key->BindKey(CKey::KEYBIND::W, DIK_W);

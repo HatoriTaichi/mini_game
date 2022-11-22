@@ -66,6 +66,7 @@ HRESULT CLight::Init(D3DLIGHTTYPE Type, D3DCOLORVALUE Diffuse, D3DVECTOR Pos, D3
 
 	//ライトを有効にする
 	device->LightEnable(m_my_number, TRUE);	//n番目のライトを付ける
+
 	return S_OK;
 }
 

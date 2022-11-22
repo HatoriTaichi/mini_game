@@ -31,10 +31,10 @@ CLetter::~CLetter()
 //=============================================================================
 // ポリゴンの初期化処理
 //=============================================================================
-HRESULT CLetter::Init(void)
+HRESULT CLetter::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 {
 	// スプライトの生成
-	m_sprite = CSprite::Create(m_pos, m_rot, m_texture);
+	m_sprite = CSprite::Create(pos, rot, m_texture);
 
 	return S_OK;
 }
@@ -54,11 +54,11 @@ void CLetter::Uninit(void)
 }
 
 //=============================================================================
-// ポリゴンの更新処理
+// ポリゴンの描画処理
 //=============================================================================
-void CLetter::Update(void)
+void CLetter::Draw(void)
 {
-
+	m_sprite->Draw();
 }
 
 //=============================================================================
@@ -74,15 +74,13 @@ CLetter *CLetter::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int font_size, int fo
 	if (letter != nullptr)
 	{
 		// 引数の代入
-		letter->m_pos = pos;
-		letter->m_rot = rot;
 		letter->m_font_size = font_size;
 		letter->m_font_weight = font_weight;
 		letter->m_text = text;
 		letter->CreateTexture();
 
 		// 初期化
-		letter->Init();
+		letter->Init(pos, rot);
 	}
 
 	return letter;

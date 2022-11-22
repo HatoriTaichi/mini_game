@@ -18,7 +18,7 @@
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class CSprite : public CObject
+class CSprite
 {
 public:
 	typedef struct
@@ -26,17 +26,18 @@ public:
 		UINT x;	// X
 		UINT y;	// Y
 	} TEX_SIZE;
-	CSprite(LAYER_TYPE Layer = LAYER_TYPE::LAYER_05);	// デフォルトコンストラクタ
+	CSprite();	// デフォルトコンストラクタ
 	~CSprite();	// デフォルトデストラクタ
 	HRESULT Init(void);	// ポリゴンの初期化
 	void Uninit(void);	// ポリゴンの終了
-	void Update(void);	// ポリゴンの更新
 	void Draw(void);	// ポリゴンの描画
 	static CSprite *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, string type);	// オブジェクトの生成
 	static CSprite *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, LPDIRECT3DTEXTURE9 tex);	// オブジェクトの生成
 	D3DXVECTOR3 GetCenter(void) { return m_center; }	// 制御点の取得
 	void SetPos(D3DXVECTOR3 pos) { m_pos = pos; }	// 位置を設定
 	void SetCol(D3DXCOLOR col) { m_col = col; }	// カラーを設定
+	void SetCenter(D3DXVECTOR3 center) { m_center = center; }	// 制御点を設定
+	TEX_SIZE GetTexture_Size(void) { return m_tex_size; }	// テクスチャのサイズの取得
 
 private:
 	LPD3DXSPRITE m_sprite = nullptr;	// スプライト

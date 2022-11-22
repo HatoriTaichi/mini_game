@@ -13,7 +13,7 @@
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
-CLetterArray::CLetterArray()
+CLetterArray::CLetterArray(LAYER_TYPE Layer) : CObject(Layer)
 {
 
 }
@@ -32,7 +32,7 @@ CLetterArray::~CLetterArray()
 HRESULT CLetterArray::Init(void)
 {
 	vector<wstring> buf;	// 変換後文字列
-	D3DXVECTOR3 distance_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	D3DXVECTOR3 distance_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置差分
 	int text_size = 0;	// 文字数
 
 	buf = CLetter::Conbrt(m_text);	// 変換
@@ -54,17 +54,20 @@ HRESULT CLetterArray::Init(void)
 			// 位置の差分
 			distance_pos.x += old_center.x + center.x;
 		}
-		m_letter[text_count]->SetSpritePos(D3DXVECTOR3(m_first_pos.x + distance_pos.x, m_first_pos.y, m_first_pos.z));
+
+		// 位置を変更
+		m_letter[text_count]->GetSprite()->SetPos(D3DXVECTOR3(m_first_pos.x + distance_pos.x, m_first_pos.y, m_first_pos.z));
 	}
 
 	// ディレイが設定されていたら
 	if (m_showing_delay != 0)
 	{
+		m_col.a = 0;
 		// 文字数分のループ
 		for (int text_count = 1; text_count < text_size; text_count++)
 		{
 			// 透明化
-			m_letter[text_count]->SetSpriteCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
+			m_letter[text_count]->GetSprite()->SetCol(m_col);
 		}
 	}
 
@@ -98,18 +101,20 @@ void CLetterArray::Update(void)
 	if (m_showing_delay != 0)
 	{
 		int letter_size = m_letter.size();	// 文字列のサイズを取得
-
 		m_delay_count++;
 
 		// ディレイカウントになって最大文字列じゃなかったら
 		if (m_delay_count >= m_showing_delay &&
 			m_now_showing < letter_size)
 		{
+			// 見える
+			m_col.a = 1.0f;
+
 			// 0にする
 			m_delay_count = 0;
 
 			// カラーを変える
-			m_letter[m_now_showing]->SetSpriteCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+			m_letter[m_now_showing]->GetSprite()->SetCol(m_col);
 
 			// 配列を進める
 			m_now_showing++;
@@ -118,9 +123,24 @@ void CLetterArray::Update(void)
 }
 
 //=============================================================================
+// ポリゴンの描画処理
+//=============================================================================
+void CLetterArray::Draw(void)
+{
+	int letter_size = m_letter.size();	// 文字列のサイズを取得
+
+	// 文字サイズ分のループ
+	for (int count_letter = 0; count_letter < letter_size; count_letter++)
+	{
+		// 描画
+		m_letter[count_letter]->Draw();
+	}
+}
+
+//=============================================================================
 // 生成処理
 //=============================================================================
-CLetterArray *CLetterArray::Create(D3DXVECTOR3 first_pos, int font_size, int font_weight, int showing_delay, string text)
+CLetterArray *CLetterArray::Create(D3DXVECTOR3 first_pos, int font_size, int font_weight, int showing_delay, string text, D3DXCOLOR col)
 {
 	// 文字のポインタ
 	CLetterArray *letter_array = nullptr;
@@ -131,6 +151,7 @@ CLetterArray *CLetterArray::Create(D3DXVECTOR3 first_pos, int font_size, int fon
 	{
 		// 引数の代入
 		letter_array->m_first_pos = first_pos;
+		letter_array->m_col = col;
 		letter_array->m_font_size = font_size;
 		letter_array->m_font_weight = font_weight;
 		letter_array->m_text = text;

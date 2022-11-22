@@ -88,7 +88,7 @@ void CObject3D::Draw(void)
 	LPDIRECT3DDEVICE9 device = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスの取得
 	D3DXMATRIX mtx_rot, mtx_trans;	// 計算用マトリックス
 	DWORD enable_light = 0;
-	DWORD pass_flag = 0;
+	DWORD pass_flag = PASS_3D;
 
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtx_world);
@@ -120,6 +120,10 @@ void CObject3D::Draw(void)
 	// シェーダにテクスチャを設定
 	CManager::GetInstance()->GetRenderer()->SetEffectTexture(m_texture);
 
+	device->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);	// アルファテスト有効
+	device->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);	// アルファテスト
+	device->SetRenderState(D3DRS_ALPHAREF, 50);	// アルファ値の参照値
+
 	// 頂点バッファをデータストリームに設定
 	device->SetStreamSource(	0,
 								m_vtx_buff,
@@ -134,16 +138,16 @@ void CObject3D::Draw(void)
 	// ライトの状態取得
 	device->GetRenderState(D3DRS_LIGHTING, &enable_light);
 
-	// 3Dオブジェクト
-	pass_flag = PASS_3D;
-
 	// テクスチャがある場合フラグを追加
 	if (m_texture != nullptr)
 	{
 		pass_flag |= PASS_TEXTURE;
 	}
 	// ライトがある場合フラグを追加
-	pass_flag |= PASS_LIGHT;
+	if (enable_light != 0)
+	{
+		pass_flag |= PASS_LIGHT;
+	}
 
 	// マテリアルの設定
 	CManager::GetInstance()->GetRenderer()->SetEffectMaterialDiffuse(m_material.MatD3D.Diffuse);
@@ -167,4 +171,8 @@ void CObject3D::Draw(void)
 
 	// エフェクト終了
 	CManager::GetInstance()->GetRenderer()->EndPassEffect();
+
+	device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);	// アルファテスト無効
+	device->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_ALWAYS);	// アルファテスト
+	device->SetRenderState(D3DRS_ALPHAREF, 0x00);	// アルファ値の参照値
 }

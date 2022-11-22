@@ -313,7 +313,7 @@ void CRenderer::Draw(void)
 			m_pD3DDevice->SetDepthStencilSurface(m_depth_buff);
 
 			// バックバッファ＆Ｚバッファのクリア
-			m_pD3DDevice->Clear(0, nullptr, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, 0);
+			m_pD3DDevice->Clear(0, nullptr, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f), 1.0f, 0);
 
 			//Z値バッファ描画中
 			m_draw_tex_z = true;
@@ -331,7 +331,7 @@ void CRenderer::Draw(void)
 		m_pD3DDevice->SetDepthStencilSurface(m_default_depth_surf);
 
 		// バックバッファ＆Ｚバッファのクリア
-		m_pD3DDevice->Clear(0, nullptr, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, 0);
+		m_pD3DDevice->Clear(0, nullptr, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f), 1.0f, 0);
 
 		//Z値バッファ描画中ではない
 		m_draw_tex_z = false;
