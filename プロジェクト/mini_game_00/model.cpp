@@ -130,7 +130,8 @@ void CModel::Update(void)
 void CModel::Draw(void)
 {
 	LPDIRECT3DDEVICE9 device = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスの取得
-	DWORD pass_flag = PASS_3D | PASS_LIGHT;
+	DWORD enable_light = 0;
+	DWORD pass_flag = PASS_3D;
 
 	//--------------------------------------
 	// マトリックスの設定
@@ -202,6 +203,15 @@ void CModel::Draw(void)
 
 		// 現在のマテリアルを取得
 		device->GetMaterial(&matDef);
+
+		// ライトの状態取得
+		device->GetRenderState(D3DRS_LIGHTING, &enable_light);
+
+		// ライトがある場合フラグを追加
+		if (enable_light != 0)
+		{
+			pass_flag |= PASS_LIGHT;
+		}
 
 		// マテリアルデータのポインタ
 		pMat = (D3DXMATERIAL*)m_model_data[static_cast<int>(m_file_data.type[m_pas])].buff_mat->GetBufferPointer();
