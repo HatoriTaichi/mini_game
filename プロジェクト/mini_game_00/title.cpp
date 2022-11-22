@@ -62,7 +62,7 @@ HRESULT CTitle::Init(void)
 								D3DXToRadian(90.0f),
 								1.0f,
 								0.1f,
-								0.0f);
+								light_length);
 
 	// ƒxƒNƒgƒ‹‚ğ³‹K‰»
 	D3DXVec3Normalize(&vec_light, &vec_light);
