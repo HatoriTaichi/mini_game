@@ -40,8 +40,8 @@ public:
 	TEX_SIZE GetTexture_Size(void) { return m_tex_size; }	// テクスチャのサイズの取得
 
 private:
-	LPD3DXSPRITE m_sprite = nullptr;	// スプライト
-	LPDIRECT3DTEXTURE9 m_texture = nullptr;	// テクスチャへのポインタ
+	LPD3DXSPRITE m_sprite;	// スプライト
+	LPDIRECT3DTEXTURE9 m_texture;	// テクスチャへのポインタ
 	TEX_SIZE m_tex_size;	// テクスチャサイズ
 	D3DXCOLOR m_col;	// カラー
 	D3DXVECTOR3 m_pos;	// ポリゴンの原点

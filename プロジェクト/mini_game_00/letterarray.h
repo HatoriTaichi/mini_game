@@ -35,7 +35,7 @@ public:
 	vector<CLetter*> GetLetter(void) {return m_letter; }	// 文字配列の取得
 	string GetText(void) { return m_text; }	// テキストの取得
 	int GetSize(void) { return m_font_size; }	// サイズの取得
-	static CLetterArray*Create(D3DXVECTOR3 first_pos, int font_size, int font_weight, int showing_delay, string text, D3DXCOLOR col);	// 生成処理
+	static CLetterArray*Create(D3DXVECTOR3 first_pos, int font_size, int font_weight, int showing_delay, int new_line, string text, D3DXCOLOR col);	// 生成処理
 
 private:
 	vector<CLetter*> m_letter;	// 文字クラス
@@ -47,6 +47,7 @@ private:
 	int m_showing_delay;	// ディレイ
 	int m_delay_count;	// カウント
 	int m_now_showing;	// 今出している文字
+	int m_new_line;	// 改行する文字
 };
 
 #endif

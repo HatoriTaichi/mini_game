@@ -98,7 +98,7 @@ HRESULT CTitle::Init(void)
 
 	//CSprite::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), "•ž.png");
 
-	m_letter_array = CLetterArray::Create(D3DXVECTOR3(0.0f + 50.0f, 0.0f + 50.0f, 0.0f), 100, 50, FPS / 2, "AiJKlBIMjGtX;C:", D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	m_letter_array = CLetterArray::Create(D3DXVECTOR3(0.0f + 50.0f, 0.0f + 50.0f, 0.0f), 100, 50, FPS / 2, 5, "AiJKlBIMjGtX;C:", D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 
 	return S_OK;
 }

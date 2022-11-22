@@ -15,16 +15,17 @@
 //=============================================================================
 CSprite::CSprite()
 {
-	m_sprite = nullptr;	// スプライト
-	m_texture = nullptr;	// テクスチャへのポインタ
-	m_tex_size.x = 0;	// テクスチャサイズ
-	m_tex_size.y = 0;	// テクスチャサイズ
-	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	// カラー
-	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// ポリゴンの原点
-	m_center = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 制御点
-	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 回転
-	D3DXMatrixIdentity(&m_mat);	// マトリッックス
-	m_tex_pas.clear();	// テクスチャタイプ
+	m_sprite = nullptr;
+	m_texture = nullptr;
+	m_tex_size.x = 0;
+	m_tex_size.y = 0;
+	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_center = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	D3DXMatrixIdentity(&m_mat);
+	m_tex_pas.clear();
+	m_is_letter = false;
 }
 
 //=============================================================================
