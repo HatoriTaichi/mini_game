@@ -62,7 +62,7 @@ HRESULT CTitle::Init(void)
 								D3DXToRadian(90.0f),
 								1.0f,
 								0.1f,
-								light_length);
+		light_length);
 
 	// ÉxÉNÉgÉãÇê≥ãKâª
 	D3DXVec3Normalize(&vec_light, &vec_light);
@@ -93,12 +93,12 @@ HRESULT CTitle::Init(void)
 	//CSingleModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/boneanim.fbx", CSingleModel::MODEL_FILE::FBX);
 	//CSingleModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/anim_my_mdoel.fbx", CSingleModel::MODEL_FILE::FBX);
 	//CSingleModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/witch_hat000.fbx", CSingleModel::MODEL_FILE::FBX);
-	CSingleModel::Create(D3DXVECTOR3(50.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "Player000.x", CSingleModel::MODEL_FILE::X);
+	CSingleModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "Player000.x", CSingleModel::MODEL_FILE::X);
 	//CSingleModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Loika.fbx", CSingleModel::MODEL_FILE::FBX);
 
 	//CSprite::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), "ïû.png");
 
-	m_letter_array = CLetterArray::Create(D3DXVECTOR3(0.0f + 50.0f, 0.0f + 50.0f, 0.0f), 100, 50, FPS / 2, 5, "AiJKlBIMjGtX;C:", D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	//m_letter_array = CLetterArray::Create(D3DXVECTOR3(0.0f + 50.0f, 0.0f + 50.0f, 0.0f), 100, 50, FPS / 2, 5, "AiJKlBIMjGtX;C:", D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 
 	return S_OK;
 }

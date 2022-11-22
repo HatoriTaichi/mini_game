@@ -49,11 +49,35 @@ CCamera::~CCamera()
 //=============================================================================
 HRESULT CCamera::Init(D3DXVECTOR3 PosV, D3DXVECTOR3 PosR, D3DXVECTOR3 Rot)
 {
+	LPDIRECT3DDEVICE9 pDevice;	//デバイスのポインタ
+	pDevice = CManager::GetRenderer()->GetDevice();		//デバイスを取得する
+
 	m_pos_v = PosV;
 	m_pos_r = PosR;
 	m_rot = Rot;
 	m_vec_u = (D3DXVECTOR3(0.0f, 1.0f, 0.0f));
 	m_long = CAMERA_DESTAANCE;
+
+	//---------------------------
+	// マトリックスの設定
+	//---------------------------
+	D3DXMatrixIdentity(&m_mtx_projection);	// マトリックス初期化
+
+	// マトリックスの作成
+	D3DXMatrixPerspectiveFovLH(	&m_mtx_projection,
+								D3DXToRadian(m_zoom),	// 視野角
+								(float)SCREEN_WIDTH / (float)SCREEN_HEIGHT,
+								CAMERA_MIN_RENDERER,	// カメラの最小描画距離
+								CAMERA_MAX_RENDERER);	// カメラの最大描画距離
+
+	// プロジェクションマトリックス設定
+	pDevice->SetTransform(	D3DTS_PROJECTION,
+							&m_mtx_projection);
+
+	// シェーダにプロジェクションマトリックスを設定
+	CManager::GetInstance()->GetRenderer()->SetEffectMatrixProj(m_mtx_projection);
+
+	SetCamera();
 
 	return S_OK;
 }
@@ -99,19 +123,6 @@ void CCamera::SetCamera(void)
 	//---------------------------
 	//マトリックスの設定
 	//---------------------------
-	D3DXMatrixIdentity(&m_mtx_projection);	//マトリックス初期化
-
-	//マトリックスの作成
-	D3DXMatrixPerspectiveFovLH(	&m_mtx_projection,
-								D3DXToRadian(m_zoom),	//視野角
-								(float)SCREEN_WIDTH / (float)SCREEN_HEIGHT,
-								CAMERA_MIN_RENDERER,		//カメラの最小描画距離
-								CAMERA_MAX_RENDERER);	//カメラの最大描画距離
-
-	//プロジェクションマトリックス設定
-	pDevice->SetTransform(	D3DTS_PROJECTION,
-							&m_mtx_projection);
-
 	//ビューマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtx_view);
 
@@ -124,9 +135,6 @@ void CCamera::SetCamera(void)
 	//ビューマトリックスの設定
 	pDevice->SetTransform(	D3DTS_VIEW,
 							&m_mtx_view);
-
-	//シェーダにプロジェクションマトリックスを設定
-	CManager::GetInstance()->GetRenderer()->SetEffectMatrixProj(m_mtx_projection);
 
 	//シェーダにビューマトリックスを設定
 	CManager::GetInstance()->GetRenderer()->SetEffectMatrixView(m_mtx_view);
