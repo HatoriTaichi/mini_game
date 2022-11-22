@@ -45,6 +45,8 @@ private:
 	bool m_bMoveStop;
 	CObject2D *m_pTitleLogo;//タイトルロゴ
 	CObject2D *m_pTitleMenu;//タイトルロゴ
+	CObject2D *m_pTitleBg;//タイトルロゴ
+	CObject2D *m_pTitleKeyHelp;//タイトルロゴ
 	CSelect_Botton *m_pPushStart;
 	CSelect_Botton *m_pPushMenu;
 	int m_bEndTimer;

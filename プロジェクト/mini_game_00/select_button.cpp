@@ -24,7 +24,11 @@ static const int FlashTimeMin = 2;
 static const D3DXCOLOR FrameCol = { 0.0f,0.0f,0.0f,0.0 };
 static const float ScaleDiameter = 1.1f;
 static const float FlameDiameter = 1.05f;
-static const float AddSpeedRate = 60.0f;
+static const float AddSpeedRate = 65.0f;
+static const float UpDownSpeed = 0.05f;
+static const float UpLimit = 1.0f;
+static const float DownLimit = -1.0f;
+
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
@@ -33,7 +37,9 @@ CSelect_Botton::CSelect_Botton(LAYER_TYPE layer) : CObject(layer)
 	m_bFadeState = false;
 	m_pUIFrame = nullptr;
 	m_pUI = nullptr;
+	m_fUpDownPos = 0.0f;
 	m_bUIInflate = true;
+	m_bUpDown = false;
 }
 
 //=============================================================================
@@ -85,8 +91,10 @@ void CSelect_Botton::Update(void)
 		break;
 	case CSelect_Botton::State::Push:
 		Push();
+		SelectMotion();
 		break;
 	case CSelect_Botton::State::Select:
+		SelectMotion();
 		Select();
 		break;
 	case CSelect_Botton::State::End:
@@ -118,6 +126,7 @@ CSelect_Botton *CSelect_Botton::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale,string
 	{
 		// 値を代入
 		Ingredients->m_pos = pos;
+		Ingredients->m_offset_pos = pos;
 		Ingredients->m_scale = scale;
 		Ingredients->m_offset_scale = scale;
 
@@ -220,10 +229,46 @@ void CSelect_Botton::Normal(void)
 	if (m_pUIFrame)
 	{
 		m_pUIFrame->SetCol({ FrameCol.r,FrameCol.b,FrameCol.g,0.0f });
+		m_pUIFrame->SetPos(m_offset_pos);
+
 	}
 	//UIのα値を0.5fにする
-	if (m_pUIFrame)
+	if (m_pUI)
 	{
 		m_pUI->SetCol({ 1.0f,1.0f,1.0f,0.5f });
+		m_pUI->SetPos(m_offset_pos);
+	}
+	m_fUpDownPos = 0.0f;
+	m_bUpDown = false;
+	m_pos = m_offset_pos;
+}
+
+void CSelect_Botton::SelectMotion(void)
+{
+	if (m_bUpDown)
+	{
+		m_fUpDownPos += UpDownSpeed;
+	}
+	else
+	{
+		m_fUpDownPos -= UpDownSpeed;
+	}
+	if (m_fUpDownPos >= UpLimit)
+	{
+		m_bUpDown = false;
+	}
+	else if (m_fUpDownPos <= DownLimit)
+	{
+		m_bUpDown = true;
+	}
+	m_pos.y += m_fUpDownPos;
+	//位置を代入
+	if (m_pUIFrame)
+	{
+		m_pUIFrame->SetPos(m_pos);
+	}
+	if (m_pUIFrame)
+	{
+		m_pUI->SetPos(m_pos);
 	}
 }

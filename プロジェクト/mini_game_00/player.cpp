@@ -165,7 +165,7 @@ void CPlayer::Update(void)
 		DropItem();
 	}
 	////テストで取得した具材を増やす処理
-	//TestGetIngredients();
+	TestGetIngredients();
 	//敵などに当たったら一定時間操作を聞かないようにする
 	if (m_PlayerData.m_bOperationLock)
 	{
@@ -690,7 +690,7 @@ void CPlayer::TestGetIngredients(void)
 		std::random_device random;	// 非決定的な乱数生成器
 		std::mt19937_64 mt(random());            // メルセンヌ・ツイスタの64ビット版、引数は初期シード
 		std::uniform_real_distribution<> randType(0, 5);
-		std::uniform_real_distribution<> randNum(0, 35);
+		std::uniform_real_distribution<> randNum(5, 99);
 		int nMax = static_cast <int>(randNum(mt));
 		for (int nType = 0; nType < 5; nType++)
 		{
