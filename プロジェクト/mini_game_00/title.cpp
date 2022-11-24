@@ -22,21 +22,26 @@
 #include "select_botton.h"
 #include "object2D.h"
 #define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(0.0f), D3DXToRadian(30.0f),D3DXToRadian(0.0f)))	// カメラの向き
-#define TITLELOGO_POS (D3DXVECTOR3(500.0f, 100.0f,0.0f))	// タイトルロゴの位置
+#define TITLELOGO_POS (D3DXVECTOR3(640.0f, 200.0f,0.0f))	// タイトルロゴの位置
 #define TITLELOGO_SIZE (D3DXVECTOR3(200.0f, 200.0f,0.0f))	// タイトルロゴの位置
-#define TITLEMENU_POS (D3DXVECTOR3(500.0f, 300.0f,0.0f))	// タイトルロゴの位置
-#define TITLEMENU_SIZE (D3DXVECTOR3(720.0f, 360.0f,0.0f))	// タイトルロゴの位置
-#define PUSHSTART_POS (D3DXVECTOR3(300.0f, 300.0f,0.0f))	// スタートボタンの位置
+#define TITLEBG_POS (D3DXVECTOR3(640.0f, 360.0f,0.0f))	// タイトルロゴの位置
+#define TITLEBG_SIZE (D3DXVECTOR3(640.0f, 360.0f,0.0f))	// タイトルロゴの位置
+#define TITLEKEY_HELP_SIZE (D3DXVECTOR3(640.0f, 40.0f,0.0f))	// タイトルロゴの位置
+#define TITLEKEY_HELP_POS (D3DXVECTOR3(640.0f, 680.0f,0.0f))	// タイトルロゴの位置
+#define TITLEMENU_POS (D3DXVECTOR3(640.0f, 320.0f,0.0f))	// タイトルロゴの位置
+#define TITLEMENU_SIZE (D3DXVECTOR3(640.0f/1.2f, 360.0f/1.2f,0.0f))	// タイトルロゴの位置
+#define PUSHSTART_POS (D3DXVECTOR3((SCREEN_WIDTH /6)*2, 500.0f,0.0f))	// スタートボタンの位置
 #define PUSHSTART_SIZE (D3DXVECTOR3(150.0f, 100.0f,0.0f))	// スタートボタンの位置
-#define PUSHMENU_POS (D3DXVECTOR3(800.0f, 300.0f,0.0f))	// 具材のメニューの位置
+#define PUSHMENU_POS (D3DXVECTOR3((SCREEN_WIDTH /6)*4, 500.0f,0.0f))	// 具材のメニューの位置
 #define PUSHMENU_SIZE (D3DXVECTOR3(150.0f, 100.0f,0.0f))	// 具材のメニューの位置
-
+#define ROT_SPEED (0.002f)//回転速度
 #define ENDTIME (40)
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
 CTitle::CTitle(CObject::LAYER_TYPE layer) :CObject(layer)
 {
+	
 	m_pTitleLogo = nullptr;
 	m_bNextMode = false;
 	m_pPushStart = nullptr;
@@ -45,6 +50,8 @@ CTitle::CTitle(CObject::LAYER_TYPE layer) :CObject(layer)
 	m_bBottonPush = false;
 	m_bMoveStop = false;
 	m_pTitleMenu = nullptr;
+	m_pTitleBg = nullptr;
+	m_pTitleKeyHelp = nullptr;
 }
 
 //=============================================================================
@@ -64,11 +71,20 @@ HRESULT CTitle::Init(void)
 
 	StageCreate();
 	
+	if (!m_pTitleBg)
+	{
+		m_pTitleBg = CObject2D::Create(TITLEBG_POS, TITLEBG_SIZE, "test000.png");
+		m_pTitleBg->SetCol({ 1.0,1.0,1.0,0.2f });
+	}
+
 	if (!m_pTitleLogo)
 	{
 		m_pTitleLogo = CObject2D::Create(TITLELOGO_POS, TITLELOGO_SIZE, "logo.png");
 	}
-
+	if (!m_pTitleKeyHelp)
+	{
+		m_pTitleKeyHelp = CObject2D::Create(TITLEKEY_HELP_POS, TITLEKEY_HELP_SIZE, "Key_Help000.png");
+	}
 	if (!m_pPushStart)
 	{
 		m_pPushStart = CSelect_Botton::Create(PUSHSTART_POS, PUSHSTART_SIZE, "Game_start000.png");
@@ -79,7 +95,7 @@ HRESULT CTitle::Init(void)
 	}
 	if (!m_pTitleMenu)
 	{
-		m_pTitleMenu = CObject2D::Create(TITLEMENU_POS, TITLEMENU_SIZE, "logo.png");
+		m_pTitleMenu = CObject2D::Create(TITLEMENU_POS, TITLEMENU_SIZE, "menu.png");
 		m_pTitleMenu->SetCol({ 1.0,1.0,1.0,0.0f });
 	}
 	m_bEnd = false;
@@ -106,6 +122,16 @@ void CTitle::Uninit(void)
 		m_pTitleLogo->Uninit();
 		m_pTitleLogo = nullptr;
 	}
+	if (m_pTitleBg)
+	{
+		m_pTitleBg->Uninit();
+		m_pTitleBg = nullptr;
+	}
+	if (m_pTitleKeyHelp)
+	{
+		m_pTitleKeyHelp->Uninit();
+		m_pTitleKeyHelp = nullptr;
+	}
 	if (m_pTitleMenu)
 	{
 		m_pTitleMenu->Uninit();
@@ -122,13 +148,16 @@ void CTitle::Update(void)
 {
 	CameraRotMove();//カメラが回転する処理
 	BottonSelect();//選択処理
-	CKey *key = CManager::GetInstance()->GetKey();
 
+	//buttonの選択状態ではなかったら
 	if (!m_bBottonPush)
 	{
+		CKey *key = CManager::GetInstance()->GetKey();
+
 		//決定ボタンを押すと
 		if (key->GetTrigger(CKey::KEYBIND::SPACE) == true)
 		{
+			//選択した状態にする
 			m_bBottonPush = true;
 		}
 		switch (m_nSelectBottonType)
@@ -162,6 +191,7 @@ void CTitle::Update(void)
 	}
 	else
 	{
+		CKey *key = CManager::GetInstance()->GetKey();
 
 		switch (m_nSelectBottonType)
 		{
@@ -172,7 +202,9 @@ void CTitle::Update(void)
 				if (m_pPushStart)
 				{
 					m_pPushStart->SetState(CSelect_Botton::State::Push);
+					//終了状態にする
 					m_bEnd = true;
+					//UIの動きを止める
 					m_bMoveStop = true;
 
 				}
@@ -187,7 +219,9 @@ void CTitle::Update(void)
 				if (m_pPushMenu)
 				{
 					m_pPushMenu->SetState(CSelect_Botton::State::Push);
+					//UIの動きを止める
 					m_bMoveStop = true;
+					//UIの色を変える
 					m_pTitleMenu->SetCol({ 1.0,1.0,1.0,1.0f });
 
 				}
@@ -199,8 +233,8 @@ void CTitle::Update(void)
 				m_bBottonPush = false;
 				m_bMoveStop = false;
 				m_pTitleMenu->SetCol({ 1.0,1.0,1.0,0.0f });
-
 			}
+
 			break;
 
 		}
@@ -237,7 +271,7 @@ void CTitle::BottonSelect(void)
 	{
 		m_nSelectBottonType = CTitle::BOTTON_TYPE::Start;
 	}
-	else if (key->GetTrigger(CKey::KEYBIND::D) == true)
+	if (key->GetTrigger(CKey::KEYBIND::D) == true)
 	{
 		m_nSelectBottonType = CTitle::BOTTON_TYPE::Menu;
 
@@ -305,6 +339,6 @@ void CTitle::StageCreate(void)
 void CTitle::CameraRotMove(void)
 {
 	D3DXVECTOR3 rot = CManager::GetInstance()->GetCamera()->GetRot();
-	rot.x += 0.005f;
+	rot.x += ROT_SPEED;
 	CManager::GetInstance()->GetCamera()->SetRot(rot);
 }

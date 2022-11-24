@@ -48,10 +48,12 @@ private:
 	void Push(void);//押したときの処理
 	void Select(void);//選択したときの処理
 	void Normal(void);//通常時の状態
+	void SelectMotion(void);//ちょっとした動きの処理
 	CObject2D *m_pUI;
 	CObject2D *m_pUIFrame;//UIの枠
 	State m_state;//状態
 	D3DXVECTOR3 m_pos;	// 位置
+	D3DXVECTOR3 m_offset_pos;	// 位置
 	D3DXVECTOR3 m_rot;	// 向き
 	D3DXVECTOR3 m_scale;	// スケール
 	D3DXVECTOR3 m_offset_scale;	// スケール
@@ -59,10 +61,13 @@ private:
 	int m_nTimer;
 	int m_nMaxPopTime;//出現時間
 	int m_nMaxFadeTime;//フェードインアウトの時間
+	float m_fUpDownPos;
 	bool m_bUninit;
 	bool m_bFadeState;
 	bool m_bFlash;
 	bool m_bUIInflate;//膨らみ
+	bool m_bUpDown;
+
 };
 
 #endif

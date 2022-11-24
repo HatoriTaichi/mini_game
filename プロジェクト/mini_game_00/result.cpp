@@ -38,6 +38,7 @@ static const D3DXVECTOR3 ComboScorePosInit1 = { 170.0f,500.0f,0.0f };
 static const D3DXVECTOR3 ComboScorePosInit2 = { 810.0f,500.0f,0.0f };
 static const D3DXVECTOR3 ComboCntSize = { 14.0f,20.0f,0.0f };
 static const D3DXVECTOR3 ComboSize = { 100.0f,15.0f,0.0f };
+static const D3DXVECTOR3 ComboBgSize = { 100.0f,15.0f,0.0f };
 static const float ComboFontSize = 20.0f;
 static const int ComboNumX = 2;
 static const float ComboPopInterval = ComboSize.x * 2.9f;
@@ -336,9 +337,30 @@ void CResult::ComboStaging(void)
 			m_nStateTimer[nCntPlayer] = 0;
 			D3DXVECTOR3 ComboPos = { posInit[nCntPlayer].x + (ComboPopInterval * m_nCntCombo_X[nCntPlayer]),
 				posInit[nCntPlayer].y + (ComboPopInterval_Y * m_nCntCombo_Y[nCntPlayer]),0.0f };
-			//ãÔçﬁÇÃâÊëúÇê∂ê¨
-			m_pComboShowing[m_nCntCombo[nCntPlayer]][nCntPlayer] = 
-				CTelop::Create(ComboPos, { ComboSize.x ,ComboSize.y ,0.0f }, ComboFontSize,"data/Txt/TextTelop.txt", m_nCntCombo[nCntPlayer]);
+			switch (m_nComboScoreType[m_nCntCombo[nCntPlayer]])
+			{
+			case ComboPointBronze:
+				//ãÔçﬁÇÃâÊëúÇê∂ê¨
+				m_pComboShowing[m_nCntCombo[nCntPlayer]][nCntPlayer] =
+					CTelop::Create(ComboPos, { ComboSize.x ,ComboSize.y ,0.0f }, ComboBgSize,
+						ComboFontSize, "data/Txt/TextTelop.txt", "Bronze_Frame000.png", m_nCntCombo[nCntPlayer]);
+
+				break;
+			case ComboPointSilver:
+				//ãÔçﬁÇÃâÊëúÇê∂ê¨
+				m_pComboShowing[m_nCntCombo[nCntPlayer]][nCntPlayer] =
+					CTelop::Create(ComboPos, { ComboSize.x ,ComboSize.y ,0.0f }, ComboBgSize,
+						ComboFontSize, "data/Txt/TextTelop.txt", "Silver_Frame000.png", m_nCntCombo[nCntPlayer]);
+
+				break;
+			case ComboPointGold:
+				//ãÔçﬁÇÃâÊëúÇê∂ê¨
+				m_pComboShowing[m_nCntCombo[nCntPlayer]][nCntPlayer] =
+					CTelop::Create(ComboPos, { ComboSize.x ,ComboSize.y ,0.0f }, ComboBgSize,
+						ComboFontSize, "data/Txt/TextTelop.txt", "Gold_Frame000.png", m_nCntCombo[nCntPlayer]);
+
+					break;
+			}
 			//ãÔçﬁå¬êîÇâ¡éZ
 			m_nCntCombo[nCntPlayer]++;
 			m_nCntCombo_X[nCntPlayer]++;
@@ -441,8 +463,8 @@ void CResult::ComboScoreCnt(void)
 	posInit[0] = ComboScorePosInit1;
 	posInit[1] = ComboScorePosInit2;
 	int nComboScore[MAX_PLAYER];
-	nComboScore[0] = m_nComboMaxScore[0] / 10;
-	nComboScore[1] = m_nComboMaxScore[1] / 10;
+	nComboScore[0] = m_nComboMaxScore[0] / 50;
+	nComboScore[1] = m_nComboMaxScore[1] / 50;
 
 	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
 	{
@@ -461,6 +483,7 @@ void CResult::ComboScoreCnt(void)
 		}
 		else
 		{
+			m_pComboScoreCounter[nCntPlayer]->SetCounterNum(m_nComboMaxScore[nCntPlayer]);
 			m_bComboScoreMaxCnt[nCntPlayer] = true;
 		}
 	}

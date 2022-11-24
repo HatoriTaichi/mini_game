@@ -84,11 +84,9 @@ CIngredients::~CIngredients()
 HRESULT CIngredients::Init(void)
 {
 	SetObjType(CObject::OBJTYPE::INGREDIENTS);
-
 	m_bUninit = false;
 	//‹ïŞ‚Ìƒ‚ƒfƒ‹‚ğ¶¬
 	CreateIngredient();
-
 	return S_OK;
 }
 

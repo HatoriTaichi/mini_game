@@ -23,7 +23,7 @@ class CObject2D;
 class CMove_UI : public CObject
 {
 public:
-	enum UI_Type
+	enum class UI_Type
 	{
 		Type_Start = 0,
 		Type_LastSpurt,
@@ -32,7 +32,7 @@ public:
 		Type_Max
 	};
 
-	enum State
+	enum class State
 	{
 		ImmediatelyAfterPop = 0,//èoåªíºå„
 		Normal,
