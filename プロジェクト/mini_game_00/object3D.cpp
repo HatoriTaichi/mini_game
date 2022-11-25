@@ -87,8 +87,8 @@ void CObject3D::Draw(void)
 {
 	LPDIRECT3DDEVICE9 device = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスの取得
 	D3DXMATRIX mtx_rot, mtx_trans;	// 計算用マトリックス
-	DWORD enable_light = 0;
-	DWORD pass_flag = PASS_3D;
+	DWORD enable_light = 0;	// ライトがあるか
+	DWORD pass_flag = PASS_3D;	// シェーダーの描画フラグ
 
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtx_world);

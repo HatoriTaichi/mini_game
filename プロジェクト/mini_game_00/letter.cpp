@@ -142,7 +142,7 @@ void CLetter::CreateTexture(void)
 	LPDIRECT3DDEVICE9 device = CManager::GetRenderer()->GetDevice();	// デバイスを取得する
 
 	// フォントの生成
-	LOGFONT lf = { m_font_size, 0, m_font_rot, 0, m_font_weight, m_is_italic, TRUE, 0, SHIFTJIS_CHARSET, OUT_TT_ONLY_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("") };
+	LOGFONT lf = { m_font_size, 0, static_cast<LONG>(m_font_rot), 0, m_font_weight, static_cast<BYTE>(m_is_italic), TRUE, 0, SHIFTJIS_CHARSET, OUT_TT_ONLY_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("") };
 	memcpy(lf.lfFaceName, m_font_name.c_str(), sizeof(m_font_name));
 	HFONT font = CreateFontIndirect(&lf);
 

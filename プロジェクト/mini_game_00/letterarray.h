@@ -35,7 +35,7 @@ public:
 	vector<CLetter*> GetLetter(void) {return m_letter; }	// 文字配列の取得
 	string GetText(void) { return m_text; }	// テキストの取得
 	int GetSize(void) { return m_font_size; }	// サイズの取得
-	void ChangeText(string text);	// 表示テキストの変更
+	void ChangeText(string text, D3DXVECTOR3 first_pos, int font_size, int font_weight, int showing_delay, int new_line, float font_rot, BOOL is_italic, D3DXCOLOR col, string font_name);	// 表示テキストの変更
 	static CLetterArray*Create(D3DXVECTOR3 first_pos, int font_size, int font_weight, int showing_delay, int new_line, float font_rot, BOOL is_italic, string text, D3DXCOLOR col, string font_name);	// 生成処理
 
 private:

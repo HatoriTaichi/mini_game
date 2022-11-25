@@ -126,7 +126,7 @@ void CTitle::Update(void)
 	}
 	if (key->GetTrigger(CKey::KEYBIND::S) == true)
 	{
-		m_letter_array->ChangeText("‚³‚µ‚·‚¹‚»‚½‚¿‚Â‚Ä‚Æ");
+		m_letter_array->ChangeText("‚³‚µ‚·‚¹‚»‚½‚¿‚Â‚Ä‚Æ‚È‚É‚Ê‚Ë‚Ì", D3DXVECTOR3(0.0f + (150 / 2), 0.0f + (150 / 2), 0.0f), 150, 50, FPS / 4, 8, 0.0f, TRUE, D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f), "‚¯‚¢‚Ó‚§‚ñ‚Æ");
 	}
 }
 

@@ -27,7 +27,7 @@ CLetterArray::CLetterArray(LAYER_TYPE Layer) : CObject(Layer)
 	m_now_showing = 0;
 	m_new_line = 0;
 	m_font_rot = 0.0f;
-	m_is_italic = FALSE
+	m_is_italic = FALSE;
 }
 
 //=============================================================================
@@ -183,10 +183,19 @@ void CLetterArray::Draw(void)
 //=============================================================================
 // テキストの変更
 //=============================================================================
-void CLetterArray::ChangeText(string text)
+void CLetterArray::ChangeText(string text, D3DXVECTOR3 first_pos, int font_size, int font_weight, int showing_delay, int new_line, float font_rot, BOOL is_italic, D3DXCOLOR col, string font_name)
 {
 	// 保存
 	m_text = text;
+	m_first_pos = first_pos;
+	m_font_size = font_size;
+	m_font_weight = font_weight;
+	m_showing_delay = showing_delay;
+	m_new_line = new_line;
+	m_font_rot = font_rot;
+	m_is_italic = is_italic;
+	m_col = col;
+	m_font_name = font_name;
 
 	vector<wstring> buf;	// 変換後文字列
 	D3DXVECTOR3 distance_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置差分
