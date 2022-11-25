@@ -37,7 +37,8 @@ public:
 	void SetPos(D3DXVECTOR3 pos) { m_pos = pos; }	// 位置を設定
 	void SetCol(D3DXCOLOR col) { m_col = col; }	// カラーを設定
 	void SetCenter(D3DXVECTOR3 center) { m_center = center; }	// 制御点を設定
-	TEX_SIZE GetTexture_Size(void) { return m_tex_size; }	// テクスチャのサイズの取得
+	TEX_SIZE GetTextureSize(void) { return m_tex_size; }	// テクスチャのサイズの取得
+	void ChangeTexture(LPDIRECT3DTEXTURE9 tex);	// テクスチャの変更
 
 private:
 	LPD3DXSPRITE m_sprite;	// スプライト

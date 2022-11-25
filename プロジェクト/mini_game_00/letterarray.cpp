@@ -19,12 +19,15 @@ CLetterArray::CLetterArray(LAYER_TYPE Layer) : CObject(Layer)
 	m_first_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	m_text.clear();
+	m_font_name.clear();
 	m_font_size = 0;
 	m_font_weight = 0;
 	m_showing_delay = 0;
 	m_delay_count = 0;
 	m_now_showing = 0;
 	m_new_line = 0;
+	m_font_rot = 0.0f;
+	m_is_italic = FALSE
 }
 
 //=============================================================================
@@ -53,7 +56,7 @@ HRESULT CLetterArray::Init(void)
 	for (int text_count = 0; text_count < text_size; text_count++)
 	{
 		// 文字を生成
-		m_letter.push_back(CLetter::Create(D3DXVECTOR3(m_first_pos.x + distance_pos.x, m_first_pos.y + distance_pos.y, m_first_pos.z), D3DXVECTOR3(0.0f, 0.0f, 0.0f), m_font_size, m_font_weight, buf[0][text_count]));
+		m_letter.push_back(CLetter::Create(D3DXVECTOR3(m_first_pos.x + distance_pos.x, m_first_pos.y + distance_pos.y, m_first_pos.z), D3DXVECTOR3(0.0f, 0.0f, 0.0f), m_font_size, m_font_weight, m_font_rot, m_is_italic, buf[0][text_count], m_font_name));
 
 		// 改行数に達していたら
 		if (text_count - (m_new_line * line_count) >= m_new_line)
@@ -111,7 +114,6 @@ HRESULT CLetterArray::Init(void)
 			m_letter[text_count]->GetSprite()->SetCol(m_col);
 		}
 	}
-
 
 	return S_OK;
 }
@@ -179,9 +181,101 @@ void CLetterArray::Draw(void)
 }
 
 //=============================================================================
+// テキストの変更
+//=============================================================================
+void CLetterArray::ChangeText(string text)
+{
+	// 保存
+	m_text = text;
+
+	vector<wstring> buf;	// 変換後文字列
+	D3DXVECTOR3 distance_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 位置差分
+	int line_count = 0;	// 何回改行
+	bool is_new_line = false;	// 改行されたか
+
+	buf = CLetter::Conbrt(m_text);	// 変換
+	int text_max = buf[0].size();	// サイズを取得
+	int letter_max = m_text.size();	// 文字列サイズ
+
+	// 文字列分のループ
+	for (int count_letter = 0; count_letter < text_max; count_letter++)
+	{
+		// 破棄
+		m_letter[count_letter]->Uninit();
+	}
+
+	// 破棄
+	m_letter.clear();
+
+	// テキスト分のループ
+	for (int count_letter = 0;  count_letter < text_max;  count_letter++)
+	{
+		// 文字を生成
+		m_letter.push_back(CLetter::Create(D3DXVECTOR3(m_first_pos.x + distance_pos.x, m_first_pos.y + distance_pos.y, m_first_pos.z), D3DXVECTOR3(0.0f, 0.0f, 0.0f), m_font_size, m_font_weight, m_font_rot, m_is_italic, buf[0][count_letter], m_font_name));
+
+		// 改行数に達していたら
+		if (count_letter - (m_new_line * line_count) >= m_new_line)
+		{
+			// 改行数
+			line_count++;
+
+			// 改行した
+			is_new_line = true;
+		}
+
+		// 最初の文字じゃなかったら
+		if (count_letter != 0)
+		{
+			// 制御点を取得
+			D3DXVECTOR3 old_center = m_letter[count_letter - 1]->GetSprite()->GetCenter();
+			D3DXVECTOR3 center = m_letter[count_letter]->GetSprite()->GetCenter();
+
+			// 位置の差分
+			distance_pos.x += old_center.x + center.x;
+
+			// 改行されていたら
+			if (is_new_line)
+			{
+				// 制御点を取得
+				D3DXVECTOR3 old_center = m_letter[count_letter - m_new_line]->GetSprite()->GetCenter();
+				D3DXVECTOR3 center = m_letter[count_letter]->GetSprite()->GetCenter();
+
+				// 位置の差分
+				distance_pos.y += old_center.y + center.y;
+
+				// Xをリセット
+				distance_pos.x = 0;
+			}
+		}
+
+		// 位置を変更
+		m_letter[count_letter]->GetSprite()->SetPos(D3DXVECTOR3(m_first_pos.x + distance_pos.x, m_first_pos.y + distance_pos.y, m_first_pos.z));
+
+		// カラーを適用
+		m_letter[count_letter]->GetSprite()->SetCol(m_col);
+
+		// 改行してない
+		is_new_line = false;
+	}
+
+	// ディレイが設定されていたら
+	if (m_showing_delay != 0)
+	{
+		m_col.a = 0;
+		// 文字数分のループ
+		for (int text_count = 1; text_count < text_max; text_count++)
+		{
+			// 透明化
+			m_letter[text_count]->GetSprite()->SetCol(m_col);
+		}
+	}
+	m_now_showing = 0;
+}
+
+//=============================================================================
 // 生成処理
 //=============================================================================
-CLetterArray *CLetterArray::Create(D3DXVECTOR3 first_pos, int font_size, int font_weight, int showing_delay, int new_line, string text, D3DXCOLOR col)
+CLetterArray *CLetterArray::Create(D3DXVECTOR3 first_pos, int font_size, int font_weight, int showing_delay, int new_line, float font_rot, BOOL is_italic, string text, D3DXCOLOR col, string font_name)
 {
 	// 文字のポインタ
 	CLetterArray *letter_array = nullptr;
@@ -196,8 +290,11 @@ CLetterArray *CLetterArray::Create(D3DXVECTOR3 first_pos, int font_size, int fon
 		letter_array->m_font_size = font_size;
 		letter_array->m_font_weight = font_weight;
 		letter_array->m_text = text;
+		letter_array->m_font_rot = font_rot;
+		letter_array->m_is_italic = is_italic;
 		letter_array->m_showing_delay = showing_delay;
 		letter_array->m_new_line = new_line;
+		letter_array->m_font_name = font_name;
 
 		// 初期化
 		letter_array->Init();

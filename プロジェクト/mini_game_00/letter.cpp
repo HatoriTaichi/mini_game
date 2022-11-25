@@ -19,8 +19,12 @@ CLetter::CLetter()
 {
 	m_sprite = nullptr;
 	m_texture = nullptr;
+	m_font_name.clear();
+	m_text = 0;
 	m_font_size = 0;
 	m_font_weight = 0;
+	m_font_rot = 0.0f;
+	m_is_italic = FALSE;
 }
 
 //=============================================================================
@@ -67,7 +71,7 @@ void CLetter::Draw(void)
 //=============================================================================
 // 生成処理
 //=============================================================================
-CLetter *CLetter::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int font_size, int font_weight, wchar_t text)
+CLetter *CLetter::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int font_size, int font_weight, float font_rot, BOOL is_italic, wchar_t text, string font_name)
 {
 	// 文字のポインタ
 	CLetter *letter = nullptr;
@@ -80,6 +84,9 @@ CLetter *CLetter::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int font_size, int fo
 		letter->m_font_size = font_size;
 		letter->m_font_weight = font_weight;
 		letter->m_text = text;
+		letter->m_is_italic = is_italic;
+		letter->m_font_name = font_name;
+		letter->m_font_rot = font_rot;
 		letter->CreateTexture();
 
 		// 初期化
@@ -135,7 +142,8 @@ void CLetter::CreateTexture(void)
 	LPDIRECT3DDEVICE9 device = CManager::GetRenderer()->GetDevice();	// デバイスを取得する
 
 	// フォントの生成
-	LOGFONT lf = { m_font_size, 0, 0, 0, m_font_weight, 0, 0, 0, SHIFTJIS_CHARSET, OUT_TT_ONLY_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Mochiy Pop One") };
+	LOGFONT lf = { m_font_size, 0, m_font_rot, 0, m_font_weight, m_is_italic, TRUE, 0, SHIFTJIS_CHARSET, OUT_TT_ONLY_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("") };
+	memcpy(lf.lfFaceName, m_font_name.c_str(), sizeof(m_font_name));
 	HFONT font = CreateFontIndirect(&lf);
 
 	// デバイスにフォントを持たせないとGetGlyphOutline関数はエラーとなる
@@ -176,6 +184,13 @@ void CLetter::CreateTexture(void)
 	int font_width = (gm.gmBlackBoxX + 3) / 4 * 4;
 	int font_height = gm.gmBlackBoxY;
 
+	// 生成されていたら
+	if (m_texture != nullptr)
+	{
+		m_texture->Release();
+		m_texture = nullptr;
+	}
+
 	device->CreateTexture(	font_width,
 							font_height,
 							1,
@@ -210,6 +225,8 @@ void CLetter::CreateTexture(void)
 void CLetter::Load(void)
 {
 	AddFontResourceEx("data/Font/MochiyPopOne-Regular.ttf", FR_PRIVATE, NULL);	// モチイpopワン
+	AddFontResourceEx("data/Font/x12y16pxMaruMonica.ttf", FR_PRIVATE, NULL);	// x12y16pxMaruMonica
+	AddFontResourceEx("data/Font/keifont.ttf", FR_PRIVATE, NULL);	// keifont.ttf
 }
 
 //=============================================================================
@@ -218,4 +235,6 @@ void CLetter::Load(void)
 void CLetter::UnLoad(void)
 {
 	RemoveFontResourceEx("data/Font/MochiyPopOne-Regular.ttf", FR_PRIVATE, NULL);	// モチイpopワン
+	RemoveFontResourceEx("data/Font/x12y16pxMaruMonica.ttf", FR_PRIVATE, NULL);	// x12y16pxMaruMonica
+	RemoveFontResourceEx("data/Font/keifont.ttf", FR_PRIVATE, NULL);	// keifont.ttf
 }

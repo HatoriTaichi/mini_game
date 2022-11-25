@@ -35,19 +35,23 @@ public:
 	vector<CLetter*> GetLetter(void) {return m_letter; }	// 文字配列の取得
 	string GetText(void) { return m_text; }	// テキストの取得
 	int GetSize(void) { return m_font_size; }	// サイズの取得
-	static CLetterArray*Create(D3DXVECTOR3 first_pos, int font_size, int font_weight, int showing_delay, int new_line, string text, D3DXCOLOR col);	// 生成処理
+	void ChangeText(string text);	// 表示テキストの変更
+	static CLetterArray*Create(D3DXVECTOR3 first_pos, int font_size, int font_weight, int showing_delay, int new_line, float font_rot, BOOL is_italic, string text, D3DXCOLOR col, string font_name);	// 生成処理
 
 private:
 	vector<CLetter*> m_letter;	// 文字クラス
 	D3DXVECTOR3 m_first_pos;	// 位置
 	D3DXCOLOR m_col;	// カラー
 	string m_text;	// テキスト
+	string m_font_name;	// フォントの名前
 	int m_font_size;	// 高さ(高さだけで幅も決まる)
 	int m_font_weight;	// 太さ
 	int m_showing_delay;	// ディレイ
 	int m_delay_count;	// カウント
 	int m_now_showing;	// 今出している文字
 	int m_new_line;	// 改行する文字
+	float m_font_rot;	// フォントの回転
+	BOOL m_is_italic;	// 斜体かどうか
 };
 
 #endif

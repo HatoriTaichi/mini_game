@@ -178,3 +178,29 @@ CSprite *CSprite::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, LPDIRECT3DTEXTURE9 te
 
 	return sprite;
 }
+
+//=============================================================================
+// テクスチャの変更
+//=============================================================================
+void CSprite::ChangeTexture(LPDIRECT3DTEXTURE9 tex)
+{
+	IDirect3DSurface9 *surface;	// サーフェイス
+	D3DSURFACE_DESC surface_Info;	// サーフェイス情報
+
+	// 保存
+	m_texture = tex;
+
+	// テクスチャからサーフェイスを取得
+	m_texture->GetSurfaceLevel(0, &surface);
+
+	// サーフェイス情報から画像サイズを取得
+	surface->GetDesc(&surface_Info);
+	m_tex_size.x = surface_Info.Width;	// 幅（ピクセル）
+	m_tex_size.y = surface_Info.Height;	// 高さ（ピクセル）
+
+	// 破棄
+	surface->Release();
+
+	// 制御点を中心に
+	m_center = D3DXVECTOR3(m_tex_size.x / 2.0f, m_tex_size.y / 2.0f, 0.0f);
+}
