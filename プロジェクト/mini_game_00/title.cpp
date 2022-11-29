@@ -57,11 +57,11 @@ HRESULT CTitle::Init(void)
 	D3DXVECTOR3 vec_light = -D3DXVECTOR3(pos_light_v - pos_light_r);	// ライトのベクトル
 
 	// ライトのプロジェクションマトリックスを生成
-	D3DXMatrixPerspectiveFovLH(&mtx_light_proj,
-		D3DXToRadian(45.0f),
-		1.0f,
-		400.0f,
-		2400.0f);
+	D3DXMatrixPerspectiveFovLH(	&mtx_light_proj,
+								D3DXToRadian(45.0f),
+								1.0f,
+								400.0f,
+								2400.0f);
 
 	// ベクトルを正規化
 	D3DXVec3Normalize(&vec_light, &vec_light);
@@ -92,6 +92,7 @@ HRESULT CTitle::Init(void)
 	//CSingleModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/boneanim.fbx", CSingleModel::MODEL_FILE::FBX);
 	//CSingleModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/anim_my_mdoel.fbx", CSingleModel::MODEL_FILE::FBX);
 	//CSingleModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/witch_hat000.fbx", CSingleModel::MODEL_FILE::FBX);
+	CSingleModel::Create(D3DXVECTOR3(-25.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, D3DXToRadian(90.0f), 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Loika.fbx", CSingleModel::MODEL_FILE::FBX);
 	CSingleModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "Player000.x", CSingleModel::MODEL_FILE::X);
 	CSingleModel::Create(D3DXVECTOR3(25.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Loika.fbx", CSingleModel::MODEL_FILE::FBX);
 
@@ -100,6 +101,7 @@ HRESULT CTitle::Init(void)
 	m_letter_array = CLetterArray::Create(D3DXVECTOR3(0.0f + 50.0f, 0.0f + 50.0f, 0.0f), 100, 50, FPS / 2, 5, 0.0f, FALSE, "AiJKlBIMjGtX;C:", D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), "Mochiy Pop One");
 	CLetterArray::Create(D3DXVECTOR3(SCREEN_WIDTH / 2 + 50.0f, 0.0f + 50.0f, 0.0f), 100, 50, FPS, 2, 0.0f, TRUE, "あいうえおかきくけこ", D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f), "x12y16pxMaruMonica");
 	CLetterArray::Create(D3DXVECTOR3(0.0f + 50.0f, SCREEN_HEIGHT - 50.0f, 0.0f), 100, 50, 0, 20, 0.0f, TRUE, "けいおん！", D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f), "けいふぉんと");
+	CLetterArray::Create(D3DXVECTOR3(SCREEN_WIDTH - 50.0f, 0.0f + 50.0f, 0.0f), 100, 50, FPS / 2, 1, 0.0f, FALSE, "ラブライブ！", D3DXCOLOR(1.0f, 0.5f, 0.5f, 1.0f), "けいふぉんと");
 
 	return S_OK;
 }
