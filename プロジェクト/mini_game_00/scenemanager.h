@@ -29,8 +29,8 @@ class CSceneManager
 public:
 	enum NetWorkMode
 	{
-		OffLine = 0,
-		OnLine
+		OFF_LINE = 0,
+		ON_LINE
 	};
 	enum class MODE
 	{

@@ -13,7 +13,12 @@
 //=============================================================================
 CTexture::CTexture()
 {
+	m_all_file.clear();
+	m_texture.clear();
 	m_file_data.type.clear();
+	m_file_data.file_name_pas.first.clear();
+	m_file_data.file_name_pas.second.clear();
+	m_num_tex = 0;
 }
 
 //=============================================================================

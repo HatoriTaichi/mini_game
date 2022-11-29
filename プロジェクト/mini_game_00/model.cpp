@@ -25,14 +25,15 @@ CFileLoad::PAS_AND_NAME_DATA CModel::m_file_data;
 CModel::CModel()
 {
 	m_texture.clear();
+	m_pas.clear();
+	m_parent = nullptr;
+	D3DXMatrixIdentity(&m_mtx_wold);
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_old_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_vtx_min = D3DXVECTOR3(10000.0f, 10000.0f, 10000.0f);
 	m_vtx_max = D3DXVECTOR3(-10000.0f, -10000.0f, -10000.0f);
-	D3DXMatrixIdentity(&m_mtx_wold);
-	m_parent = nullptr;
-	m_transparent = false;
 
 	for (int box_vtx_count = 0; box_vtx_count < BOXVTX_MAX; box_vtx_count++)
 	{
@@ -43,6 +44,8 @@ CModel::CModel()
 		m_nor[box_vtx_count] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		m_center_vtx[box_vtx_count] = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	}
+
+	m_transparent = false;
 }
 
 //=============================================================================

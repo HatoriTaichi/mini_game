@@ -18,6 +18,8 @@
 CTcpClient::CTcpClient()
 {
 	m_socket = INVALID_SOCKET;
+	m_ip_name.clear();
+	m_port_num = 0;
 	m_is_connect = false;
 }
 
@@ -34,8 +36,8 @@ CTcpClient::~CTcpClient()
 //-------------------------------
 void CTcpClient::WSASInit(void)
 {
-	WSADATA  wsaData;
-	WSAStartup(WINSOCK_VERSION, &wsaData);
+	WSADATA  wsa_data;
+	WSAStartup(WINSOCK_VERSION, &wsa_data);
 }
 
 //-------------------------------
@@ -51,34 +53,34 @@ void CTcpClient::WSASUninit(void)
 //-------------------------------
 bool CTcpClient::Init(void)
 {
-	FILE *pFile;
-	char aFile[2][64];
+	FILE *file;
+	char file_data[2][64];
 
-	pFile = fopen("data/Txt/severdata.txt", "r");
+	file = fopen("data/Txt/severdata.txt", "r");
 
-	if (pFile != NULL)
+	if (file != NULL)
 	{
 		while (true)
 		{
-			fscanf(pFile, "%s", &aFile[0]);
-			if (strcmp(aFile[0], "PORT_NUM") == 0) // PORT_NUMの文字列を見つけたら
+			fscanf(file, "%s", &file_data[0]);
+			if (strcmp(file_data[0], "PORT_NUM") == 0) // PORT_NUMの文字列を見つけたら
 			{
-				fscanf(pFile, "%s", &aFile[1]);
-				fscanf(pFile, "%d", &m_port_num);
+				fscanf(file, "%s", &file_data[1]);
+				fscanf(file, "%d", &m_port_num);
 			}
-			if (strcmp(aFile[0], "IP_NUM") == 0) // MAX_WAITの文字列を見つけたら
+			if (strcmp(file_data[0], "IP_NUM") == 0) // MAX_WAITの文字列を見つけたら
 			{
-				fscanf(pFile, "%s", &aFile[1]);
-				fscanf(pFile, "%s", m_ip_name.c_str());
+				fscanf(file, "%s", &file_data[1]);
+				fscanf(file, "%s", m_ip_name.c_str());
 			}
-			if (strcmp(aFile[0], "END_SCRIPT") == 0) //END_SCRIPTの文字列を見つけたら
+			if (strcmp(file_data[0], "END_SCRIPT") == 0) //END_SCRIPTの文字列を見つけたら
 			{
 				break;
 			}
 		}
 	}
 
-	fclose(pFile);
+	fclose(file);
 
 	//------------------------
 	// ソケット作成
@@ -127,13 +129,13 @@ bool CTcpClient::Connect(void)
 //-------------------------------
 int CTcpClient::Send(char *pSendData, int nSendDataSize)
 {
-	int nRecvSize = send(m_socket, pSendData, nSendDataSize, 0);	// どのソケット, 何を, 何バイト, 通信の種類
-	if (nRecvSize < 0)
+	int recv_size = send(m_socket, pSendData, nSendDataSize, 0);	// どのソケット, 何を, 何バイト, 通信の種類
+	if (recv_size < 0)
 	{
 		Uninit();
 	}
 
-	return nRecvSize;
+	return recv_size;
 }
 
 //-------------------------------
@@ -142,9 +144,9 @@ int CTcpClient::Send(char *pSendData, int nSendDataSize)
 int CTcpClient::Recv(char *pRecvData, int nRecvDataSize)
 {
 	memset(pRecvData, 0, sizeof(pRecvData));
-	int nRecvSize = recv(m_socket, pRecvData, nRecvDataSize, 0);	// どのソケット, どこに, 最大容量, 通信の種類
+	int recv_size = recv(m_socket, pRecvData, nRecvDataSize, 0);	// どのソケット, どこに, 最大容量, 通信の種類
 
-	return nRecvSize;
+	return recv_size;
 }
 
 //-------------------------------

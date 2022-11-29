@@ -30,10 +30,13 @@ CSceneManager::NetWorkMode CSceneManager::m_networkmode;
 //=============================================================================
 CSceneManager::CSceneManager()
 {
+	m_fade = nullptr;
 	m_title = nullptr;
 	m_game = nullptr;
+	m_online_game = nullptr;
 	m_result = nullptr;
 	m_mode = CSceneManager::MODE::ONLINE_GAME;
+	m_networkmode = CSceneManager::NetWorkMode::ON_LINE;
 }
 
 //=============================================================================
@@ -65,9 +68,42 @@ HRESULT CSceneManager::Init(void)
 void CSceneManager::Uninit(void)
 {
 	// シーンの破棄
-	m_title = nullptr;
-	m_game = nullptr;
-	m_result = nullptr;
+	if (m_title != nullptr)
+	{
+		// 終了処理
+		m_title->Uninit();
+
+		// メモリの開放
+		delete m_title;
+		m_title = nullptr;
+	}
+	if (m_game != nullptr)
+	{
+		// 終了処理
+		m_game->Uninit();
+
+		// メモリの開放
+		delete m_game;
+		m_game = nullptr;
+	}
+	if (m_online_game != nullptr)
+	{
+		// 終了処理
+		m_online_game->Uninit();
+
+		// メモリの開放
+		delete m_online_game;
+		m_online_game = nullptr;
+	}
+	if (m_result != nullptr)
+	{
+		// 終了処理
+		m_result->Uninit();
+
+		// メモリの開放
+		delete m_result;
+		m_result = nullptr;
+	}
 
 	// フェードクラスの破棄
 	if (m_fade != nullptr)
@@ -166,7 +202,7 @@ void CSceneManager::SetMode(MODE mode)
 		{
 			// 初期化
 			m_game->Init();
-			m_networkmode = OffLine;
+			m_networkmode = NetWorkMode::OFF_LINE;
 		}
 		break;
 	case MODE::ONLINE_GAME:
@@ -177,7 +213,7 @@ void CSceneManager::SetMode(MODE mode)
 		{
 			// 初期化
 			m_online_game->Init();
-			m_networkmode = OnLine;
+			m_networkmode = NetWorkMode::ON_LINE;
 
 		}
 		break;

@@ -13,10 +13,10 @@
 //=============================================================================
 CFade::CFade()
 {
-	m_vtx_buff = NULL;
-	m_col_a = 0.0f;
-	m_fade_in = false;
+	m_vtx_buff = nullptr;
 	m_next_mode = CSceneManager::MODE::TITLE;
+	m_fade_in = false;
+	m_col_a = 0.0f;
 }
 
 //=============================================================================
@@ -41,7 +41,7 @@ HRESULT CFade::Init(void)
 								FVF_VERTEX_2D,
 								D3DPOOL_MANAGED,
 								&m_vtx_buff,
-								NULL);
+								nullptr);
 
 	m_vtx_buff->Lock(0, 0, (void**)&vtx, 0);
 
@@ -77,10 +77,12 @@ HRESULT CFade::Init(void)
 //=============================================================================
 void CFade::Uninit(void) 
 {
-	if (m_vtx_buff != NULL) 
+	// 生成されていたら
+	if (m_vtx_buff != nullptr)
 	{
+		// 破棄
 		m_vtx_buff->Release();
-		m_vtx_buff = NULL;
+		m_vtx_buff = nullptr;
 	}
 }
 
@@ -114,8 +116,9 @@ void CFade::Update(void)
 	// フェード中のみ更新
 	if (m_fade_in == true || m_col_a > 0.0f)
 	{
-		VERTEX_2D *vtx;
+		VERTEX_2D *vtx;	// 頂点情報
 
+		// 頂点バッファをロックする
 		m_vtx_buff->Lock(0, 0, (void**)&vtx, 0);
 
 		// 頂点情報を設定
@@ -134,17 +137,20 @@ void CFade::Update(void)
 //=============================================================================
 void CFade::Draw(void) 
 {
-	//フェード中のみ描画
+	// フェード中のみ描画
 	if (m_fade_in == true || m_col_a > 0.0f) 
 	{
 		LPDIRECT3DDEVICE9 device = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスの取得
 
-		device->SetFVF(FVF_VERTEX_2D);			//頂点フォーマットの設定
-		device->SetStreamSource(0, m_vtx_buff, 0, sizeof(VERTEX_2D));	//頂点バッファをデバイスのデータストリームに設定
-		device->SetTexture(0, NULL);		//テクスチャの設定
+		device->SetFVF(FVF_VERTEX_2D);	// 頂点フォーマットの設定
+		device->SetStreamSource(0,
+								m_vtx_buff,
+								0,
+								sizeof(VERTEX_2D));	// 頂点バッファをデバイスのデータストリームに設定
+		device->SetTexture(0, nullptr);	// テクスチャの設定
 
 		// ポリゴンの描画
-		device->DrawPrimitive(	D3DPT_TRIANGLESTRIP, //プリミティブの種類
+		device->DrawPrimitive(	D3DPT_TRIANGLESTRIP,	// プリミティブの種類
 								0,
 								2);
 	}

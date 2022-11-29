@@ -34,7 +34,7 @@
 #define CAMERA_POS_V (D3DXVECTOR3(0.0f, 1105.0f, -100.0f))	// カメラの位置
 #define CAMERA_POS_R (D3DXVECTOR3(0.0f, 0.0f, 0.0f))	// カメラの注視点
 #define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(0.0f), D3DXToRadian(180.0f),D3DXToRadian(0.0f)))	// カメラの向き
-static const CSceneManager::MODE mode = CSceneManager::MODE::ONLINE_GAME;//最初のモード
+
 //=============================================================================
 // 静的メンバ変数宣言
 //=============================================================================
@@ -45,25 +45,26 @@ CManager *CManager::m_single_manager;
 //=============================================================================
 CManager::CManager()
 {
+	m_hwnd = nullptr;
 	m_single_manager = nullptr;
-	m_mouse = nullptr;
-	m_key = nullptr;
 	m_renderer = nullptr;
 	m_camera = nullptr;
-	m_scene_manager = nullptr;
-	m_texture = nullptr;
-	m_xinput = nullptr;
-	m_net_work_manager = nullptr;
-	m_directInput = nullptr;
-	m_hwnd = NULL;
-	for (int count_player = 0; count_player < MAX_PLAYER; count_player++)
-	{
-		m_player_ingredient_data[count_player] = nullptr;
-	}
 	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
 	{
 		m_light[count_liht] = NULL;
 	}
+	m_scene_manager = nullptr;
+	m_mouse = nullptr;
+	m_key = nullptr;
+	m_direct_input = nullptr;
+	m_texture = nullptr;
+	m_xinput = nullptr;
+	m_net_work_manager = nullptr;
+	for (int count_player = 0; count_player < MAX_PLAYER; count_player++)
+	{
+		m_player_ingredient_data[count_player] = nullptr;
+	}
+
 }
 
 //=============================================================================
@@ -99,16 +100,13 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 		m_key->Init(hInstance, hWnd);
 	}
 	//directinputの生成
-	if (m_directInput == NULL)
-	{
-		m_directInput = new CDirectInput;
-		m_directInput->Init(hInstance, hWnd);
+	m_direct_input = new CDirectInput;
+	if (m_direct_input != nullptr)
+	{	
+		m_direct_input->Init(hInstance, hWnd);
 	}
-	//Xinput
-	if (!m_xinput)
-	{
-		m_xinput = new CXInput;
-	}
+	//Xinputの生成
+	m_xinput = new CXInput;
 	// マウスクラスの生成
 	m_mouse = new CMouse;
 	if (m_mouse != nullptr)
@@ -130,14 +128,10 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 		m_net_work_manager->Init();
 	}
 
-
-	for (int nPlayer = 0; nPlayer < MAX_PLAYER; nPlayer++)
+	// プレイヤー分のループ
+	for (int count_player = 0; count_player < MAX_PLAYER; count_player++)
 	{
-		//プレイヤーの具材情報クラス
-		if (!m_player_ingredient_data[nPlayer])
-		{
-			m_player_ingredient_data[nPlayer] = CPlayer_ingredient_data::Create();
-		}
+		m_player_ingredient_data[count_player] = CPlayer_ingredient_data::Create();
 	}
 
 	// シーンマネージャークラスの生成
@@ -161,7 +155,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	m_key->BindKey(CKey::KEYBIND::SPACE, DIK_SPACE);
 
 	// 初期シーン
-	m_scene_manager->ChangeScene(mode);
+	m_scene_manager->ChangeScene(CSceneManager::MODE::ONLINE_GAME);
 
 	return S_OK;
 }
@@ -211,14 +205,18 @@ void CManager::Uninit(void)
 	}
 
 	// ゲームパッドの破棄
-	if (m_directInput != NULL)
+	if (m_direct_input != nullptr)
 	{
-		m_directInput->Uninit();
-		delete m_directInput;
-		m_directInput = NULL;
+		// 終了処理
+		m_direct_input->Uninit();
+
+		// メモリの開放
+		delete m_direct_input;
+		m_direct_input = nullptr;
 	}
 	if (m_xinput != nullptr) 
 	{
+		// メモリの開放
 		delete m_xinput;
 		m_xinput = nullptr;
 	}
@@ -233,7 +231,7 @@ void CManager::Uninit(void)
 		delete m_net_work_manager;
 		m_net_work_manager = nullptr;
 	}
-
+	// ライト分のループ
 	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
 	{
 		// ライトクラスの破棄
@@ -296,20 +294,23 @@ void CManager::Update(void)
 	{
 		m_renderer->Update();
 	}
+
 	// キーボードクラス
 	if (m_key != nullptr)
 	{
 		m_key->Update();
 	}
+
 	//ゲームパッドのクラス
-	if (m_directInput != nullptr)
+	if (m_direct_input != nullptr)
 	{
-		m_directInput->Update();
+		m_direct_input->Update();
 	}
 	if (m_xinput != nullptr)
 	{
 		m_xinput->UpdateGamepad();
 	}
+
 	// マウスクラス
 	if (m_mouse != nullptr)
 	{
@@ -336,8 +337,6 @@ void CManager::Update(void)
 	{
 		m_scene_manager->Update();
 	}
-
-
 }
 
 //================================================

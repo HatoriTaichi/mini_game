@@ -17,7 +17,12 @@
 //=============================================================================
 CSingleModel::CSingleModel(LAYER_TYPE layer) : CObject(layer)
 {
-	
+	m_model = nullptr;
+	m_name.clear();
+	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	D3DXMatrixIdentity(&m_mtx_wold);
 }
 
 //=============================================================================

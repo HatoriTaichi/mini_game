@@ -23,7 +23,7 @@
 //===========================================================
 
 #ifdef _DEBUG
-int	g_nCountFPS;	// FPSカウンタ
+int	g_count_fps;	// FPSカウンタ
 #endif
 
 //=============================================================================
@@ -47,12 +47,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
 		NULL
 	};
 	RECT rect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-	HWND hWnd;
+	HWND hwnd;
 	MSG msg;
-	DWORD dwCurrentTime;
-	DWORD dwFrameCount;
-	DWORD dwExecLastTime;
-	DWORD dwFPSLastTime;
+	DWORD current_time;
+	DWORD frame_count;
+	DWORD exec_last_time;
+	DWORD fps_last_time;
 	
 	// ウィンドウクラスの登録
 	RegisterClassEx(&wcex);
@@ -61,7 +61,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
 	AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false);
 
 	// ウィンドウの作成
-	hWnd = CreateWindow(CLASS_NAME,
+	hwnd = CreateWindow(CLASS_NAME,
 						WINDOW_NAME,
 						WS_OVERLAPPEDWINDOW /*& ~WS_THICKFRAME & ~WS_MAXIMIZEBOX*/,
 						CW_USEDEFAULT,
@@ -74,7 +74,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
 						NULL);
 
 	//初期化処理(ウィンドウを生成してから行う)(DirectX本体の生成を行う)
-	if (FAILED(CManager::GetInstance()->Init(hInstance, hWnd, TRUE)))
+	if (FAILED(CManager::GetInstance()->Init(hInstance, hwnd, TRUE)))
 	{
 		return -1;
 	}
@@ -83,14 +83,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
 	timeBeginPeriod(1);
 
 	// フレームカウント初期化
-	dwCurrentTime =
-	dwFrameCount = 0;
-	dwExecLastTime = 
-	dwFPSLastTime = timeGetTime();
+	current_time =
+	frame_count = 0;
+	exec_last_time =
+	fps_last_time = timeGetTime();
 
 	// ウインドウの表示
-	ShowWindow(hWnd, nCmdShow);
-	UpdateWindow(hWnd);
+	ShowWindow(hwnd, nCmdShow);
+	UpdateWindow(hwnd);
 	
 	// メッセージループ
 	while(1)
@@ -110,20 +110,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
         }
 		else
 		{
-			dwCurrentTime = timeGetTime();	// 現在の時間を取得
-			if((dwCurrentTime - dwFPSLastTime) >= 500)
-			{// 0.5秒ごとに実行
+			current_time = timeGetTime();	// 現在の時間を取得
+
+			// 0.5秒ごとに実行
+			if((current_time - fps_last_time) >= 500)
+			{
 #ifdef _DEBUG
 				// FPSを算出
-				g_nCountFPS = dwFrameCount * 1000 / (dwCurrentTime - dwFPSLastTime);
+				g_count_fps = frame_count * 1000 / (current_time - fps_last_time);
 #endif
-				dwFPSLastTime = dwCurrentTime;	// 現在の時間を保存
-				dwFrameCount = 0;
+				fps_last_time = current_time;	// 現在の時間を保存
+				frame_count = 0;
 			}
 
-			if((dwCurrentTime - dwExecLastTime) >= (1000 / FPS))
-			{// 1/60秒経過
-				dwExecLastTime = dwCurrentTime;	// 現在の時間を保存
+			if((current_time - exec_last_time) >= (1000 / FPS))
+			{
+				// 1/60秒経過
+				exec_last_time = current_time;	// 現在の時間を保存
 
 				// 更新処理
 				CManager::GetInstance()->Update();
@@ -131,7 +134,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
 				// 描画処理
 				CManager::GetInstance()->Draw();
 
-				dwFrameCount++;
+				frame_count++;
 			}
 		}
 	}
@@ -205,6 +208,6 @@ D3DXVECTOR3 VTransform(D3DXVECTOR3 InV, D3DXMATRIX InM)
 //=============================================================================
 int GetFPS(void)
 {
-	return g_nCountFPS;
+	return g_count_fps;
 }
 #endif
