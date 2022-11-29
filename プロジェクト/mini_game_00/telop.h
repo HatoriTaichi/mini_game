@@ -22,6 +22,8 @@ public:
 	void Draw();
 	static CTelop *Create(const D3DXVECTOR3& pos, const D3DXVECTOR3& size,const float& fFontSize,
 		const char *sFileName,const int& nLevel = 0);
+	static CTelop *Create(const D3DXVECTOR3& pos, const D3DXVECTOR3& size, const D3DXVECTOR3& Bgsize, const float& fFontSize,
+		const char *sFileName,string TexType, const int& nLevel = 0);
 	void SetCol(D3DXCOLOR col);
 	void SetEnd(bool bEnd) { m_bEnd = bEnd; }
 	void TextLoad(const char* sFileName);

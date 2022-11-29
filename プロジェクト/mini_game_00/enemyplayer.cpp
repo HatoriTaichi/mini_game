@@ -18,6 +18,7 @@
 #include "onlinegame.h"
 #include "ingredients.h"
 #include "player.h"
+#include "player_ingredient_data.h"
 #define MOVE_SPEED (5.0f)
 #define SPEED_UP_DIAMETER (1.5f)//スピードアップ倍率
 #define SPEED_UP_TIME_LIMIT (60 * 5)//スピードアップの時間制限
@@ -51,7 +52,7 @@ CEnemyPlayer::~CEnemyPlayer()
 //=============================================================================
 HRESULT CEnemyPlayer::Init(void)
 {
-	SetObjType(CObject::OBJTYPE::PLAYER);
+	SetObjType(CObject::OBJTYPE::ENEMYPLAYER);
 	CreateModel();
 	return S_OK;
 }
@@ -61,6 +62,7 @@ HRESULT CEnemyPlayer::Init(void)
 //=============================================================================
 void CEnemyPlayer::Uninit(void)
 {
+	CManager::GetInstance()->GetPlayer_ingredient_data(m_number)->SetIngredientsType(m_enemy_player_data.get_ingredients_type);
 	// サイズの取得
 	int size = m_model.size();
 	for (int count_model = 0; count_model < size; count_model++)
@@ -217,8 +219,8 @@ void CEnemyPlayer::Drawtext(void)
 	char str[3000];
 	int nNum = 0;
 
-	nNum = sprintf(&str[0], "\n\n 情報 \n");
-	nNum += sprintf(&str[nNum], " [numPlayer] %d\n", m_number);
+	nNum = sprintf(&str[0], "\n\n\n\n\n\n\n\n\n\n\n\n 情報 \n");
+	nNum += sprintf(&str[nNum], " [numEnemyPlayer] %d\n", m_number);
 	LPD3DXFONT pFont = CManager::GetInstance()->GetRenderer()->GetFont();
 	// テキスト描画
 	pFont->DrawText(NULL, str, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));

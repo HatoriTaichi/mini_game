@@ -13,6 +13,9 @@
 #include "object.h"
 static const int MaxPlayer = 2;
 static const int MaxIngredients = 5;
+static const int IngredientsSpawnMax = 6;
+static const int ItemSpawnMax = 2;
+
 #define MAXINGREDIENTS (5)
 
 //*****************************************************************************
@@ -34,6 +37,12 @@ public:
 		NormalMode=0,
 		ClimaxMode,
 		ModeMax
+	};
+	enum GameState
+	{
+		Start = 0,//開始時
+		Play,//ゲーム中
+		Finish//終了時
 	};
 	CGame(LAYER_TYPE layer = LAYER_TYPE::LAYER_00);	// デフォルトコンストラクタ
 	~CGame();	// デフォルトデストラクタ
@@ -63,6 +72,7 @@ private:
 	int m_MaxItemSpawn;
 	int m_MaxEnemySpawn;
 	int m_nGameTimeSeconds;//秒数を数えるやつ
+	int m_nGameStartTimer;//始まるまでの時間
 	int m_IngredientsSpawnTimer;//具材の出現タイマー
 	int m_ItemSpawnTimer;//アイテムの出現タイマー
 	int m_ItemSpawnInterval[ModeMax];//アイテムの出現間隔

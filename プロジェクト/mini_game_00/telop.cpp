@@ -17,7 +17,7 @@ static const float TextInterval = 17.0f;//アイコンの大きさ
 static const int TextLinefeed = 20;//改行するライン
 static const float TextPosY = 70.0f;//アイコンの位置
 static const float TextPosX = 120.0f;//アイコンの位置
-static const D3DXCOLOR ConboCol = { 0.0f,0.0f,0.0f,0.5f };
+static const D3DXCOLOR TextCol = { 0.0f,0.0f,0.0f,1.0f };
 
 //--------------------------------------------
 //コンストラクタ
@@ -120,11 +120,33 @@ CTelop *CTelop::Create(const D3DXVECTOR3& pos, const D3DXVECTOR3& size, const fl
 		//テキストの読み込み
 		pSkillSelect->TextLoad(sFileName);
 		pSkillSelect->m_nLevel = nLevel;
+
+		pSkillSelect->Init();
+
+	}
+
+	return pSkillSelect;
+}
+//-----------------------------------------------
+//インスタンス生成
+//---------------------------------------------
+CTelop * CTelop::Create(const D3DXVECTOR3& pos, const D3DXVECTOR3& size, const D3DXVECTOR3& Bgsize, const float& fFontSize,
+	const char *sFileName, string TexType, const int& nLevel)
+{
+	CTelop *pSkillSelect = new CTelop;
+
+	if (pSkillSelect)
+	{
+		pSkillSelect->m_pos = pos;
+		pSkillSelect->m_size = size;
+		pSkillSelect->m_fFontSize = fFontSize;
+		//テキストの読み込み
+		pSkillSelect->TextLoad(sFileName);
+		pSkillSelect->m_nLevel = nLevel;
 		if (!pSkillSelect->m_pTelopBg)
 		{
 			//文字の背景の生成
-			pSkillSelect->m_pTelopBg = CObject2D::Create(pos, pSkillSelect->m_size,"teak_floor.jpg");
-			pSkillSelect->m_pTelopBg->SetCol(ConboCol);
+			pSkillSelect->m_pTelopBg = CObject2D::Create(pos, Bgsize, TexType);
 		}
 		pSkillSelect->Init();
 
@@ -332,7 +354,7 @@ void CTelop::SetText(int nLevel)
 											  m_Text[nLevel][m_nCntLetter],
 											  fSizeY,
 											  500,
-											  {1.0,1.0,1.0,1.0},
+											  TextCol,
 											  CLetter::Nicokaku));
 
 		if (m_Text[nLevel].size() - 1 <= m_nCntLetter)

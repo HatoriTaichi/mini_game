@@ -17,13 +17,15 @@
 static const int StartUIEndTime = 30;
 static const int LastSpurtUIEndTime = 30;
 static const int FinishUIEndTime = 30;
+static const int FlashTimeMin = 2;
+static const float LastSpurtMoveSpeed = 7.0f;
 
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
 CMove_UI::CMove_UI(LAYER_TYPE layer) : CObject(layer)
 {
-
+	m_bFadeState = false;
 }
 
 //=============================================================================
@@ -39,7 +41,7 @@ CMove_UI::~CMove_UI()
 //=============================================================================
 HRESULT CMove_UI::Init(void)
 {
-
+	m_bFlash = false;
 	return S_OK;
 }
 
@@ -64,39 +66,63 @@ void CMove_UI::Update(void)
 
 	switch (m_state)
 	{
-	case CMove_UI::ImmediatelyAfterPop:
+	case CMove_UI::State::ImmediatelyAfterPop:
 		switch (m_Type)
 		{
-		case CMove_UI::Type_Start:
+		case CMove_UI::UI_Type::Type_Start:
 			FadeIn();
 			break;
-		case CMove_UI::Type_LastSpurt:
+		case CMove_UI::UI_Type::Type_LastSpurt:
+			LastSpurt();
 			break;
-		case CMove_UI::Type_Finish:
+		case CMove_UI::UI_Type::Type_Finish:
+			break;
+		case CMove_UI::UI_Type::Type_PushStart:
+			m_state = CMove_UI::State::Normal;
 			break;
 
 		}
 
 		break;
-	case CMove_UI::Normal:
+	case CMove_UI::State::Normal:
 		m_nTimer++;
 		switch (m_Type)
 		{
-		case CMove_UI::Type_Start:
+		case CMove_UI::UI_Type::Type_Start:
 			if (m_nTimer >= StartUIEndTime)
 			{
 				m_nTimer = 0;
 				FadeOut();
 			}
 			break;
-		case CMove_UI::Type_LastSpurt:
+		case CMove_UI::UI_Type::Type_LastSpurt:
 			break;
-		case CMove_UI::Type_Finish:
+		case CMove_UI::UI_Type::Type_Finish:
 			break;
-
+		case CMove_UI::UI_Type::Type_PushStart:
+			FadeInOut();
+			break;
 		}
 		break;
+	case CMove_UI::State::End:
+		m_nTimer++;
 
+		switch (m_Type)
+		{
+		case CMove_UI::UI_Type::Type_Start:
+
+			break;
+		case CMove_UI::UI_Type::Type_LastSpurt:
+			m_bUninit = true;
+			break;
+		case CMove_UI::UI_Type::Type_Finish:
+			break;
+		case CMove_UI::UI_Type::Type_PushStart:
+			Flash();
+			break;
+		}
+
+		break;
 	}
 	if (m_bUninit)
 	{
@@ -139,7 +165,7 @@ void CMove_UI::FadeIn(void)
 
 	if (fColA >= 1.0f)
 	{
-		m_state = Normal;
+		m_state = CMove_UI::State::Normal;
 	}
 
 	if (m_pUI)
@@ -167,7 +193,59 @@ void CMove_UI::FadeOut(void)
 	}
 }
 //=============================================================================
-// モデルの生成
+// 画像のフェードインアウト
+//=============================================================================
+void CMove_UI::FadeInOut(void)
+{
+	float fColA = m_pUI->GetCol().a;
+	if (!m_bFadeState)
+	{
+		fColA += 0.01f;
+	}
+	else
+	{
+		fColA -= 0.01f;
+	}
+	if (fColA <= 0.0f)
+	{
+		m_bFadeState = false;
+	}
+	if (fColA >= 1.0f)
+	{
+		m_bFadeState = true;
+	}
+	if (m_pUI)
+	{
+		m_pUI->SetCol({ 1.0,1.0,1.0,fColA });
+	}
+}
+//=============================================================================
+// チカチカ
+//=============================================================================
+void CMove_UI::Flash(void)
+{
+	float fColA = m_pUI->GetCol().a;
+	if (m_nTimer >= FlashTimeMin)
+	{
+		m_nTimer = 0;
+		m_bFlash = !m_bFlash;
+	}
+	if (!m_bFlash)
+	{
+		fColA = 0.5f;
+	}
+	else
+	{
+		fColA = 1.0f;
+	}
+	if (m_pUI)
+	{
+		m_pUI->SetCol({ 1.0,1.0,1.0,fColA });
+	}
+
+}
+//=============================================================================
+// 生成(位置、サイズ、出現持続時間、フェードインアウトの時間)
 //=============================================================================
 CMove_UI *CMove_UI::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale,
 	int nPopTime, int nFadeTime, string TexType, UI_Type type)
@@ -199,7 +277,6 @@ CMove_UI *CMove_UI::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale,
 //=============================================================================
 // スタートUIの処理
 //=============================================================================
-
 void CMove_UI::Start(void)
 {
 
@@ -207,16 +284,31 @@ void CMove_UI::Start(void)
 //=============================================================================
 // lastspurtUIの処理
 //=============================================================================
-
 void CMove_UI::LastSpurt(void)
+{
+	if (m_pUI)
+	{
+		D3DXVECTOR3 pos = m_pUI->GetPos();
+		pos.x -= LastSpurtMoveSpeed;
+		m_pUI->SetPos(pos);
+		if (pos.x <= 0.0f + m_pUI->GetSize().x / 2.0f)
+		{
+			m_state = CMove_UI::State::End;
+		}
+	}
+}
+//=============================================================================
+// フィニッシュUIの処理
+//=============================================================================
+void CMove_UI::Finisj(void)
 {
 }
 //=============================================================================
 // フィニッシュUIの処理
 //=============================================================================
-
-void CMove_UI::Finisj(void)
+void CMove_UI::PushStart(void)
 {
+
 }
 
 

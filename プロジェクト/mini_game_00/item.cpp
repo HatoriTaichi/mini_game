@@ -101,6 +101,7 @@ void CItem::Update(void)
 	case CItem::Normal:
 		Motion();
 		ColisionPlayer();
+		ColisionEnemyPlayer();
 		if (m_nTimer >= ItemEndTypeTime1)
 		{
 			m_state = EndType1;
@@ -110,6 +111,7 @@ void CItem::Update(void)
 		//‚¿‚å‚Á‚Æ‚µ‚½“®‚«
 		Motion();
 		ColisionPlayer();
+		ColisionEnemyPlayer();
 		if (m_nTimer >= ItemEndTypeTime2)
 		{
 			m_state = EndType2;
@@ -119,6 +121,7 @@ void CItem::Update(void)
 		//‚¿‚å‚Á‚Æ‚µ‚½“®‚«
 		Motion();
 		ColisionPlayer();
+		ColisionEnemyPlayer();
 		if (m_nTimer >= ItemEndTypeTime3)
 		{
 			m_state = EndType3;
@@ -127,7 +130,7 @@ void CItem::Update(void)
 		//‚¿‚å‚Á‚Æ‚µ‚½“®‚«
 		Motion();
 		ColisionPlayer();
-
+		ColisionEnemyPlayer();
 		break;
 	}
 	if (m_nTimer >= DeleteTime)

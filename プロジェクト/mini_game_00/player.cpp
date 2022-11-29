@@ -165,7 +165,7 @@ void CPlayer::Update(void)
 		DropItem();
 	}
 	////テストで取得した具材を増やす処理
-	//TestGetIngredients();
+	TestGetIngredients();
 	//敵などに当たったら一定時間操作を聞かないようにする
 	if (m_PlayerData.m_bOperationLock)
 	{
@@ -209,7 +209,7 @@ void CPlayer::Update(void)
 				{
 					for (int nCnt = 0; nCnt < nSize; nCnt++)
 					{
-						CEnemyPlayer *pEnemyPlayer = (CEnemyPlayer*)ObjPlayer[nSize];
+						CEnemyPlayer *pEnemyPlayer = (CEnemyPlayer*)ObjPlayer[nCnt];
 						//自身が敵プレイヤーに当たったら
 						if (pEnemyPlayer->Collision(m_PlayerData.m_pos, PlayerHitSize))
 						{
@@ -311,10 +311,6 @@ void CPlayer::Update(void)
 void CPlayer::Draw(void)
 {
 	LPDIRECT3DDEVICE9 device = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスの取得
-	//if (m_pCenter)
-	//{
-	//	m_pCenter->Draw();
-	//}
 	//--------------------------------------
 	//プレイヤー(原点)のマトリックスの設定
 	//--------------------------------------
@@ -419,18 +415,18 @@ void CPlayer::Drawtext(void)
 	float fLength = (float)sqrt(ThumbL.x  * ThumbL.x +
 		ThumbL.y * ThumbL.y);
 
-	nNum = sprintf(&str[0], "\n\n 情報 \n");
+	nNum = sprintf(&str[0], "\n\n\n\n\n 情報 \n");
 	int nSize = m_PlayerData.m_nGetIngredientsType.size();
-	for (int nCnt = 0; nCnt < nSize; nCnt++)
-	{
-		nNum += sprintf(&str[nNum], " [Ingredients%d] %d\n", nCnt, m_PlayerData.m_nGetIngredientsType[nCnt]);
-	}
+	//for (int nCnt = 0; nCnt < nSize; nCnt++)
+	//{
+	//	nNum += sprintf(&str[nNum], " [Ingredients%d] %d\n", nCnt, m_PlayerData.m_nGetIngredientsType[nCnt]);
+	//}
 	nNum += sprintf(&str[nNum], " [numPlayer] %d\n",m_nNumPlayer);
-	nNum += sprintf(&str[nNum], " [fLength] %.6f\n", fLength);
-	nNum += sprintf(&str[nNum], " [sThumbLY] %.2f\n", ThumbL.y);
-	nNum += sprintf(&str[nNum], " [sThumbLX] %.2f\n", ThumbL.x);
-	nNum += sprintf(&str[nNum], " [sThumbLYNor] %.6f\n", ThumbLNor.y);
-	nNum += sprintf(&str[nNum], " [sThumbLXNor] %.6f\n", ThumbLNor.x);
+	//nNum += sprintf(&str[nNum], " [fLength] %.6f\n", fLength);
+	//nNum += sprintf(&str[nNum], " [sThumbLY] %.2f\n", ThumbL.y);
+	//nNum += sprintf(&str[nNum], " [sThumbLX] %.2f\n", ThumbL.x);
+	//nNum += sprintf(&str[nNum], " [sThumbLYNor] %.6f\n", ThumbLNor.y);
+	//nNum += sprintf(&str[nNum], " [sThumbLXNor] %.6f\n", ThumbLNor.x);
 
 	//vector<CObject *>Obj = CObject::GetObjTypeObject(CObject::OBJTYPE::INGREDIENTS);
 	//{
@@ -694,7 +690,7 @@ void CPlayer::TestGetIngredients(void)
 		std::random_device random;	// 非決定的な乱数生成器
 		std::mt19937_64 mt(random());            // メルセンヌ・ツイスタの64ビット版、引数は初期シード
 		std::uniform_real_distribution<> randType(0, 5);
-		std::uniform_real_distribution<> randNum(0, 35);
+		std::uniform_real_distribution<> randNum(5, 99);
 		int nMax = static_cast <int>(randNum(mt));
 		for (int nType = 0; nType < 5; nType++)
 		{

@@ -39,20 +39,21 @@ public:
 	};
 	enum class ComboType
 	{
-		Palma = 0,//パルマ
+		TomatoALot = 0,
+		CheeseALot,
+		HaramiALot,
+		BasilALot,
+		MushroomALot,
+		Palma,//パルマ
 		Margherita,//マルゲリータ
 		BigCheese,//ビッグチーズ
 		GigaMeat,//ギガミート
 		BossChiAura,//ボスカイオーラ
 		OrthoRarNa,//オルトラーナ
-		TomatoALot,
-		CheeseALot,
-		HaramiALot,
-		BasilALot,
-		MushroomALot,
 		Variety5,
 		Max
 	};
+
 	CResult(LAYER_TYPE layer = LAYER_TYPE::LAYER_00);	// デフォルトコンストラクタ
 	~CResult();	// デフォルトデストラクタ
 	HRESULT Init(void);	// 初期化

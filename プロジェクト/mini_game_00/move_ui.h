@@ -23,15 +23,16 @@ class CObject2D;
 class CMove_UI : public CObject
 {
 public:
-	enum UI_Type
+	enum class UI_Type
 	{
 		Type_Start = 0,
 		Type_LastSpurt,
 		Type_Finish,
+		Type_PushStart,
 		Type_Max
 	};
 
-	enum State
+	enum class State
 	{
 		ImmediatelyAfterPop = 0,//出現直後
 		Normal,
@@ -48,8 +49,12 @@ public:
 	void Motion(void);//ちょっとした動きの処理
 	void FadeIn(void);//画像のフェードイン
 	void FadeOut(void);//画像のフェードアウト
+	void FadeInOut(void);
+	void Flash(void);
+	void SetState(CMove_UI::State state) { m_state = state; }
+	// 生成(位置、サイズ、出現持続時間、フェードインアウトの時間)
 	static CMove_UI *Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale,
-		int nPopTime,int nFadeTime, string TexType, UI_Type type);	// 生成(位置、サイズ、出現持続時間、フェードインアウトの時間)
+		int nPopTime,int nFadeTime, string TexType, UI_Type type);
 	D3DXVECTOR3 GetPos(void) { return m_pos; }	// ゲッダー
 	D3DXVECTOR3 GetRot(void) { return m_rot; }	// ゲッダー
 
@@ -57,6 +62,7 @@ private:
 	void Start(void);//スタートUIの処理
 	void LastSpurt(void);//lastspurtUIの処理
 	void Finisj(void);//フィニッシュUIの処理
+	void PushStart(void);//フィニッシュUIの処理
 	CObject2D *m_pUI;
 	State m_state;//状態
 	UI_Type m_Type; //UIの種類
@@ -67,7 +73,8 @@ private:
 	int m_nMaxPopTime;//出現時間
 	int m_nMaxFadeTime;//フェードインアウトの時間
 	bool m_bUninit;
-
+	bool m_bFadeState;
+	bool m_bFlash;
 };
 
 #endif

@@ -24,6 +24,8 @@
 #include "field.h"
 #include "object2D.h"
 #include "counter.h"
+#include "camera.h"
+#define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(0.0f), D3DXToRadian(90.0f),D3DXToRadian(0.0f)))	// カメラの向き
 
 //=============================================================================
 // 静的メンバ変数宣言
@@ -88,6 +90,8 @@ COnlineGame::COnlineGame(CObject::LAYER_TYPE layer) :CObject(layer)
 	m_pFinishUI = nullptr;
 	m_pLastSpurtUI = nullptr;
 	memset(m_pIngredientsUI, NULL, sizeof(m_pIngredientsUI));
+	CManager::GetInstance()->GetCamera()->SetRot(CAMERA_ROT);
+
 }
 
 //=============================================================================
@@ -118,8 +122,20 @@ HRESULT COnlineGame::Init(void)
 					// データを取得
 					CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetEnemyData()->GetCmmuData();
 
-					m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-						D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_2.txt", data->player.number);
+					//プレイヤー識別番号を保存
+					m_nPlayerNumber = data->player.number;
+					//プレイヤー識別番号によってプレイヤーのモデルを変える
+					switch (data->player.number)
+					{
+					case 0:
+						m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt", data->player.number);
+						break;
+					case 1:
+						m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_2.txt", data->player.number);
+						break;
+					}
 				}
 				//if (!m_pPlayer[1])
 				//{
@@ -363,7 +379,18 @@ void COnlineGame::Matching(void)
 	// 敵数分のループ
 	for (int count_enemy = 0; count_enemy < MAX_PLAYER - 1; count_enemy++)
 	{
-		m_enemy_player = CEnemyPlayer::Create({ 0.0f,0.0f,0.0f }, {0.0f,0.0f,0.0f}, "data/Txt/player_motion_1.txt", player_data->player.number);
+		//プレイヤー識別番号で生成する敵プレイヤーのモデルを変える
+		switch (player_data->player.number)
+		{
+		case 0:
+			m_enemy_player = CEnemyPlayer::Create({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f }, "data/Txt/player_motion_2.txt", player_data->player.number);
+			break;
+
+		case 1:
+			m_enemy_player = CEnemyPlayer::Create({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f }, "data/Txt/player_motion_1.txt", player_data->player.number);
+			break;
+		}
+
 	}
 
 	// 送信

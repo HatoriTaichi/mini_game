@@ -20,18 +20,22 @@
 #include "field.h"
 #include "object2D.h"
 #include "counter.h"
+#include "camera.h"
+#include "move_ui.h"
+
 static const int IngredientsSpawnInterval = 30 * 60;
 static const int NormalItemSpawnInterval = 17 * 60;
 static const int ClimaxItemSpawnInterval = 12 * 60;
 static const int NormalIngredientsSpawnMin = 6;
 static const int NormalIngredientsSpawnMax = 8;
-static const int ClimaxIngredientsSpawnMin = 6;
 static const int ClimaxIngredientsSpawnMax = 8;
 static const int NormalItemSpawnMin = 2;
 static const int NormalItemSpawnMax = 2;
 static const int ClimaxItemSpawnMin = 2;
 static const int ClimaxItemSpawnMax = 2;
 static const int EnemySpawnMax = 2;
+static const int LastSpartTime = 30;
+static const int GameMaxTime = 31;
 static const D3DXVECTOR3 BandUIPos = {SCREEN_WIDTH/2.0f,50.0f,0.0f};//ゲーム画面上部にある帯みたいなやつ
 static const D3DXVECTOR3 BandUISize = { SCREEN_WIDTH / 2.0f,50.0f,0.0f };//ゲーム画面上部にある帯みたいなやつ
 static const D3DXVECTOR3 GameTimerSize = { 35.0f,40.0f,0.0f };//ゲーム画面上部にある帯みたいなやつ
@@ -40,14 +44,15 @@ static const D3DXVECTOR3 StartSize = { 100.0f,40.0f,0.0f };//スタートUI
 static const D3DXVECTOR3 StartPos = { SCREEN_WIDTH / 2.0f,SCREEN_HEIGHT/2.0f,0.0f };//スタートUI
 static const D3DXVECTOR3 FinishSize = { 120.0f,40.0f,0.0f };//終了UI
 static const D3DXVECTOR3 FinishPos = { SCREEN_WIDTH / 2.0f,SCREEN_HEIGHT / 2.0f,0.0f };//終了UI
-static const D3DXVECTOR3 LastSpurtSize = { 150.0f,40.0f,0.0f };//ラストスパートUI
-static const D3DXVECTOR3 LastSpurtPos = { SCREEN_WIDTH+150.0f ,SCREEN_HEIGHT / 2.0f,0.0f };//ラストスパートUI
+static const D3DXVECTOR3 LastSpurtSize = { 180.0f,40.0f,0.0f };//ラストスパートUI
+static const D3DXVECTOR3 LastSpurtPos = { SCREEN_WIDTH+ LastSpurtSize.x ,SCREEN_HEIGHT / 2.0f,0.0f };//ラストスパートUI
 static const D3DXVECTOR3 IngredientsSize = { 50.0f,50.0f,0.0f };//ラストスパートUI
 static const D3DXVECTOR3 IngredientsPos = { 60.0f ,40.0f ,0.0f };//ラストスパートUI
 static const D3DXVECTOR3 IngredientsPos2 = { 820.0f ,40.0f ,0.0f };//ラストスパートUI
 static const D3DXVECTOR3 NumberSize = { 15.0f ,20.0f ,0.0f };//ラストスパートUI
 static const D3DXVECTOR3 NumberPos = { 45.0f ,40.0f ,0.0f };//ラストスパートUI
 static const D3DXVECTOR3 NumberPos2 = { 805.0f ,40.0f ,0.0f };//ラストスパートUI
+#define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(180.0f), D3DXToRadian(-90.0f),D3DXToRadian(0.0f)))	// カメラの向き
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -61,7 +66,7 @@ CGame::CGame(CObject::LAYER_TYPE layer) :CObject(layer)
 	m_IngredientsSpawnMax[NormalMode] = NormalIngredientsSpawnMax;
 	m_ItemSpawnMin[NormalMode] = NormalItemSpawnMin;
 	m_ItemSpawnMax[NormalMode] = NormalItemSpawnMax;
-	m_IngredientsSpawnMin[ClimaxMode] = ClimaxIngredientsSpawnMin;
+	m_IngredientsSpawnMin[ClimaxMode] = IngredientsSpawnMax;
 	m_IngredientsSpawnMax[ClimaxMode] = ClimaxIngredientsSpawnMax;
 	m_ItemSpawnMin[ClimaxMode] = ClimaxItemSpawnMin;
 	m_ItemSpawnMax[ClimaxMode] = ClimaxItemSpawnMax;
@@ -75,6 +80,8 @@ CGame::CGame(CObject::LAYER_TYPE layer) :CObject(layer)
 	m_pFinishUI = nullptr;
 	m_pLastSpurtUI = nullptr;
 	memset(m_pIngredientsUI, NULL, sizeof(m_pIngredientsUI));
+	CManager::GetInstance()->GetCamera()->SetRot(CAMERA_ROT);
+
 }
 
 //=============================================================================
@@ -111,7 +118,7 @@ HRESULT CGame::Init(void)
 	if (!m_pGameTimer)
 	{
 		m_pGameTimer = CCounter::Create(GameTimerPos, GameTimerSize, 2, "Number000.png");
-		m_pGameTimer->SetCounterNum(90);
+		m_pGameTimer->SetCounterNum(GameMaxTime);
 	}
 	//具材のUI生成
 	for (int nCnt = 0;  nCnt < MaxIngredients;  nCnt++)
@@ -156,11 +163,11 @@ HRESULT CGame::Init(void)
 		}
 	}
 	////スタートUIを生成
-	//if (!m_pStartUI)
-	//{
-	//	m_pStartUI = CObject2D::Create(StartPos, StartSize, "Start000.png");
-	//	m_pStartUI->SetCol({ 1.0,1.0,1.0,0.0 });
-	//}
+	if (!m_pStartUI)
+	{
+		m_pStartUI = CMove_UI::Create(StartPos, StartSize, "Start000.png");
+		m_pStartUI->SetCol({ 1.0,1.0,1.0,0.0 });
+	}
 	////フィニッシュUIを生成
 	//if (!m_pFinishUI)
 	//{
@@ -170,8 +177,8 @@ HRESULT CGame::Init(void)
 	//ラストスパートUIUIを生成
 	if (!m_pLastSpurtUI)
 	{
-		//m_pLastSpurtUI = CObject2D::Create(LastSpurtPos, LastSpurtSize, "lastspurt000.png");
-		//m_pLastSpurtUI
+		m_pLastSpurtUI = CMove_UI::Create(LastSpurtPos, LastSpurtSize,0,0, "lastspurt000.png", CMove_UI::UI_Type::Type_LastSpurt);
+		m_pLastSpurtUI->SetState(CMove_UI::State::Normal);
 	}
 	vector<string> TextElement;	// フォルダの保存バッファ
 	CFileLoad::STAGE_INFO Stage;
@@ -244,6 +251,9 @@ HRESULT CGame::Init(void)
 			"wooden_floor.png");
 	}
 	EnemySpawn();
+	//--------------
+	//音楽再生
+	//--------------
 	return S_OK;
 }
 
@@ -252,6 +262,9 @@ HRESULT CGame::Init(void)
 //=============================================================================
 void CGame::Uninit(void)
 {
+	//--------------
+	//音楽停止
+	//--------------
 	for (int nPlayer = 0; nPlayer < MaxPlayer; nPlayer++)
 	{
 		if (m_pPlayer[nPlayer])
@@ -281,6 +294,10 @@ void CGame::Update(void)
 	if (m_pGameTimer->GetCounter() <= 0)
 	{
 		CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT);
+	}
+	if (m_pGameTimer->GetCounter() <= LastSpartTime)
+	{
+		m_pLastSpurtUI->SetState(CMove_UI::State::ImmediatelyAfterPop);
 	}
 	//if (key->GetTrigger(CKey::KEYBIND::W) == true)
 	//{
