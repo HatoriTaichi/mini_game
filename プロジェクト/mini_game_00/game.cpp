@@ -28,7 +28,6 @@ static const int NormalItemSpawnInterval = 17 * 60;
 static const int ClimaxItemSpawnInterval = 12 * 60;
 static const int NormalIngredientsSpawnMin = 6;
 static const int NormalIngredientsSpawnMax = 8;
-static const int ClimaxIngredientsSpawnMin = 6;
 static const int ClimaxIngredientsSpawnMax = 8;
 static const int NormalItemSpawnMin = 2;
 static const int NormalItemSpawnMax = 2;
@@ -67,7 +66,7 @@ CGame::CGame(CObject::LAYER_TYPE layer) :CObject(layer)
 	m_IngredientsSpawnMax[NormalMode] = NormalIngredientsSpawnMax;
 	m_ItemSpawnMin[NormalMode] = NormalItemSpawnMin;
 	m_ItemSpawnMax[NormalMode] = NormalItemSpawnMax;
-	m_IngredientsSpawnMin[ClimaxMode] = ClimaxIngredientsSpawnMin;
+	m_IngredientsSpawnMin[ClimaxMode] = IngredientsSpawnMax;
 	m_IngredientsSpawnMax[ClimaxMode] = ClimaxIngredientsSpawnMax;
 	m_ItemSpawnMin[ClimaxMode] = ClimaxItemSpawnMin;
 	m_ItemSpawnMax[ClimaxMode] = ClimaxItemSpawnMax;
@@ -164,11 +163,11 @@ HRESULT CGame::Init(void)
 		}
 	}
 	////スタートUIを生成
-	//if (!m_pStartUI)
-	//{
-	//	m_pStartUI = CObject2D::Create(StartPos, StartSize, "Start000.png");
-	//	m_pStartUI->SetCol({ 1.0,1.0,1.0,0.0 });
-	//}
+	if (!m_pStartUI)
+	{
+		m_pStartUI = CMove_UI::Create(StartPos, StartSize, "Start000.png");
+		m_pStartUI->SetCol({ 1.0,1.0,1.0,0.0 });
+	}
 	////フィニッシュUIを生成
 	//if (!m_pFinishUI)
 	//{
@@ -252,6 +251,9 @@ HRESULT CGame::Init(void)
 			"wooden_floor.png");
 	}
 	EnemySpawn();
+	//--------------
+	//音楽再生
+	//--------------
 	return S_OK;
 }
 
@@ -260,6 +262,9 @@ HRESULT CGame::Init(void)
 //=============================================================================
 void CGame::Uninit(void)
 {
+	//--------------
+	//音楽停止
+	//--------------
 	for (int nPlayer = 0; nPlayer < MaxPlayer; nPlayer++)
 	{
 		if (m_pPlayer[nPlayer])

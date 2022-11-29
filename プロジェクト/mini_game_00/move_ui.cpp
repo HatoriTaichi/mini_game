@@ -245,7 +245,7 @@ void CMove_UI::Flash(void)
 
 }
 //=============================================================================
-// モデルの生成
+// 生成(位置、サイズ、出現持続時間、フェードインアウトの時間)
 //=============================================================================
 CMove_UI *CMove_UI::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale,
 	int nPopTime, int nFadeTime, string TexType, UI_Type type)
