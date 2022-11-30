@@ -35,7 +35,9 @@ static const int ClimaxItemSpawnMin = 2;
 static const int ClimaxItemSpawnMax = 2;
 static const int EnemySpawnMax = 2;
 static const int LastSpartTime = 30;
-static const int GameMaxTime = 31;
+static const int GameMaxTime = 90;//制限時間
+static const int StartTime = 60 * 2;
+static const int StartFadeTime = 30;
 static const D3DXVECTOR3 BandUIPos = {SCREEN_WIDTH/2.0f,50.0f,0.0f};//ゲーム画面上部にある帯みたいなやつ
 static const D3DXVECTOR3 BandUISize = { SCREEN_WIDTH / 2.0f,50.0f,0.0f };//ゲーム画面上部にある帯みたいなやつ
 static const D3DXVECTOR3 GameTimerSize = { 35.0f,40.0f,0.0f };//ゲーム画面上部にある帯みたいなやつ
@@ -165,8 +167,7 @@ HRESULT CGame::Init(void)
 	////スタートUIを生成
 	if (!m_pStartUI)
 	{
-		m_pStartUI = CMove_UI::Create(StartPos, StartSize, "Start000.png");
-		m_pStartUI->SetCol({ 1.0,1.0,1.0,0.0 });
+		m_pStartUI = CMove_UI::Create(StartPos, StartSize, StartTime, StartFadeTime, "Start000.png", CMove_UI::UI_Type::Type_Start);
 	}
 	////フィニッシュUIを生成
 	//if (!m_pFinishUI)

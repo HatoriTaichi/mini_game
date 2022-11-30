@@ -19,7 +19,7 @@ static const int LastSpurtUIEndTime = 30;
 static const int FinishUIEndTime = 30;
 static const int FlashTimeMin = 2;
 static const float LastSpurtMoveSpeed = 7.0f;
-
+static const float FadeSpeed = 0.05f;
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
@@ -71,6 +71,7 @@ void CMove_UI::Update(void)
 		{
 		case CMove_UI::UI_Type::Type_Start:
 			FadeIn();
+			SizeUp();
 			break;
 		case CMove_UI::UI_Type::Type_LastSpurt:
 			LastSpurt();
@@ -89,10 +90,10 @@ void CMove_UI::Update(void)
 		switch (m_Type)
 		{
 		case CMove_UI::UI_Type::Type_Start:
-			if (m_nTimer >= StartUIEndTime)
+			if (m_nTimer >= m_nMaxFadeTime)
 			{
 				m_nTimer = 0;
-				FadeOut();
+				m_state = CMove_UI::State::End;
 			}
 			break;
 		case CMove_UI::UI_Type::Type_LastSpurt:
@@ -110,6 +111,7 @@ void CMove_UI::Update(void)
 		switch (m_Type)
 		{
 		case CMove_UI::UI_Type::Type_Start:
+			FadeOut();
 
 			break;
 		case CMove_UI::UI_Type::Type_LastSpurt:
@@ -139,19 +141,19 @@ void CMove_UI::Draw(void)
 //=============================================================================
 // ちょっとした動きの処理
 //=============================================================================
-void CMove_UI::Motion(void)
+void CMove_UI::SizeUp(void)
 {
 	//大きさを小さくする
-	//m_scale.x -= Difspeed;
-	//m_scale.y -= Difspeed;
-	////大きさが元の大きさくらいまで小さくなったら動きをやめる
-	//if (m_Originscale.x >= m_scale.x&&
-	//	m_Originscale.y >= m_scale.y)
-	//{
-	//	m_scale = m_Originscale;
-	//	m_state = CMove_UI::State::Normal;
+	m_scale.x += m_addspeed.x;
+	m_scale.y += m_addspeed.y;
+	//大きさが元の大きさくらいまで小さくなったら動きをやめる
+	if (m_origin_scale.x <= m_scale.x&&
+		m_origin_scale.y <= m_scale.y)
+	{
+		m_scale = m_origin_scale;
+		m_state = CMove_UI::State::Normal;
 
-	//}
+	}
 	m_pUI->SetSize(m_scale);
 }
 //=============================================================================
@@ -161,11 +163,24 @@ void CMove_UI::FadeIn(void)
 {
 	float fColA = m_pUI->GetCol().a;
 
-	fColA += 0.01f;
+	fColA += FadeSpeed;
 
 	if (fColA >= 1.0f)
 	{
-		m_state = CMove_UI::State::Normal;
+		switch (m_Type)
+		{
+		case CMove_UI::UI_Type::Type_Start:
+
+			break;
+		case CMove_UI::UI_Type::Type_LastSpurt:
+			m_state = CMove_UI::State::Normal;
+			break;
+		case CMove_UI::UI_Type::Type_Finish:
+			m_state = CMove_UI::State::Normal;
+			break;
+		case CMove_UI::UI_Type::Type_PushStart:
+			break;
+		}
 	}
 
 	if (m_pUI)
@@ -180,7 +195,7 @@ void CMove_UI::FadeOut(void)
 {
 	float fColA = m_pUI->GetCol().a;
 
-	fColA -= 0.01f;
+	fColA -= FadeSpeed;
 
 	if (fColA <= 0.0f)
 	{
@@ -259,7 +274,9 @@ CMove_UI *CMove_UI::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale,
 	{
 		// 値を代入
 		Ingredients->m_pos = pos;
-		Ingredients->m_scale = scale;
+		Ingredients->m_scale = { scale.x / 100.0f,scale.y / 100.0f ,0.0f };
+		Ingredients->m_origin_scale = scale;
+		Ingredients->m_addspeed = { scale.x / 50.0f,scale.y / 50.0f ,0.0f };
 		Ingredients->m_nMaxPopTime = nPopTime;
 		Ingredients->m_nMaxFadeTime = nFadeTime;
 		Ingredients->m_Type = type;
