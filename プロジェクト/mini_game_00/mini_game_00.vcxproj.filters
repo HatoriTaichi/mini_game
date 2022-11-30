@@ -100,6 +100,9 @@
     <Filter Include="ソース ファイル\モデル">
       <UniqueIdentifier>{1ce21b97-4d58-4b03-977e-5d77196b650f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\サウンド">
+      <UniqueIdentifier>{6731ddce-d29a-4c6c-8f2e-fee48de357ab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="item.h">
@@ -237,6 +240,9 @@
     <ClInclude Include="select_botton.h">
       <Filter>ソース ファイル\UI</Filter>
     </ClInclude>
+    <ClInclude Include="sound.h">
+      <Filter>ソース ファイル\サウンド</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="item.cpp">
@@ -373,6 +379,9 @@
     </ClCompile>
     <ClCompile Include="select_button.cpp">
       <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="sound.cpp">
+      <Filter>ソース ファイル\サウンド</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

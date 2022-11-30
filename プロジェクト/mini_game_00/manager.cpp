@@ -138,7 +138,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	m_scene_manager = new CSceneManager;
 	if (m_scene_manager != nullptr)
 	{
-		m_scene_manager->Init();
+		m_scene_manager->Init(hWnd);
 	}
 
 	// ƒ‰ƒCƒg‚ÆƒJƒƒ‰‚Ì¶¬
