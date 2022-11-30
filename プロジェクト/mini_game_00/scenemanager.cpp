@@ -13,6 +13,8 @@
 #include "onlinegame.h"
 #include "fade.h"
 #include "result.h"
+#include "manager.h"
+#include "sound.h"
 
 //=============================================================================
 // Ã“Iƒƒ“ƒo•Ï”éŒ¾
@@ -182,6 +184,8 @@ void CSceneManager::SetMode(MODE mode)
 
 	m_mode = mode;
 
+	CManager::GetSound()->Stop();
+
 	switch (mode)
 	{
 	case MODE::TITLE:
@@ -236,4 +240,6 @@ void CSceneManager::SetMode(MODE mode)
 void CSceneManager::ChangeScene(CSceneManager::MODE mode)
 {
 	m_fade->SetFade(mode);
+
+	m_mode = mode;
 }

@@ -193,6 +193,7 @@
     <ClInclude Include="scenemanager.h" />
     <ClInclude Include="select_botton.h" />
     <ClInclude Include="singlemodel.h" />
+    <ClInclude Include="sound.h" />
     <ClInclude Include="tcp_client.h" />
     <ClInclude Include="telop.h" />
     <ClInclude Include="texture.h" />
@@ -240,6 +241,7 @@
     <ClCompile Include="scenemanager.cpp" />
     <ClCompile Include="select_button.cpp" />
     <ClCompile Include="singlemodel.cpp" />
+    <ClCompile Include="sound.cpp" />
     <ClCompile Include="tcp_client.cpp" />
     <ClCompile Include="telop.cpp" />
     <ClCompile Include="texture.cpp" />

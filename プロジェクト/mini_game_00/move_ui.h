@@ -46,7 +46,6 @@ public:
 	void Uninit(void);	// ポリゴンの終了
 	void Update(void);	// ポリゴンの更新
 	void Draw(void);	// ポリゴンの描画
-	void Motion(void);//ちょっとした動きの処理
 	void FadeIn(void);//画像のフェードイン
 	void FadeOut(void);//画像のフェードアウト
 	void FadeInOut(void);
@@ -59,6 +58,7 @@ public:
 	D3DXVECTOR3 GetRot(void) { return m_rot; }	// ゲッダー
 
 private:
+	void SizeUp(void);//ちょっとした動きの処理
 	void Start(void);//スタートUIの処理
 	void LastSpurt(void);//lastspurtUIの処理
 	void Finisj(void);//フィニッシュUIの処理
@@ -69,6 +69,9 @@ private:
 	D3DXVECTOR3 m_pos;	// 位置
 	D3DXVECTOR3 m_rot;	// 向き
 	D3DXVECTOR3 m_scale;	// スケール
+	D3DXVECTOR3 m_origin_scale;	// スケール
+	D3DXVECTOR3 m_addspeed;	// スケール
+
 	int m_nTimer;
 	int m_nMaxPopTime;//出現時間
 	int m_nMaxFadeTime;//フェードインアウトの時間

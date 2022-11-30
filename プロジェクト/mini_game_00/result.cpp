@@ -99,7 +99,7 @@ CResult::CResult(CObject::LAYER_TYPE layer) :CObject(layer)
 	m_bNext = false;
 	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
 	{
-		vector<int> nGetIngredients = CManager::GetInstance()->GetPlayer_ingredient_data(nCntPlayer)->GetIngredientsType();
+		vector<int> nGetIngredients = CManager::GetInstance()->GetPlayerIngredientData(nCntPlayer)->GetIngredientsType();
 		int nSize = nGetIngredients.size();
 		for (int GetIngredients = 0; GetIngredients < nSize; GetIngredients++)
 		{
@@ -183,7 +183,7 @@ void CResult::Uninit(void)
 				m_pComboCounter[nCombo][nCntPlayer] = nullptr;
 			}
 		}
-		CManager::GetInstance()->GetPlayer_ingredient_data(nCntPlayer)->ResetGetIngredientsType();
+		CManager::GetInstance()->GetPlayerIngredientData(nCntPlayer)->ResetGetIngredientsType();
 
 	}
 	//オブジェクトの破棄
@@ -195,7 +195,7 @@ void CResult::Uninit(void)
 //=============================================================================
 void CResult::Update(void)
 {
-	CPlayer_ingredient_data *Data = CManager::GetInstance()->GetPlayer_ingredient_data(0);
+	CPlayer_ingredient_data *Data = CManager::GetInstance()->GetPlayerIngredientData(0);
 	switch (m_state)
 	{
 	case ResultState::State_IngredientStart:
