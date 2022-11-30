@@ -278,7 +278,7 @@ void CPlayer::Update(void)
 
 	}
 	m_PlayerData.m_posold = m_PlayerData.m_pos;
-	if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::ON_LINE)
+	if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NETWORK_MODE::ON_LINE)
 	{
 		//プレイヤー情報をサーバーに送信
 		CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
@@ -591,7 +591,7 @@ void CPlayer::DropItem()
 			}
 			for (int nCnt = 0; nCnt < 1; nCnt++)
 			{
-				if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::ON_LINE)
+				if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NETWORK_MODE::ON_LINE)
 				{
 					CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
 

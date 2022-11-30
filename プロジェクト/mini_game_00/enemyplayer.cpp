@@ -83,7 +83,7 @@ void CEnemyPlayer::Uninit(void)
 //=============================================================================
 void CEnemyPlayer::Update(void)
 {
-	if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::ON_LINE)
+	if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NETWORK_MODE::ON_LINE)
 	{
 		// ƒf[ƒ^‚ðŽæ“¾
 		CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetEnemyData()->GetCmmuData();
@@ -283,7 +283,7 @@ void CEnemyPlayer::DropItem()
 			}
 			for (int nCnt = 0; nCnt < 1; nCnt++)
 			{
-				if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::ON_LINE)
+				if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NETWORK_MODE::ON_LINE)
 				{
 					CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
 

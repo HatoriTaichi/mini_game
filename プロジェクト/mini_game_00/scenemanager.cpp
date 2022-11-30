@@ -69,43 +69,13 @@ HRESULT CSceneManager::Init(void)
 //=============================================================================
 void CSceneManager::Uninit(void)
 {
-	// シーンの破棄
-	if (m_title != nullptr)
-	{
-		// 終了処理
-		m_title->Uninit();
+	bool is_release = CObject::IsReleaseAll();	// リリースオールフラグの取得
 
-		// メモリの開放
-		delete m_title;
-		m_title = nullptr;
-	}
-	if (m_game != nullptr)
-	{
-		// 終了処理
-		m_game->Uninit();
-
-		// メモリの開放
-		delete m_game;
-		m_game = nullptr;
-	}
-	if (m_online_game != nullptr)
-	{
-		// 終了処理
-		m_online_game->Uninit();
-
-		// メモリの開放
-		delete m_online_game;
-		m_online_game = nullptr;
-	}
-	if (m_result != nullptr)
-	{
-		// 終了処理
-		m_result->Uninit();
-
-		// メモリの開放
-		delete m_result;
-		m_result = nullptr;
-	}
+	// nullを入れる
+	m_title = nullptr;
+	m_game = nullptr;
+	m_online_game = nullptr;
+	m_result = nullptr;
 
 	// フェードクラスの破棄
 	if (m_fade != nullptr)
