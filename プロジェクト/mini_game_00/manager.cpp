@@ -155,7 +155,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	m_key->BindKey(CKey::KEYBIND::SPACE, DIK_SPACE);
 
 	// ‰ŠúƒV[ƒ“
-	m_scene_manager->ChangeScene(CSceneManager::MODE::ONLINE_GAME);
+	m_scene_manager->ChangeScene(CSceneManager::MODE::TITLE);
 
 	return S_OK;
 }

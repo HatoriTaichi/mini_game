@@ -38,7 +38,6 @@ CSceneManager::CSceneManager()
 	m_online_game = nullptr;
 	m_result = nullptr;
 	m_pSound = nullptr;
-	m_mode = CSceneManager::MODE::ONLINE_GAME;
 	m_networkmode = CSceneManager::NetWorkMode::ON_LINE;
 }
 
@@ -258,4 +257,6 @@ void CSceneManager::SetMode(MODE mode)
 void CSceneManager::ChangeScene(CSceneManager::MODE mode)
 {
 	m_fade->SetFade(mode);
+
+	m_mode = mode;
 }
