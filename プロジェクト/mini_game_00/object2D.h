@@ -55,8 +55,8 @@ public:
 	static CObject2D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, string type);	// オブジェクトの生成
 
 private:
-	LPDIRECT3DTEXTURE9 m_texture = NULL;	//テクスチャへのポインタ
-	LPDIRECT3DVERTEXBUFFER9 m_vtx_buff = NULL;	//頂点バッファへのポインタ
+	LPDIRECT3DTEXTURE9 m_texture;	//テクスチャへのポインタ
+	LPDIRECT3DVERTEXBUFFER9 m_vtx_buff;	//頂点バッファへのポインタ
 	D3DXVECTOR3 m_pos;	// ポリゴンの原点
 	D3DXVECTOR3 m_size;	// サイズ
 	string m_tex_pas;	// テクスチャタイプ

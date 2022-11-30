@@ -15,7 +15,12 @@
 //=============================================================================
 CObject2D::CObject2D(LAYER_TYPE Layer) : CObject(Layer)
 {
-
+	m_texture = nullptr;
+	m_vtx_buff = nullptr;
+	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_tex_pas.clear();
+	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 //=============================================================================
@@ -80,10 +85,10 @@ HRESULT CObject2D::Init(void)
 void CObject2D::Uninit(void)
 {
 	//頂点バッファの破棄
-	if (m_vtx_buff != NULL)
+	if (m_vtx_buff != nullptr)
 	{
 		m_vtx_buff->Release();
-		m_vtx_buff = NULL;
+		m_vtx_buff = nullptr;
 	}
 
 	Release();	// 自分の破棄
