@@ -27,7 +27,7 @@ class CResult;	//リザルトクラス
 class CSceneManager
 {
 public:
-	enum NetWorkMode
+	enum class NETWORK_MODE
 	{
 		OFF_LINE = 0,
 		ON_LINE
@@ -53,7 +53,7 @@ public:
 	static void SetMode(CSceneManager::MODE mode);	// モード設定
 	static MODE GetMode(void) { return m_mode; }	// モード取得
 	static void ChangeScene(CSceneManager::MODE mode);	// フェード
-	static NetWorkMode GetNetWorkMode(void) { return m_networkmode; }	// フェード
+	static NETWORK_MODE GetNetWorkMode(void) { return m_network_mode; }	// フェード
 
 private:
 	static CFade *m_fade;	// フェードクラス
@@ -62,7 +62,7 @@ private:
 	static COnlineGame *m_online_game;	// オンラインゲームクラス
 	static CResult *m_result;	// ゲームクラス
 	static CSceneManager::MODE m_mode;	// モード
-	static NetWorkMode m_networkmode;	// モード
+	static NETWORK_MODE m_network_mode;	// モード
 
 };
 

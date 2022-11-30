@@ -23,7 +23,7 @@ CGame *CSceneManager::m_game;
 COnlineGame *CSceneManager::m_online_game;
 CResult *CSceneManager::m_result;
 CSceneManager::MODE CSceneManager::m_mode;
-CSceneManager::NetWorkMode CSceneManager::m_networkmode;
+CSceneManager::NETWORK_MODE CSceneManager::m_network_mode;
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -36,7 +36,7 @@ CSceneManager::CSceneManager()
 	m_online_game = nullptr;
 	m_result = nullptr;
 	m_mode = CSceneManager::MODE::ONLINE_GAME;
-	m_networkmode = CSceneManager::NetWorkMode::ON_LINE;
+	m_network_mode = CSceneManager::NETWORK_MODE::ON_LINE;
 }
 
 //=============================================================================
@@ -202,7 +202,7 @@ void CSceneManager::SetMode(MODE mode)
 		{
 			// 初期化
 			m_game->Init();
-			m_networkmode = NetWorkMode::OFF_LINE;
+			m_network_mode = NETWORK_MODE::OFF_LINE;
 		}
 		break;
 	case MODE::ONLINE_GAME:
@@ -213,7 +213,7 @@ void CSceneManager::SetMode(MODE mode)
 		{
 			// 初期化
 			m_online_game->Init();
-			m_networkmode = NetWorkMode::ON_LINE;
+			m_network_mode = NETWORK_MODE::ON_LINE;
 
 		}
 		break;
