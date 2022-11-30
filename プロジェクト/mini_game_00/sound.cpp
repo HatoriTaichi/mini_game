@@ -6,7 +6,7 @@
 //=============================================================================
 #include "sound.h"
 
-/*// 各音素材のパラメータ
+// 各音素材のパラメータ
 CSound::PARAM CSound::m_aParam[SOUND_LABEL_MAX] =
 {
 	{ "data\\Sound\\Bgm\\Title.wav", -1 },				// BGMタイトル
@@ -358,4 +358,4 @@ HRESULT CSound::ReadChunkData(HANDLE hFile, void *pBuffer, DWORD dwBuffersize, D
 	}
 
 	return S_OK;
-}*/
+}

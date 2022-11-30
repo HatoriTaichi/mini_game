@@ -144,11 +144,11 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 		m_scene_manager->Init();
 	}
 
-	/*m_sound = new CSound;
+	m_sound = new CSound;
 	if (m_sound != nullptr)
 	{
 		m_sound->Init(hWnd);
-	}*/
+	}
 
 	// ライトとカメラの生成
 	m_camera = CCamera::Create(CAMERA_POS_V, CAMERA_POS_R, CAMERA_ROT);
@@ -164,7 +164,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	m_key->BindKey(CKey::KEYBIND::SPACE, DIK_SPACE);
 
 	// 初期シーン
-	m_scene_manager->ChangeScene(CSceneManager::MODE::ONLINE_GAME);
+	m_scene_manager->ChangeScene(CSceneManager::MODE::TITLE);
 
 	return S_OK;
 }
@@ -174,7 +174,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 //================================================
 void CManager::Uninit(void)
 {
-	//CManager::GetSound()->Stop();
+	CManager::GetSound()->Stop();
 
 	// 全てのオブジェクトの破棄
 	CObject::ReleaseAll();
@@ -290,14 +290,14 @@ void CManager::Uninit(void)
 		m_renderer = nullptr;
 	}
 
-	/*//サウンドクラスのUninit
+	//サウンドクラスのUninit
 	if (m_sound != NULL)
 	{
 		m_sound->Uninit();
 
 		delete m_sound;
 		m_sound = NULL;
-	}*/
+	}
 
 	// メモリの開放
 	delete m_single_manager;

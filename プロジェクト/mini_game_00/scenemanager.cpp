@@ -184,7 +184,7 @@ void CSceneManager::SetMode(MODE mode)
 
 	m_mode = mode;
 
-	//CManager::GetSound()->Stop();
+	CManager::GetSound()->Stop();
 
 	switch (mode)
 	{
@@ -240,4 +240,6 @@ void CSceneManager::SetMode(MODE mode)
 void CSceneManager::ChangeScene(CSceneManager::MODE mode)
 {
 	m_fade->SetFade(mode);
+
+	m_mode = mode;
 }
