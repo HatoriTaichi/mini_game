@@ -104,7 +104,7 @@ HRESULT CPlayer::Init(void)
 void CPlayer::Uninit(void)
 {
 	//具材の情報を保存
-	CManager::GetInstance()->GetPlayer_ingredient_data(m_nNumPlayer)->SetIngredientsType(m_PlayerData.m_nGetIngredientsType);
+	CManager::GetInstance()->GetPlayerIngredientData(m_nNumPlayer)->SetIngredientsType(m_PlayerData.m_nGetIngredientsType);
 	// サイズの取得
 	int size = m_model.size();
 	for (int count_model = 0; count_model < size; count_model++)
@@ -278,7 +278,7 @@ void CPlayer::Update(void)
 
 	}
 	m_PlayerData.m_posold = m_PlayerData.m_pos;
-	if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::OnLine)
+	if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::ON_LINE)
 	{
 		//プレイヤー情報をサーバーに送信
 		CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
@@ -591,7 +591,7 @@ void CPlayer::DropItem()
 			}
 			for (int nCnt = 0; nCnt < 1; nCnt++)
 			{
-				if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::OnLine)
+				if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::ON_LINE)
 				{
 					CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
 

@@ -407,7 +407,7 @@ void CIngredients::ColisionPlayer(void)
 				if (!m_bDelete)
 				{
 					pPlayer->SetIngredients(m_Type);
-					if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::OnLine)
+					if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::ON_LINE)
 					{
 						CManager::GetInstance()->GetSceneManager()->GetOnloineGame()->AddIngredientsCnt(1, m_Type, nCnt);
 
@@ -449,7 +449,7 @@ void CIngredients::ColisionEnemyPlayer(void)
 				if (!m_bDelete)
 				{
 					pEnemyPlayer->SetIngredients(m_Type);
-					if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::OnLine)
+					if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::ON_LINE)
 					{
 						CManager::GetInstance()->GetSceneManager()->GetOnloineGame()->AddIngredientsCnt(1, m_Type, nCnt -1);
 					}

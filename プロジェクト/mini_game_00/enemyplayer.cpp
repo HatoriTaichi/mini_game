@@ -62,7 +62,7 @@ HRESULT CEnemyPlayer::Init(void)
 //=============================================================================
 void CEnemyPlayer::Uninit(void)
 {
-	CManager::GetInstance()->GetPlayer_ingredient_data(m_number)->SetIngredientsType(m_enemy_player_data.get_ingredients_type);
+	CManager::GetInstance()->GetPlayerIngredientData(m_number)->SetIngredientsType(m_enemy_player_data.get_ingredients_type);
 	// サイズの取得
 	int size = m_model.size();
 	for (int count_model = 0; count_model < size; count_model++)
@@ -83,7 +83,7 @@ void CEnemyPlayer::Uninit(void)
 //=============================================================================
 void CEnemyPlayer::Update(void)
 {
-	if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::OnLine)
+	if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::ON_LINE)
 	{
 		// データを取得
 		CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetEnemyData()->GetCmmuData();
@@ -283,7 +283,7 @@ void CEnemyPlayer::DropItem()
 			}
 			for (int nCnt = 0; nCnt < 1; nCnt++)
 			{
-				if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::OnLine)
+				if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NetWorkMode::ON_LINE)
 				{
 					CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
 

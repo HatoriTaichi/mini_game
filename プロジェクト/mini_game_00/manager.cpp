@@ -21,6 +21,7 @@
 #include "player_ingredient_data.h"
 #include "XInput.h"
 #include "networkmanager.h"
+#include "sound.h"
 
 //=============================================================================
 // マクロ定義
@@ -39,6 +40,7 @@
 // 静的メンバ変数宣言
 //=============================================================================
 CManager *CManager::m_single_manager;
+CSound *CManager::m_sound;
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -60,6 +62,7 @@ CManager::CManager()
 	m_texture = nullptr;
 	m_xinput = nullptr;
 	m_net_work_manager = nullptr;
+	m_sound = nullptr;
 	for (int count_player = 0; count_player < MAX_PLAYER; count_player++)
 	{
 		m_player_ingredient_data[count_player] = nullptr;
@@ -138,7 +141,13 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	m_scene_manager = new CSceneManager;
 	if (m_scene_manager != nullptr)
 	{
-		m_scene_manager->Init(hWnd);
+		m_scene_manager->Init();
+	}
+
+	m_sound = new CSound;
+	if (m_sound != nullptr)
+	{
+		m_sound->Init(hWnd);
 	}
 
 	// ライトとカメラの生成
@@ -165,6 +174,8 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 //================================================
 void CManager::Uninit(void)
 {
+	CManager::GetSound()->Stop();
+
 	// 全てのオブジェクトの破棄
 	CObject::ReleaseAll();
 
@@ -277,6 +288,15 @@ void CManager::Uninit(void)
 		// メモリの開放
 		delete m_renderer;
 		m_renderer = nullptr;
+	}
+
+	//サウンドクラスのUninit
+	if (m_sound != NULL)
+	{
+		m_sound->Uninit();
+
+		delete m_sound;
+		m_sound = NULL;
 	}
 
 	// メモリの開放
