@@ -6,24 +6,29 @@
 //=============================================================================
 #include "sound.h"
 
-// 各音素材のパラメータ
+/*// 各音素材のパラメータ
 CSound::PARAM CSound::m_aParam[SOUND_LABEL_MAX] =
 {
-	{ "data\\bgm\\title.wav", -1 },			// BGMタイトル
-	{ "data\\bgm\\build.wav", -1 },			// BGMビルダー
-	{ "data\\bgm\\game.wav", -1 },			// BGMゲーム
+	{ "data\\Sound\\Bgm\\Title.wav", -1 },				// BGMタイトル
+	{ "data\\Sound\\Bgm\\Matching.wav", -1 },			// BGMマッチング
+	{ "data\\Sound\\Bgm\\Game.wav", -1 },				// BGMゲーム
+	{ "data\\Sound\\Bgm\\Game_Lastspurt.wav", -1 },		// BGMゲームラストスパート
+	{ "data\\Sound\\Bgm\\Result.wav", -1 },				// BGMリザルト
 
-	{ "data\\se\\jump.wav", 0 },			// ジャンプ
-	{ "data\\se\\reverse.wav", 0 },			// 重力反転
-	{ "data\\se\\updown.wav", 0 },			// 重力updown
-	{ "data\\se\\death.wav", 0 },			// 死
+	{ "data\\Sound\\Se\\Title_Buttonpress.wav", 0 },	// SEタイトルでのボタン押下
 
-	{ "data\\se\\goalshake.wav", 0 },		// ゴール
-	{ "data\\se\\goallogo.wav", 0 },		// 各種ロゴ表示
+	{ "data\\Sound\\Se\\Game_Start.wav", 0 },			// SEゲームスタート
+	{ "data\\Sound\\Se\\Game_Damage.wav", 0 },			// SEダメージ
+	{ "data\\Sound\\Se\\Game_Itemattack.wav", 0 },		// SEアイテム取得
+	{ "data\\Sound\\Se\\Game_Spawn.wav", 0 },			// SE具材、アイテムスポーン
+	{ "data\\Sound\\Se\\Game_walk.wav", 0 },			// SE歩行
+	{ "data\\Sound\\Se\\Game_End.wav", 0 },				// SEゲームエンド
 
-	{ "data\\se\\cursor.wav", 0 },			// カーソル
-	{ "data\\se\\return.wav", 0 },			// 決定
-	{ "data\\se\\title_return.wav", 0 },	// タイトルでエンターキー押下
+	{ "data\\Sound\\Se\\Result_Ingredients.wav", 0 },	// SEコンボ
+	{ "data\\Sound\\Se\\Result_Scoreup.wav", -1 },		// SEスコア上昇
+	{ "data\\Sound\\Se\\Result_Scoreconfirm.wav", 0 },	// SEスコア確定
+	{ "data\\Sound\\Se\\Result_Win.wav", 0 },			// 勝利ジングル
+	{ "data\\Sound\\Se\\Result_Lose.wav", 0 },			// 敗北ジングル
 };
 
 //=============================================================================
@@ -353,4 +358,4 @@ HRESULT CSound::ReadChunkData(HANDLE hFile, void *pBuffer, DWORD dwBuffersize, D
 	}
 
 	return S_OK;
-}
+}*/

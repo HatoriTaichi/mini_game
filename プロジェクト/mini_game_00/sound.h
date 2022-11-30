@@ -15,7 +15,7 @@
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class CSound
+/*class CSound
 {
 public:
 	CSound();
@@ -24,21 +24,27 @@ public:
 	// サウンドファイル
 	enum SOUND_LABEL
 	{
-		SOUND_LABEL_BGM_TITLE,		// BGMタイトルok
-		SOUND_LABEL_BGM_BUILD,		// BGMビルダーok
-		SOUND_LABEL_BGM_GAME,		// BGMゲームok
+		SOUND_LABEL_BGM_TITLE,		// BGMタイトル
+		SOUND_LABEL_BGM_MATCHING,	// BGMマッチング
+		SOUND_LABEL_BGM_GAME,		// BGMゲーム
+		SOUND_LABEL_BGM_GAMELAST,	// BGMゲームラストスパート
+		SOUND_LABEL_BGM_RESULT,		// BGMリザルト
 
-		SOUND_LABEL_SE_JUMP,		// ジャンプok
-		SOUND_LABEL_SE_REVERSE,		// 重力反転ok
-		SOUND_LABEL_SE_GRAVUPDOWN,	// 重力updownok
-		SOUND_LABEL_SE_DEATH,		// 死
+		SOUND_LABEL_SE_TITLE_START,	// タイトルでのボタン押下
 
-		SOUND_LABEL_SE_GOALSHAKE,	// ゴールok
-		SOUND_LABEL_SE_GOALLOGO,	// 各種ロゴ表示ok
+		SOUND_LABEL_SE_GAME_START,	// ゲームスタート
+		SOUND_LABEL_SE_GAME_DAMAGE,	// ダメージ
+		SOUND_LABEL_SE_GAME_ITEM,	// アイテム取得
+		SOUND_LABEL_SE_GAME_SPAWN,	// 具材、アイテムスポーン
+		SOUND_LABEL_SE_GAME_WALK,	// 歩行
+		SOUND_LABEL_SE_GAME_END,	// ゲームエンド
 
-		SOUND_LABEL_SE_CURSOR,		// カーソルok
-		SOUND_LABEL_SE_ENTER,		// 決定ok
-		SOUND_LABEL_SE_PRESS,		// タイトルでエンターキー押下ok
+		SOUND_LABEL_SE_RESULT_CONBO,		// コンボ
+		SOUND_LABEL_SE_RESULT_SCOREUP,		// スコア上昇(ループ)
+		SOUND_LABEL_SE_RESULT_SCORECONFIRM,	// スコア確定
+
+		SOUND_LABEL_SE_RESULT_WIN,	// 勝利ジングル
+		SOUND_LABEL_SE_RESULT_LOSE,	// 敗北ジングル
 
 		SOUND_LABEL_MAX
 	};
@@ -57,11 +63,11 @@ public:
 
 private:
 	// パラメータ構造体
-	typedef struct
+	struct PARAM
 	{
 		char *m_filename;			// ファイル名
 		int m_nCntLoop;				// ループカウント
-	} PARAM;
+	};
 
 	HRESULT CheckChunk(HANDLE hFile, DWORD format, DWORD *pChunkSize, DWORD *pChunkDataPosition);
 	HRESULT ReadChunkData(HANDLE hFile, void *pBuffer, DWORD dwBuffersize, DWORD dwBufferoffset);
@@ -73,6 +79,6 @@ private:
 	DWORD m_aSizeAudio[SOUND_LABEL_MAX] = {};					// オーディオデータサイズ
 
 	static PARAM m_aParam[SOUND_LABEL_MAX];						// 各音声素材のパラメータ
-};
+};*/
 
 #endif

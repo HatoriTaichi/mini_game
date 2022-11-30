@@ -184,7 +184,7 @@ void CSceneManager::SetMode(MODE mode)
 
 	m_mode = mode;
 
-	CManager::GetSound()->Stop();
+	//CManager::GetSound()->Stop();
 
 	switch (mode)
 	{
