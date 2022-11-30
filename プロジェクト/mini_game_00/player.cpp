@@ -24,6 +24,7 @@
 #include "networkmanager.h"
 #include "onlinegame.h"
 #include "enemyplayer.h"
+
 static const float MoveSpeed = 5.0f;
 static const float SpeedUpDiameter = 1.5f;//スピードアップ倍率
 static const float PossibleAttackSpeedUpDiameter = 1.2f;//攻撃可能時のスピードアップ倍率

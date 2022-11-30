@@ -20,6 +20,7 @@ class CGame;	// ゲームクラス
 class COnlineGame;	// オンラインゲームクラス
 class CFade;	// フェードクラス
 class CResult;	//リザルトクラス
+class CSound;
 
 //*****************************************************************************
 // クラス定義
@@ -42,7 +43,7 @@ public:
 	};
 	CSceneManager();	// デフォルトコンストラクタ
 	~CSceneManager();	// デフォルトデストラクタ
-	HRESULT Init(void);	// 初期化
+	HRESULT Init(HWND hWnd);	// 初期化
 	void Uninit(void);	// 終了
 	void Update(void);	// 更新
 	static CFade *GetFade(void) { return m_fade; }	// フェードクラスの取得
@@ -54,6 +55,7 @@ public:
 	static MODE GetMode(void) { return m_mode; }	// モード取得
 	static void ChangeScene(CSceneManager::MODE mode);	// フェード
 	static NetWorkMode GetNetWorkMode(void) { return m_networkmode; }	// フェード
+	static CSound *GetSound() { return m_pSound; }
 
 private:
 	static CFade *m_fade;	// フェードクラス
@@ -63,6 +65,7 @@ private:
 	static CResult *m_result;	// ゲームクラス
 	static CSceneManager::MODE m_mode;	// モード
 	static NetWorkMode m_networkmode;	// モード
+	static CSound *m_pSound;	// サウンドのクラス
 
 };
 

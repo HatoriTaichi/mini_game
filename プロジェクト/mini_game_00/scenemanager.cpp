@@ -13,6 +13,7 @@
 #include "onlinegame.h"
 #include "fade.h"
 #include "result.h"
+#include "sound.h"
 
 //=============================================================================
 // 静的メンバ変数宣言
@@ -24,6 +25,7 @@ COnlineGame *CSceneManager::m_online_game;
 CResult *CSceneManager::m_result;
 CSceneManager::MODE CSceneManager::m_mode;
 CSceneManager::NetWorkMode CSceneManager::m_networkmode;
+CSound *CSceneManager::m_pSound;
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -35,6 +37,7 @@ CSceneManager::CSceneManager()
 	m_game = nullptr;
 	m_online_game = nullptr;
 	m_result = nullptr;
+	m_pSound = nullptr;
 	m_mode = CSceneManager::MODE::ONLINE_GAME;
 	m_networkmode = CSceneManager::NetWorkMode::ON_LINE;
 }
@@ -50,13 +53,19 @@ CSceneManager::~CSceneManager()
 //=============================================================================
 // 初期化処理
 //=============================================================================
-HRESULT CSceneManager::Init(void)
+HRESULT CSceneManager::Init(HWND hWnd)
 {
 	//フェードクラスの生成
 	m_fade = new CFade;
 	if (m_fade != nullptr)
 	{
 		m_fade->Init();
+	}
+
+	m_pSound = new CSound;
+	if (m_pSound != nullptr)
+	{
+		m_pSound->Init(hWnd);
 	}
 
 	return S_OK;
@@ -67,6 +76,8 @@ HRESULT CSceneManager::Init(void)
 //=============================================================================
 void CSceneManager::Uninit(void)
 {
+	CSceneManager::GetSound()->Stop();
+
 	// シーンの破棄
 	if (m_title != nullptr)
 	{
@@ -114,6 +125,15 @@ void CSceneManager::Uninit(void)
 		// メモリの開放
 		delete m_fade;
 		m_fade = nullptr;
+	}
+
+	//サウンドクラスのUninit
+	if (m_pSound != NULL)
+	{
+		m_pSound->Uninit();
+
+		delete m_pSound;
+		m_pSound = NULL;
 	}
 }
 
@@ -181,6 +201,8 @@ void CSceneManager::SetMode(MODE mode)
 	CObject::ReleaseAll();
 
 	m_mode = mode;
+
+	CSceneManager::GetSound()->Stop();
 
 	switch (mode)
 	{
