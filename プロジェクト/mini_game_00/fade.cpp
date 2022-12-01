@@ -109,7 +109,7 @@ void CFade::Update(void)
 		{
 			m_col_a = 1.0f;
 			m_fade_in = false;
-			CSceneManager::SetMode(m_next_mode);
+			CManager::GetInstance()->GetSceneManager()->SetMode(m_next_mode);
 		}
 	}
 

@@ -67,7 +67,7 @@ static const D3DXVECTOR3 NumberPos2 = { 805.0f ,40.0f ,0.0f };//ラストスパートUI
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
-COnlineGame::COnlineGame(CObject::LAYER_TYPE layer) :CObject(layer)
+COnlineGame::COnlineGame()
 {
 	m_ItemSpawnInterval[NormalMode] = NormalItemSpawnInterval;
 	m_ItemSpawnInterval[ClimaxMode] = ClimaxItemSpawnInterval;
@@ -310,8 +310,6 @@ void COnlineGame::Uninit(void)
 		}
 	}
 
-	//オブジェクトの破棄
-	Release();
 }
 
 //=============================================================================
@@ -336,14 +334,6 @@ void COnlineGame::Update(void)
 		}
 	}
 
-
-}
-
-//=============================================================================
-// 描画処理
-//=============================================================================
-void COnlineGame::Draw(void)
-{
 
 }
 

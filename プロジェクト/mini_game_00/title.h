@@ -20,7 +20,7 @@ class CSelect_Botton;
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class CTitle : public CObject
+class CTitle
 {
 public:
 	enum class BOTTON_TYPE
@@ -29,12 +29,12 @@ public:
 		Menu,
 		Max
 	};
-	CTitle(LAYER_TYPE layer = LAYER_TYPE::LAYER_00);	// デフォルトコンストラクタ
+	CTitle();	// デフォルトコンストラクタ
 	~CTitle();	// デフォルトデストラクタ
 	HRESULT Init(void);	// 初期化
 	void Uninit(void);	// 終了
 	void Update(void);	// 更新
-	void Draw(void);	// 描画
+
 private:
 	void BottonSelect(void);//選択処理
 	void StageCreate(void);

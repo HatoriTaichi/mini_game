@@ -17,17 +17,6 @@
 #include "sound.h"
 
 //=============================================================================
-// 静的メンバ変数宣言
-//=============================================================================
-CFade *CSceneManager::m_fade;
-CTitle *CSceneManager::m_title;
-CGame *CSceneManager::m_game;
-COnlineGame *CSceneManager::m_online_game;
-CResult *CSceneManager::m_result;
-CSceneManager::MODE CSceneManager::m_mode;
-CSceneManager::NETWORK_MODE CSceneManager::m_network_mode;
-
-//=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
 CSceneManager::CSceneManager()
@@ -69,13 +58,49 @@ HRESULT CSceneManager::Init(void)
 //=============================================================================
 void CSceneManager::Uninit(void)
 {
-	bool is_release = CObject::IsReleaseAll();	// リリースオールフラグの取得
+	// タイトルクラスの破棄
+	if (m_title != nullptr)
+	{
+		// 終了処理
+		m_title->Uninit();
 
-	// nullを入れる
-	m_title = nullptr;
-	m_game = nullptr;
-	m_online_game = nullptr;
-	m_result = nullptr;
+		// メモリの開放
+		delete m_title;
+		m_title = nullptr;
+	}
+
+	// ゲームクラスの破棄
+	if (m_game != nullptr)
+	{
+		// 終了処理
+		m_game->Uninit();
+
+		// メモリの開放
+		delete m_game;
+		m_game = nullptr;
+	}
+
+	// オンラインゲームクラスの破棄
+	if (m_online_game != nullptr)
+	{
+		// 終了処理
+		m_online_game->Uninit();
+
+		// メモリの開放
+		delete m_online_game;
+		m_online_game = nullptr;
+	}
+
+	// リザルトクラスの破棄
+	if (m_result != nullptr)
+	{
+		// 終了処理
+		m_result->Uninit();
+
+		// メモリの開放
+		delete m_result;
+		m_result = nullptr;
+	}
 
 	// フェードクラスの破棄
 	if (m_fade != nullptr)
@@ -94,6 +119,45 @@ void CSceneManager::Uninit(void)
 //=============================================================================
 void CSceneManager::Update(void)
 {
+	// シーン事に更新
+	switch (m_mode)
+	{
+	case MODE::TITLE:
+		// nullチェック
+		if (m_title != nullptr)
+		{
+			// 更新処理
+			m_title->Update();
+		}
+		break;
+	case MODE::GAME:
+		// nullチェック
+		if (m_game != nullptr)
+		{
+			// 更新処理
+			m_game->Update();
+		}
+		break;
+	case MODE::ONLINE_GAME:
+		// nullチェック
+		if (m_online_game != nullptr)
+		{
+			// 更新処理
+			m_online_game->Update();
+		}
+		break;
+	case MODE::RESULT:
+		// nullチェック
+		if (m_result != nullptr)
+		{
+			// 更新処理
+			m_result->Update();
+		}
+		break;
+	default:
+		break;
+	}
+
 	// フェードクラスの更新
 	if (m_fade != nullptr)
 	{
@@ -152,9 +216,11 @@ void CSceneManager::SetMode(MODE mode)
 	//全てのオブジェクトの破棄
 	CObject::ReleaseAll();
 
+	// シーンを保存
 	m_mode = mode;
 
-	CManager::GetSound()->Stop();
+	// サウンドの停止
+	CManager::GetInstance()->GetSound()->Stop();
 
 	switch (mode)
 	{
@@ -210,6 +276,4 @@ void CSceneManager::SetMode(MODE mode)
 void CSceneManager::ChangeScene(CSceneManager::MODE mode)
 {
 	m_fade->SetFade(mode);
-
-	m_mode = mode;
 }

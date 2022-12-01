@@ -139,7 +139,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
 		}
 	}
 
-	if (CManager::GetInstance() != NULL)
+	if (CManager::GetInstance() != nullptr)
 	{
 		// I—¹ˆ—
 		CManager::GetInstance()->Uninit();

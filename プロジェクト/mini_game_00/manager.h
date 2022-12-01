@@ -51,7 +51,7 @@ public:
 	CDirectInput *GetDirectInput(void) { return m_direct_input; }	// キーボードクラスの取得
 	CXInput *GetXInput(void) { return m_xinput; }	// Xインプットクラスの取得
 	CNetWorkManager *GetNetWorkManager(void) { return m_net_work_manager; }	// ネットワークマネージャークラスの取得
-	static CSound *GetSound() { return m_sound; }
+	CSound *GetSound() { return m_sound; }
 	CPlayer_ingredient_data *GetPlayerIngredientData(int num_player) { return m_player_ingredient_data[num_player]; }	// プレイヤーの具材情報
 	HWND GetWindowHandle() { return m_hwnd; }	// ウィンドウハンドル取得処理
 	void SetWindowHandle(HWND hWind) { m_hwnd = hWind; }	// ウィンドウハンドル設定処理
@@ -72,7 +72,7 @@ private:
 	CXInput *m_xinput;	// xインプットクラス
 	CNetWorkManager *m_net_work_manager;	// ネットワークマネージャークラス
 	CPlayer_ingredient_data *m_player_ingredient_data[MAX_PLAYER];	// プレイヤーの具材情報クラス
-	static CSound *m_sound;	// サウンドのクラス
+	CSound *m_sound;	// サウンドのクラス
 };
 
 

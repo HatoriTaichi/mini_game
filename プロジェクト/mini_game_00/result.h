@@ -23,7 +23,7 @@ class CCounter;
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class CResult : public CObject
+class CResult
 {
 public:
 
@@ -54,12 +54,12 @@ public:
 		Max
 	};
 
-	CResult(LAYER_TYPE layer = LAYER_TYPE::LAYER_00);	// デフォルトコンストラクタ
+	CResult();	// デフォルトコンストラクタ
 	~CResult();	// デフォルトデストラクタ
 	HRESULT Init(void);	// 初期化
 	void Uninit(void);	// 終了
 	void Update(void);	// 更新
-	void Draw(void);	// 描画
+
 private:
 	void ComboCalculate(void);//コンボの計算
 	void ComboStaging(void);//コンボの演出

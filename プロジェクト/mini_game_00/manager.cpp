@@ -40,7 +40,6 @@
 // 静的メンバ変数宣言
 //=============================================================================
 CManager *CManager::m_single_manager;
-CSound *CManager::m_sound;
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -62,12 +61,11 @@ CManager::CManager()
 	m_texture = nullptr;
 	m_xinput = nullptr;
 	m_net_work_manager = nullptr;
-	m_sound = nullptr;
 	for (int count_player = 0; count_player < MAX_PLAYER; count_player++)
 	{
 		m_player_ingredient_data[count_player] = nullptr;
 	}
-
+	m_sound = nullptr;
 }
 
 //=============================================================================
@@ -144,6 +142,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 		m_scene_manager->Init();
 	}
 
+	// サウンドクラスの生成
 	m_sound = new CSound;
 	if (m_sound != nullptr)
 	{
@@ -174,13 +173,8 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 //================================================
 void CManager::Uninit(void)
 {
-	CManager::GetSound()->Stop();
-
-	// 全てのオブジェクトの破棄
-	CObject::ReleaseAll();
-
-	// モデルの破棄
-	CModel::UnLoad();
+	// サウンドの停止
+	m_sound->Stop();
 
 	// テクスチャの破棄
 	if (m_texture != nullptr)
@@ -290,14 +284,22 @@ void CManager::Uninit(void)
 		m_renderer = nullptr;
 	}
 
-	//サウンドクラスのUninit
-	if (m_sound != NULL)
+	// サウンドクラスの破棄
+	if (m_sound != nullptr)
 	{
+		// 終了処理
 		m_sound->Uninit();
 
+		// メモリの開放
 		delete m_sound;
-		m_sound = NULL;
+		m_sound = nullptr;
 	}
+
+	// 全てのオブジェクトの破棄
+	CObject::ReleaseAll();
+
+	// モデルの破棄
+	CModel::UnLoad();
 
 	// メモリの開放
 	delete m_single_manager;
@@ -309,6 +311,12 @@ void CManager::Uninit(void)
 //================================================
 void CManager::Update(void)
 {
+	// シーンマネージャークラス
+	if (m_scene_manager != nullptr)
+	{
+		m_scene_manager->Update();
+	}
+
 	// レンダラークラス
 	if (m_renderer != nullptr)
 	{
@@ -350,12 +358,6 @@ void CManager::Update(void)
 	if (m_camera != nullptr)
 	{
 		m_camera->Update();
-	}
-
-	// シーンマネージャークラス
-	if (m_scene_manager != nullptr)
-	{
-		m_scene_manager->Update();
 	}
 }
 

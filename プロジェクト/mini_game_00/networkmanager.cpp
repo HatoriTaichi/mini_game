@@ -88,7 +88,6 @@ void CNetWorkManager::Recv(void)
 			// 受信データがあったら
 			while (recv_size > 0)
 			{
-				char send_data[MAX_COMMU_DATA];	// 送信データ
 				char recv_data[MAX_COMMU_DATA];	// 受信データ
 
 				CCommunicationData::COMMUNICATION_DATA *data_buf = new CCommunicationData::COMMUNICATION_DATA;	// データのバッファ

@@ -26,7 +26,7 @@ static const int OnLineMaxIngredients = 5;
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class COnlineGame : public CObject
+class COnlineGame
 {
 public:
 	enum GameMode
@@ -36,12 +36,11 @@ public:
 		ModeMax
 	};
 
-	COnlineGame(LAYER_TYPE layer = LAYER_TYPE::LAYER_00);	// デフォルトコンストラクタ
+	COnlineGame();	// デフォルトコンストラクタ
 	~COnlineGame();	// デフォルトデストラクタ
 	HRESULT Init(void);	// 初期化
 	void Uninit(void);	// 終了
 	void Update(void);	// 更新
-	void Draw(void);	// 描画
 	void ItemSpawn(void);
 	void EnemySpawn(void);
 	void IngredientsSpawn(void);

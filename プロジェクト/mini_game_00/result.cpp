@@ -53,7 +53,7 @@ static const int ComboPointGold = 7500;//コンボの点数
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
-CResult::CResult(CObject::LAYER_TYPE layer) :CObject(layer)
+CResult::CResult()
 {
 	m_state = ResultState::State_IngredientStart;
 	m_nComboScoreType[(int)ComboType::BasilALot] = ComboPointBronze;
@@ -186,8 +186,6 @@ void CResult::Uninit(void)
 		CManager::GetInstance()->GetPlayerIngredientData(nCntPlayer)->ResetGetIngredientsType();
 
 	}
-	//オブジェクトの破棄
-	Release();
 }
 
 //=============================================================================
@@ -236,23 +234,6 @@ void CResult::Update(void)
 	}
 }
 
-//=============================================================================
-// 描画処理
-//=============================================================================
-void CResult::Draw(void)
-{
-	//for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
-	//{
-	//	int nSize = m_pIngredient[nCntPlayer].size();
-	//	if (nSize != 0)
-	//	{
-	//		for (int nCnt = 0; nCnt < nSize; nCnt++)
-	//		{
-	//			m_pIngredient[nCntPlayer][nCnt]->Draw();
-	//		}
-	//	}
-	//}
-}
 //=============================================================================
 //コンボの計算
 //=============================================================================

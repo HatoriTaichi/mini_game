@@ -45,24 +45,24 @@ public:
 	HRESULT Init(void);	// 初期化
 	void Uninit(void);	// 終了
 	void Update(void);	// 更新
-	static CFade *GetFade(void) { return m_fade; }	// フェードクラスの取得
-	static CTitle *GetTitle(void) { return m_title; }	// タイトルクラスの取得
-	static CGame *GetGame(void) { return m_game; }	// ゲームクラスの取得
-	static COnlineGame *GetOnloineGame(void) { return m_online_game; }	// オンラインゲームクラスの取得
-	static CResult *GetResult(void) { return m_result; }	// リザルトクラスの取得
-	static void SetMode(CSceneManager::MODE mode);	// モード設定
-	static MODE GetMode(void) { return m_mode; }	// モード取得
-	static void ChangeScene(CSceneManager::MODE mode);	// フェード
-	static NETWORK_MODE GetNetWorkMode(void) { return m_network_mode; }	// フェード
+	CFade *GetFade(void) { return m_fade; }	// フェードクラスの取得
+	CTitle *GetTitle(void) { return m_title; }	// タイトルクラスの取得
+	CGame *GetGame(void) { return m_game; }	// ゲームクラスの取得
+	COnlineGame *GetOnloineGame(void) { return m_online_game; }	// オンラインゲームクラスの取得
+	CResult *GetResult(void) { return m_result; }	// リザルトクラスの取得
+	void SetMode(CSceneManager::MODE mode);	// モード設定
+	MODE GetMode(void) { return m_mode; }	// モード取得
+	void ChangeScene(CSceneManager::MODE mode);	// フェード
+	NETWORK_MODE GetNetWorkMode(void) { return m_network_mode; }	// フェード
 
 private:
-	static CFade *m_fade;	// フェードクラス
-	static CTitle *m_title;	// タイトルクラス
-	static CGame *m_game;	// ゲームクラス
-	static COnlineGame *m_online_game;	// オンラインゲームクラス
-	static CResult *m_result;	// ゲームクラス
-	static CSceneManager::MODE m_mode;	// モード
-	static NETWORK_MODE m_network_mode;	// モード
+	CFade *m_fade;	// フェードクラス
+	CTitle *m_title;	// タイトルクラス
+	CGame *m_game;	// ゲームクラス
+	COnlineGame *m_online_game;	// オンラインゲームクラス
+	CResult *m_result;	// ゲームクラス
+	CSceneManager::MODE m_mode;	// モード
+	NETWORK_MODE m_network_mode;	// モード
 
 };
 
