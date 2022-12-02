@@ -164,15 +164,14 @@ END_EFFECTSTATE3D
 #メモ：風切り
 #========================================================================
 EFFECTSTATE3D
-	PATTERN = 0				//動きのパターン
-	SECONDCOLOR = 0 255 255 255			//先端カラー
-	SECONDCHANGECOLOR = 0 0 0 -18			//先端カラー変動値
-	MODEL = 0						//軌跡手元モデル
-	TRAJECTMODEL = 1				//軌跡先端モデル
-	COLOR = 160 255 255 255			//カラー
-	CHANGECOLOR = 0 0 0 -18			//カラー変動値
-	LIFE = 10						//ライフ
-	TEXTURE = 3						//テクスチャ  (trans.png)
+	PATTERN = 9				//動きのパターン
+	SIZE = 60.0						//大きさ
+	ADDSIZE = 0.0					//大きさ変動
+	DENSITY = 1						//密度
+	COLOR = 0 160 255 255			//カラー
+	CHANGECOLOR = 0 0 0 -3			//カラー変動値
+	LIFE = 100						//ライフ
+	TEXTURE = 19						//テクスチャ  ()
 	SYNTHETIC = 0						//合成
 	TEXMOVE = 0.000 0.000					//テクスチャ移動
 	TEXNUM = 1.0 1.0					//テクスチャ枚数
