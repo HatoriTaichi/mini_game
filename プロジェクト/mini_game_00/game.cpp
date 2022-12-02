@@ -382,7 +382,7 @@ void CGame::EnemySpawn(void)
 {
 	std::random_device random;	// 非決定的な乱数生成器
 	std::mt19937_64 mt(random());// メルセンヌ・ツイスタの64ビット版、引数は初期シード
-	std::uniform_real_distribution<> randEnemyPosType(0, m_MaxEnemySpawn);
+	std::uniform_int_distribution<> randEnemyPosType(0, m_MaxEnemySpawn);
 	bool *bOverlapPos = nullptr;
 	bOverlapPos = new bool[m_MaxEnemySpawn];
 	for (int nCntNum = 0; nCntNum < m_MaxEnemySpawn; nCntNum++)
@@ -408,7 +408,7 @@ void CGame::EnemySpawn(void)
 			while (!bHoge)
 			{
 				//ランダムな位置を決める
-				int nCntType = static_cast<int>(randEnemyPosType(mt));
+				int nCntType = randEnemyPosType(mt);
 
 				for (int nCntPoint = 0; nCntPoint < nCntMax; nCntPoint++)
 				{
@@ -437,9 +437,9 @@ void CGame::IngredientsSpawn(void)
 	{
 		std::random_device random;	// 非決定的な乱数生成器
 		std::mt19937_64 mt(random());// メルセンヌ・ツイスタの64ビット版、引数は初期シード
-		std::uniform_real_distribution<> randIngredientsCnt(NormalIngredientsSpawnMin, NormalIngredientsSpawnMax);
-		std::uniform_real_distribution<> randIngredientsType(0, 5);
-		std::uniform_real_distribution<> randIngredientsPosType(0, m_MaxIngredientsSpawn);
+		std::uniform_int_distribution<> randIngredientsCnt(NormalIngredientsSpawnMin, NormalIngredientsSpawnMax);
+		std::uniform_int_distribution<> randIngredientsType(0, 5);
+		std::uniform_int_distribution<> randIngredientsPosType(0, m_MaxIngredientsSpawn);
 		bool *bOverlapPos = nullptr;//ランダムで選出した位置に再度出現しないようにするための変数
 		bOverlapPos = new bool[m_MaxIngredientsSpawn];
 		for (int nCntNum = 0; nCntNum < m_MaxIngredientsSpawn; nCntNum++)
@@ -451,7 +451,7 @@ void CGame::IngredientsSpawn(void)
 		if (nSize != 0)
 		{
 			//具材を配置する最大値を決める
-			int nCntMax = static_cast<int>(randIngredientsCnt(mt));
+			int nCntMax = randIngredientsCnt(mt);
 			m_NumIngredientsSpawnPoint = new int[nCntMax];
 			//数値の初期化
 			for (int nCntNum = 0; nCntNum < nCntMax; nCntNum++)
@@ -464,7 +464,7 @@ void CGame::IngredientsSpawn(void)
 				while (!bHoge)
 				{
 					//ランダムな位置を決める
-					int nCntType = static_cast<int>(randIngredientsPosType(mt));
+					int nCntType = randIngredientsPosType(mt);
 
 					for (int nCntPoint = 0; nCntPoint < nCntMax; nCntPoint++)
 					{
@@ -477,7 +477,7 @@ void CGame::IngredientsSpawn(void)
 						}
 					}
 				}
-				int nType = static_cast<int>(randIngredientsType(mt));
+				int nType = randIngredientsType(mt);
 				//具材を生成
 				CIngredients::Create({ m_IngredientsSpawnPoint[m_NumIngredientsSpawnPoint[nCnt]].x ,
 					m_IngredientsSpawnPoint[m_NumIngredientsSpawnPoint[nCnt]].y + 200.0f,
