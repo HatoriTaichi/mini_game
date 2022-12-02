@@ -80,6 +80,7 @@ private:
 	int m_ItemSpawnMin[ModeMax];//アイテムの出現個数（小）
 	int m_ItemSpawnMax[ModeMax];//アイテムの出現個数（大）
 
+	bool m_bLastSoundToggle;	// ラストスパートの曲が鳴ったか
 };
 
 #endif // !_TITLE_H_処理

@@ -30,13 +30,16 @@ public:
 		SOUND_LABEL_BGM_GAMELAST,	// BGMゲームラストスパート
 		SOUND_LABEL_BGM_RESULT,		// BGMリザルト
 
-		SOUND_LABEL_SE_TITLE_START,	// タイトルでのボタン押下
+		SOUND_LABEL_SE_TITLE_SELECT,// タイトルでの選択時SE
+		SOUND_LABEL_SE_TITLE_START,	// タイトルでのスタート押下
+		SOUND_LABEL_SE_TITLE_MENU,	// タイトルでのメニュー表押下
 
 		SOUND_LABEL_SE_GAME_START,	// ゲームスタート
 		SOUND_LABEL_SE_GAME_DAMAGE,	// ダメージ
 		SOUND_LABEL_SE_GAME_ITEM,	// アイテム取得
 		SOUND_LABEL_SE_GAME_SPAWN,	// 具材、アイテムスポーン
 		SOUND_LABEL_SE_GAME_WALK,	// 歩行
+		SOUND_LABEL_SE_GAME_LAST,	// ラストスパート
 		SOUND_LABEL_SE_GAME_END,	// ゲームエンド
 
 		SOUND_LABEL_SE_RESULT_CONBO,		// コンボ

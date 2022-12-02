@@ -24,6 +24,7 @@
 #include "networkmanager.h"
 #include "onlinegame.h"
 #include "enemyplayer.h"
+#include "sound.h"
 
 static const float MoveSpeed = 5.0f;
 static const float SpeedUpDiameter = 1.5f;//スピードアップ倍率
@@ -371,6 +372,7 @@ void CPlayer::Motion(void)
 	case CPlayer::NUTLARAL:
 		m_motion_controller->PlayMotin("NUTLARAL");
 		memcpy(&m_PlayerData.m_motion_name[0], "NUTLARAL", sizeof(m_PlayerData.m_motion_name));
+		
 		break;
 	case CPlayer::RUN:
 		m_motion_controller->PlayMotin("RUN");
@@ -380,7 +382,6 @@ void CPlayer::Motion(void)
 	case CPlayer::DIZZY:
 		m_motion_controller->PlayMotin("DIZZY");
 		memcpy(&m_PlayerData.m_motion_name[0], "DIZZY", sizeof(m_PlayerData.m_motion_name));
-
 		break;
 	case CPlayer::NECKSWING:
 		m_motion_controller->PlayMotin("NECKSWING");

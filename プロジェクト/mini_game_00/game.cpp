@@ -22,6 +22,8 @@
 #include "counter.h"
 #include "camera.h"
 #include "move_ui.h"
+#include "manager.h"
+#include "sound.h"
 
 static const int IngredientsSpawnInterval = 30 * 60;
 static const int NormalItemSpawnInterval = 17 * 60;
@@ -168,6 +170,7 @@ HRESULT CGame::Init(void)
 	if (!m_pStartUI)
 	{
 		m_pStartUI = CMove_UI::Create(StartPos, StartSize, StartTime, StartFadeTime, "Start000.png", CMove_UI::UI_Type::Type_Start);
+		CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_GAME_START);
 	}
 	////フィニッシュUIを生成
 	//if (!m_pFinishUI)
@@ -255,6 +258,8 @@ HRESULT CGame::Init(void)
 	//--------------
 	//音楽再生
 	//--------------
+
+	m_bLastSoundToggle = false;
 	return S_OK;
 }
 
@@ -296,6 +301,13 @@ void CGame::Update(void)
 	}
 	if (m_pGameTimer->GetCounter() <= LastSpartTime)
 	{
+		if (!m_bLastSoundToggle)
+		{
+			CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_GAME_LAST);
+		}
+
+		m_bLastSoundToggle = true;
+
 		m_pLastSpurtUI->SetState(CMove_UI::State::ImmediatelyAfterPop);
 	}
 	//if (key->GetTrigger(CKey::KEYBIND::W) == true)
