@@ -40,6 +40,7 @@ public:
 		BLOCK,	// 障害物
 		WALL,	// 障害物
 		PLAYER,	// プレイヤー
+		ENEMYPLAYER,//テキプレイヤー
 		ENEMY,	// 敵
 		INGREDIENTS,	// 具材
 		MAX,
@@ -60,9 +61,11 @@ public:
 	void ChangeLayer(const int &next_layer);	// レイヤー変更処理
 	static vector<CObject*> GetObject(const int &priority) { return m_object[priority]; }	// 全オブジェクトのゲッダー
 	static vector<CObject*> GetObjTypeObject(const OBJTYPE &ObjType);	// 全オブジェクトのゲッダー
+	static bool IsReleaseAll(void) { return m_is_release_all; }	// リリースオールフラグのゲッダー
 
 private:
 	static vector<CObject*> m_object[(int)LAYER_TYPE::MAX];	// オブジェクト
+	static bool m_is_release_all;	// リリースオールされたか
 	OBJTYPE m_obj_type;	// オブジェクトの種類
 	int m_layer;	// 描画順
 	bool m_deth;	// 死亡フラグ

@@ -144,7 +144,6 @@ void CBillboard::Draw()
 	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);		
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
 	
-																													
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
 	
@@ -154,11 +153,15 @@ void CBillboard::Draw()
 	pDevice->SetFVF(FVF_VERTEX_3D);			//頂点フォーマットの設定
 	
 	pDevice->SetTexture(0, m_pTexture);	//テクスチャの設定
-	
-	//ポリゴンの描画
-	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,	//プリミティブの種類
-		0,					//開始する頂点のインデックス
-		2);					//描画するプリミティブ数
+
+	//m_bDrawで描画判定
+	if (!m_bDraw)
+	{
+		//ポリゴンの描画
+		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,	//プリミティブの種類
+			0,					//開始する頂点のインデックス
+			2);					//描画するプリミティブ数
+	}
 	
 	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_ALWAYS);

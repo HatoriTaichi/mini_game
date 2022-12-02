@@ -34,6 +34,9 @@ public:
 	{
 		ImmediatelyAfterPop = 0,//出現直後
 		Normal,
+		EndType1,
+		EndType2,
+		EndType3,
 		StateMax
 	};
 	CItem(LAYER_TYPE Layer = LAYER_TYPE::LAYER_01);	// デフォルトコンストラクタ
@@ -44,6 +47,7 @@ public:
 	void Draw(void);	// ポリゴンの描画
 	void Motion(void);//ちょっとした動きの処理
 	void ColisionPlayer(void);//プレイヤーに当たった時
+	void ColisionEnemyPlayer(void);
 	static CItem *Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, ItemType type);	// 生成
 	D3DXVECTOR3 GetPos(void) { return m_pos; }	// ゲッダー
 	D3DXVECTOR3 GetRot(void) { return m_rot; }	// ゲッダー
@@ -60,6 +64,9 @@ private:
 	bool m_bUpDown;
 	bool m_bUninit;
 	float m_fFall;
+	int m_nTimer;
+	int m_nFlashingTimer;
+	bool m_bFlash;
 
 };
 

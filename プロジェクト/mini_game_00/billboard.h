@@ -23,6 +23,7 @@ public:
 	static CBillboard *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, 
 		const string &texType, const D3DXCOLOR& col = {1.0,1.0,1.0,1.0});
 	D3DXVECTOR3 GetPos() { return m_pos; }
+	void SwitchDraw(bool bDraw) { m_bDraw = bDraw; }
 private:
 	LPDIRECT3DTEXTURE9		m_pTexture = NULL;				//テクスチャへのポインタ
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff = NULL;				//頂点バッファへのポインタ
@@ -31,7 +32,7 @@ private:
 	D3DXVECTOR3 m_pos;
 	D3DXVECTOR3 m_size;										//ポリゴンサイズ
 	D3DXCOLOR m_col;
-
+	bool m_bDraw;//描画判定
 };
 
 

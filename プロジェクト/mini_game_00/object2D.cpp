@@ -15,7 +15,12 @@
 //=============================================================================
 CObject2D::CObject2D(LAYER_TYPE Layer) : CObject(Layer)
 {
-
+	m_texture = nullptr;
+	m_vtx_buff = nullptr;
+	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_tex_pas.clear();
+	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 //=============================================================================
@@ -80,10 +85,10 @@ HRESULT CObject2D::Init(void)
 void CObject2D::Uninit(void)
 {
 	//頂点バッファの破棄
-	if (m_vtx_buff != NULL)
+	if (m_vtx_buff != nullptr)
 	{
 		m_vtx_buff->Release();
-		m_vtx_buff = NULL;
+		m_vtx_buff = nullptr;
 	}
 
 	Release();	// 自分の破棄
@@ -125,15 +130,18 @@ void CObject2D::Draw(void)
 //=============================================================================
 void CObject2D::SetCol(D3DXCOLOR col)
 {
+	//色を代入
+	m_col = col;
+
 	VERTEX_2D *vtx;	// 頂点情報
 
 	//頂点バッファをロックし、頂点データへのポインタを取得
 	m_vtx_buff->Lock(0, 0, (void**)&vtx, 0);
 
-	vtx[0].col = col;
-	vtx[1].col = col;
-	vtx[2].col = col;
-	vtx[3].col = col;
+	vtx[0].col = m_col;
+	vtx[1].col = m_col;
+	vtx[2].col = m_col;
+	vtx[3].col = m_col;
 
 	//頂点バッファをアンロックする
 	m_vtx_buff->Unlock();

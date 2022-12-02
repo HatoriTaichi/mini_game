@@ -16,21 +16,31 @@
 #include "singlemodel.h"
 #include"player.h"
 #include"game.h"
+#include "scenemanager.h"
+#include "wall.h"
+#include "onlinegame.h"
+#include "networkmanager.h"
+#include "enemyplayer.h"
+static float Size = 7.0f;
 static float fDropMoveSpeed = 8.0f;
 static const float FallSpeed = 5.0f;
 static const float UpLimit = 2.0f;
 static const float DownLimit = -2.0f;
 static const float UpDownSpeed = 0.1f;
-static const D3DXVECTOR3 IngredientsOfSet00 = {0.0f,20.0f,10.0f};
+static const D3DXVECTOR3 IngredientsOfSet00 = {0.0f,20.0f,0.0f};
 static const D3DXVECTOR3 IngredientsOfSet01 = { -5.0f,25.0f,-10.0f };
 static const D3DXVECTOR3 IngredientsOfSet02 = { 5.0f,30.0f,-10.0f };
 static const int DeleteTime = 30*60;
 static const int EndTypeTime1 = 17 * 60;
 static const int EndTypeTime2 = 24 * 60;
 static const int EndTypeTime3 = 27 * 60;
+static const int EndTypeTime2_1 = 7 * 60;
+static const int EndTypeTime2_2 = 10 * 60;
+static const int EndTypeTime2_3 = 13 * 60;
 static const int EndTypeFlashTime1 = 15;
 static const int EndTypeFlashTime2 = 8;
 static const int EndTypeFlashTime3 = 4;
+static const int PopTime = 5 * 60;
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -39,7 +49,7 @@ CIngredients::CIngredients(LAYER_TYPE layer) : CObject(layer)
 {
 	m_fUpDown = 0.0f;
 	m_bUpDown = true;
-	for (int nCnt = 0; nCnt < IngredientsMax; nCnt++)
+	for (int nCnt = 0; nCnt < IngredientsNumMax; nCnt++)
 	{
 		m_Data.m_IngredientModel[nCnt] = nullptr;
 
@@ -48,7 +58,16 @@ CIngredients::CIngredients(LAYER_TYPE layer) : CObject(layer)
 	m_bDoDrop = false;
 	m_nTimer = 0;
 	m_bFlash = false;
+	m_bDelete = false;
 	m_nFlashingTimer = 0;
+	m_nPopTimer = 0;
+	m_nEndTypeTime[0][0] = EndTypeTime1;
+	m_nEndTypeTime[1][0] = EndTypeTime2;
+	m_nEndTypeTime[2][0] = EndTypeTime3;
+	m_nEndTypeTime[0][1] = EndTypeTime2_1;
+	m_nEndTypeTime[1][1] = EndTypeTime2_2;
+	m_nEndTypeTime[2][1] = EndTypeTime2_3;
+	m_bHit = false;
 }
 
 //=============================================================================
@@ -65,57 +84,9 @@ CIngredients::~CIngredients()
 HRESULT CIngredients::Init(void)
 {
 	SetObjType(CObject::OBJTYPE::INGREDIENTS);
-
 	m_bUninit = false;
 	//具材のモデルを生成
-	if (!m_Data.m_BasketModel)
-	{
-		m_Data.m_BasketModel = CModel::Create("basket.x");
-	}
-
-
-	for (int nCnt = 0; nCnt < IngredientsMax; nCnt++)
-	{
-		if (!m_Data.m_IngredientModel[nCnt])
-		{
-			switch (m_Type)
-			{
-			case CIngredients::Basil:
-				m_Data.m_IngredientModel[nCnt] = CModel::Create("basil.x");
-				break;
-			case CIngredients::Tomato:
-				m_Data.m_IngredientModel[nCnt] = CModel::Create("cut_tomato.x");
-				break;
-			case CIngredients::Cheese:
-				m_Data.m_IngredientModel[nCnt] = CModel::Create("mozzarella_cheese.x");
-				break;
-			case CIngredients::Mushroom:
-				m_Data.m_IngredientModel[nCnt] = CModel::Create("mushroom.x");
-				break;
-			case CIngredients::Salami:
-				m_Data.m_IngredientModel[nCnt] = CModel::Create("salami.x");
-				break;
-			}
-		}
-	}
-	if (m_Data.m_IngredientModel[0])
-	{
-		m_Data.m_IngredientModel[0]->SetPos(IngredientsOfSet00);
-		m_Data.m_IngredientModel[0]->SetPrent(m_Data.m_BasketModel);
-	}
-	if (m_Data.m_IngredientModel[1])
-	{
-		m_Data.m_IngredientModel[1]->SetPos(IngredientsOfSet01);
-		m_Data.m_IngredientModel[1]->SetPrent(m_Data.m_BasketModel);
-
-	}
-	if (m_Data.m_IngredientModel[2])
-	{
-		m_Data.m_IngredientModel[2]->SetPos(IngredientsOfSet02);
-		m_Data.m_IngredientModel[2]->SetPrent(m_Data.m_BasketModel);
-
-	}
-
+	CreateIngredient();
 	return S_OK;
 }
 
@@ -124,7 +95,7 @@ HRESULT CIngredients::Init(void)
 //=============================================================================
 void CIngredients::Uninit(void)
 {
-	for (int nCnt = 0; nCnt < IngredientsMax; nCnt++)
+	for (int nCnt = 0; nCnt < IngredientsNumMax; nCnt++)
 	{
 		if (m_Data.m_IngredientModel[nCnt])
 		{
@@ -147,7 +118,16 @@ void CIngredients::Uninit(void)
 void CIngredients::Update(void)
 {
 	m_nTimer++;
-
+	if (m_bDelete)
+	{
+		m_nPopTimer++;
+		if (m_nPopTimer >= PopTime && !m_bHit)
+		{
+			m_bDelete = false;
+			CreateIngredient();
+			m_nPopTimer = 0;
+		}
+	}
 	switch (m_State)
 	{
 	case CIngredients::IngredientsState::ImmediatelyAfterPop:
@@ -167,7 +147,8 @@ void CIngredients::Update(void)
 		//ちょっとした動き
 		Motion();
 		ColisionPlayer();
-		if (m_nTimer >= EndTypeTime1)
+		ColisionEnemyPlayer();
+		if (m_nTimer >= m_nEndTypeTime[0][m_bDoDrop])
 		{
 			m_State = EndType1;
 		}
@@ -176,7 +157,8 @@ void CIngredients::Update(void)
 		//ちょっとした動き
 		Motion();
 		ColisionPlayer();
-		if (m_nTimer >= EndTypeTime2)
+		ColisionEnemyPlayer();
+		if (m_nTimer >= m_nEndTypeTime[1][m_bDoDrop])
 		{
 			m_State = EndType2;
 		}
@@ -185,7 +167,8 @@ void CIngredients::Update(void)
 		//ちょっとした動き
 		Motion();
 		ColisionPlayer();
-		if (m_nTimer >= EndTypeTime3)
+		ColisionEnemyPlayer();
+		if (m_nTimer >= m_nEndTypeTime[2][m_bDoDrop])
 		{
 			m_State = EndType3;
 		}
@@ -193,9 +176,11 @@ void CIngredients::Update(void)
 		//ちょっとした動き
 		Motion();
 		ColisionPlayer();
+		ColisionEnemyPlayer();
 
 		break;
 	}
+
 	if (m_nTimer >= DeleteTime)
 	{
 		m_bUninit = true;
@@ -278,7 +263,7 @@ void CIngredients::Draw(void)
 		{
 			m_Data.m_BasketModel->Draw();
 		}
-		for (int nCnt = 0; nCnt < IngredientsMax; nCnt++)
+		for (int nCnt = 0; nCnt < IngredientsNumMax; nCnt++)
 		{
 			if (m_Data.m_IngredientModel[nCnt])
 			{
@@ -386,7 +371,22 @@ void CIngredients::ColisionWall()
 			}
 		}
 	}
+	//壁との当たり判定
+	vector<CObject *>ObjWall = CObject::GetObjTypeObject(CObject::OBJTYPE::WALL);
+	int nWallSize = ObjWall.size();
+	; if (nWallSize != 0)
+	{
+		for (int nCntWall = 0; nCntWall < nWallSize; nCntWall++)
+		{
+			CWall *pWall = static_cast<CWall*>(ObjWall[nCntWall]);
+			bool bCol = pWall->Collision(&m_pos, &m_oldPos, Size);
 
+			if (bCol)
+			{
+				m_fDropMoveSpeed *= -1.0f;
+			}
+		}
+	}
 
 }
 //=============================================================================
@@ -401,13 +401,69 @@ void CIngredients::ColisionPlayer(void)
 		for (int nCnt = 0; nCnt < nSize; nCnt++)
 		{
 			CPlayer *pPlayer = static_cast <CPlayer*> (buf[nCnt]);
-			if (pPlayer->Collision(m_pos, 50.0f))
+			m_bHit = pPlayer->Collision(m_pos, 50.0f);
+			if (m_bHit)
 			{
-				pPlayer->SetIngredients(m_Type);
-				m_bUninit = true;
+				if (!m_bDelete)
+				{
+					pPlayer->SetIngredients(m_Type);
+					if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NETWORK_MODE::ON_LINE)
+					{
+						CManager::GetInstance()->GetSceneManager()->GetOnloineGame()->AddIngredientsCnt(1, m_Type, nCnt);
+
+					}
+					else
+					{
+						CManager::GetInstance()->GetSceneManager()->GetGame()->AddIngredientsCnt(1, m_Type, nCnt);
+
+					}
+					if (!m_bDoDrop)
+					{
+						DeleteIngredient();
+					}
+					else
+					{
+						m_bUninit = true;
+					}
+				}
+				
 			}
 		}
+	}
 
+}
+//=============================================================================
+// 敵プレイヤーに当たった時
+//=============================================================================
+void CIngredients::ColisionEnemyPlayer(void)
+{
+	vector <CObject*> buf = CObject::GetObjTypeObject(CObject::OBJTYPE::ENEMYPLAYER);
+	int nSize = buf.size();
+	if (nSize != 0)
+	{
+		for (int nCnt = 0; nCnt < nSize; nCnt++)
+		{
+			CEnemyPlayer *pEnemyPlayer = static_cast <CEnemyPlayer*> (buf[nCnt]);
+			if (pEnemyPlayer->Collision(m_pos, 50.0f))
+			{
+				if (!m_bDelete)
+				{
+					pEnemyPlayer->SetIngredients(m_Type);
+					if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NETWORK_MODE::ON_LINE)
+					{
+						CManager::GetInstance()->GetSceneManager()->GetOnloineGame()->AddIngredientsCnt(1, m_Type, nCnt -1);
+					}
+					if (!m_bDoDrop)
+					{
+						DeleteIngredient();
+					}
+					else
+					{
+						m_bUninit = true;
+					}
+				}
+			}
+		}
 	}
 }
 //=============================================================================
@@ -467,6 +523,83 @@ CIngredients *CIngredients::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot,
 		Ingredients->Init();
 	}
 	return Ingredients;
+}
+//=============================================================================
+// 具材を消す
+//=============================================================================
+void CIngredients::DeleteIngredient(void)
+{
+	for (int nCnt = 0; nCnt < IngredientsNumMax; nCnt++)
+	{
+		if (m_Data.m_IngredientModel[nCnt])
+		{
+			m_Data.m_IngredientModel[nCnt]->Uninit();
+			m_Data.m_IngredientModel[nCnt] = nullptr;
+		}
+	}
+	//if (m_Data.m_BasketModel)
+	//{
+	//	m_Data.m_BasketModel->Uninit();
+	//	m_Data.m_BasketModel = nullptr;
+	//}
+	m_bDelete = true;
+}
+//=============================================================================
+// 具材を生成
+//=============================================================================
+
+void CIngredients::CreateIngredient(void)
+{
+	////具材のモデルを生成
+	//if (!m_Data.m_BasketModel)
+	//{
+	//	m_Data.m_BasketModel = CModel::Create("basket.x");
+	//}
+
+
+	for (int nCnt = 0; nCnt < IngredientsNumMax; nCnt++)
+	{
+		if (!m_Data.m_IngredientModel[nCnt])
+		{
+			switch (m_Type)
+			{
+			case CIngredients::Basil:
+				m_Data.m_IngredientModel[nCnt] = CModel::Create("basil.x");
+				break;
+			case CIngredients::Tomato:
+				m_Data.m_IngredientModel[nCnt] = CModel::Create("tomato.x");
+				break;
+			case CIngredients::Cheese:
+				m_Data.m_IngredientModel[nCnt] = CModel::Create("cheese.x");
+				break;
+			case CIngredients::Mushroom:
+				m_Data.m_IngredientModel[nCnt] = CModel::Create("mushroom.x");
+				m_Data.m_IngredientModel[nCnt]->SetScale({ 2.0f,2.0f,2.0f });
+				break;
+			case CIngredients::Salami:
+				m_Data.m_IngredientModel[nCnt] = CModel::Create("salami.x");
+				break;
+			}
+		}
+	}
+	if (m_Data.m_IngredientModel[0])
+	{
+		m_Data.m_IngredientModel[0]->SetPos(IngredientsOfSet00);
+		m_Data.m_IngredientModel[0]->SetPrent(m_Data.m_BasketModel);
+	}
+	//if (m_Data.m_IngredientModel[1])
+	//{
+	//	m_Data.m_IngredientModel[1]->SetPos(IngredientsOfSet01);
+	//	m_Data.m_IngredientModel[1]->SetPrent(m_Data.m_BasketModel);
+
+	//}
+	//if (m_Data.m_IngredientModel[2])
+	//{
+	//	m_Data.m_IngredientModel[2]->SetPos(IngredientsOfSet02);
+	//	m_Data.m_IngredientModel[2]->SetPrent(m_Data.m_BasketModel);
+
+	//}
+
 }
 
 

@@ -42,7 +42,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -76,6 +76,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -155,9 +157,11 @@
     <ClInclude Include="2d_ingredients.h" />
     <ClInclude Include="billboard.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="communicationdata.h" />
     <ClInclude Include="counter.h" />
     <ClInclude Include="directinput.h" />
     <ClInclude Include="enemy.h" />
+    <ClInclude Include="enemyplayer.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="field.h" />
     <ClInclude Include="fileload.h" />
@@ -166,14 +170,19 @@
     <ClInclude Include="input.h" />
     <ClInclude Include="item.h" />
     <ClInclude Include="keyinput.h" />
+    <ClInclude Include="letter.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="manager.h" />
+    <ClInclude Include="move_telop.h" />
+    <ClInclude Include="onlinegame.h" />
     <ClInclude Include="meshfloo.h" />
     <ClInclude Include="meshsphere.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="motion.h" />
     <ClInclude Include="mouseinput.h" />
+    <ClInclude Include="move_ui.h" />
+    <ClInclude Include="networkmanager.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="player_ingredient_data.h" />
@@ -182,15 +191,21 @@
     <ClInclude Include="object3D.h" />
     <ClInclude Include="result.h" />
     <ClInclude Include="scenemanager.h" />
+    <ClInclude Include="select_botton.h" />
     <ClInclude Include="singlemodel.h" />
+    <ClInclude Include="sound.h" />
+    <ClInclude Include="tcp_client.h" />
+    <ClInclude Include="telop.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="title.h" />
     <ClInclude Include="wall.h" />
+    <ClInclude Include="XInput.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="2d_ingredients.cpp" />
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="communicationdata.cpp" />
     <ClCompile Include="counter.cpp" />
     <ClCompile Include="directinput.cpp" />
     <ClCompile Include="enemy.cpp" />
@@ -202,14 +217,20 @@
     <ClCompile Include="input.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="keyinput.cpp" />
+    <ClCompile Include="letter.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="manager.cpp" />
+    <ClCompile Include="move_telop.cpp" />
+    <ClCompile Include="onlinegame.cpp" />
     <ClCompile Include="meshfloo.cpp" />
     <ClCompile Include="meshsphere.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="motion.cpp" />
     <ClCompile Include="mouseinput.cpp" />
+    <ClCompile Include="move_ui.cpp" />
+    <ClCompile Include="enemyplayer.cpp" />
+    <ClCompile Include="networkmanager.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="player_ingredient_data.cpp" />
@@ -218,10 +239,15 @@
     <ClCompile Include="object3D.cpp" />
     <ClCompile Include="result.cpp" />
     <ClCompile Include="scenemanager.cpp" />
+    <ClCompile Include="select_button.cpp" />
     <ClCompile Include="singlemodel.cpp" />
+    <ClCompile Include="sound.cpp" />
+    <ClCompile Include="tcp_client.cpp" />
+    <ClCompile Include="telop.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="title.cpp" />
     <ClCompile Include="wall.cpp" />
+    <ClCompile Include="XInput.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

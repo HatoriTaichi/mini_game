@@ -13,11 +13,13 @@
 //=============================================================================
 CObject3D::CObject3D(LAYER_TYPE Layer) : CObject(Layer)
 {
+	m_tex_pas.clear();
+	D3DXMatrixIdentity(&m_mtx_world);
+	m_texture = nullptr;
+	m_vtx_buff = nullptr;
+	m_idx_buff = nullptr;
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	D3DXMatrixIdentity(&m_mtx_world);
-	m_vtx_buff = NULL;
-	m_idx_buff = NULL;
 	m_num_vtx = 0;
 	m_num_idx = 0;
 }

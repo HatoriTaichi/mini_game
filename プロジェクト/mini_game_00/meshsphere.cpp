@@ -13,10 +13,11 @@
 //=============================================================================
 CMeshsphere::CMeshsphere(LAYER_TYPE Layer) : CObject3D(Layer)
 {
+	D3DXMatrixIdentity(&m_mtx_world);
+	m_tex_pas.clear();
 	m_x_num = 0;
 	m_y_num = 0;
 	m_radius = 0;
-	D3DXMatrixIdentity(&m_mtx_world);
 }
 
 //=============================================================================
@@ -44,18 +45,18 @@ HRESULT CMeshsphere::Init(void)
 	int num_idx = GetNumIdx();	// インデックス数の取得
 
 	// 頂点バッファの生成
-	if (*vtx_buff == NULL)
+	if (*vtx_buff == nullptr)
 	{
 		device->CreateVertexBuffer(sizeof(VERTEX_3D) * num_vtx,
 									D3DUSAGE_WRITEONLY,
 									FVF_VERTEX_3D,
 									D3DPOOL_MANAGED,
 									vtx_buff,
-									NULL);
+									nullptr);
 	}
 
 	// 頂点バッファの設定
-	if (*vtx_buff != NULL)
+	if (*vtx_buff != nullptr)
 	{
 		VERTEX_3D *pVtx;	// 頂点バッファのポインタ
 
@@ -84,17 +85,17 @@ HRESULT CMeshsphere::Init(void)
 	LPDIRECT3DINDEXBUFFER9* idx_buff = GetIdxBuff();
 
 	// インデックスバッファの生成
-	if (*idx_buff == NULL)
+	if (*idx_buff == nullptr)
 	{
 		device->CreateIndexBuffer( sizeof(WORD) * num_idx,
 									D3DUSAGE_WRITEONLY,
 									D3DFMT_INDEX16,
 									D3DPOOL_MANAGED,
 									idx_buff,
-									NULL);
+									nullptr);
 	}
 	// インデックスバッファの設定
-	if (*idx_buff != NULL)
+	if (*idx_buff != nullptr)
 	{
 		WORD *pIdx;	// インデックス情報へのポインタ
 

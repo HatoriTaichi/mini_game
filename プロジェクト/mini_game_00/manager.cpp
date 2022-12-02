@@ -19,6 +19,10 @@
 #include "model.h"
 #include "directinput.h"
 #include "player_ingredient_data.h"
+#include "XInput.h"
+#include "networkmanager.h"
+#include "sound.h"
+
 //=============================================================================
 // マクロ定義
 //=============================================================================
@@ -28,9 +32,9 @@
 #define LIGHT_DIR_00 (D3DXVECTOR3(0.2f, -0.8f, 0.4f))	// ライトの向き
 #define LIGHT_DIR_01 (D3DXVECTOR3(0.0f, -1.0f, 0.0f))	// ライトの向き
 #define LIGHT_DIR_02 (D3DXVECTOR3(-0.2f, 0.8f, -0.4f))	// ライトの向き
-#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 1005.0f, -100.0f))	// カメラの位置
-#define CAMERA_POS_R (D3DXVECTOR3(0.0f, 0.0f, 0.0f))	// カメラの注視点
-#define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(0.0f), D3DXToRadian(180.0f),D3DXToRadian(0.0f)))	// カメラの向き
+#define CAMERA_POS_V (D3DXVECTOR3(0.0f, 0.0f, -0.0f))	// カメラの位置
+#define CAMERA_POS_R (D3DXVECTOR3(0.0f, 80.0f, 0.0f))	// カメラの注視点
+#define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(0.0f), D3DXToRadian(-90.0f),D3DXToRadian(0.0f)))	// カメラの向き
 
 //=============================================================================
 // 静的メンバ変数宣言
@@ -42,24 +46,26 @@ CManager *CManager::m_single_manager;
 //=============================================================================
 CManager::CManager()
 {
+	m_hwnd = nullptr;
 	m_single_manager = nullptr;
-	m_mouse = nullptr;
-	m_key = nullptr;
 	m_renderer = nullptr;
 	m_camera = nullptr;
-	m_scene_manager = nullptr;
-	m_texture = nullptr;
-	for (int nPlayer = 0; nPlayer < MAX_PLAYER; nPlayer++)
-	{
-		m_player_ingredient_data[nPlayer] = nullptr;
-
-	}
-	m_directInput = nullptr;
-	m_hwnd = NULL;
 	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
 	{
 		m_light[count_liht] = NULL;
 	}
+	m_scene_manager = nullptr;
+	m_mouse = nullptr;
+	m_key = nullptr;
+	m_direct_input = nullptr;
+	m_texture = nullptr;
+	m_xinput = nullptr;
+	m_net_work_manager = nullptr;
+	for (int count_player = 0; count_player < MAX_PLAYER; count_player++)
+	{
+		m_player_ingredient_data[count_player] = nullptr;
+	}
+	m_sound = nullptr;
 }
 
 //=============================================================================
@@ -95,11 +101,13 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 		m_key->Init(hInstance, hWnd);
 	}
 	//directinputの生成
-	if (m_directInput == NULL)
-	{
-		m_directInput = new CDirectInput;
-		m_directInput->Init(hInstance, hWnd);
+	m_direct_input = new CDirectInput;
+	if (m_direct_input != nullptr)
+	{	
+		m_direct_input->Init(hInstance, hWnd);
 	}
+	//Xinputの生成
+	m_xinput = new CXInput;
 	// マウスクラスの生成
 	m_mouse = new CMouse;
 	if (m_mouse != nullptr)
@@ -114,15 +122,18 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 		m_texture->Init();
 	}
 
-	for (int nPlayer = 0; nPlayer < MAX_PLAYER; nPlayer++)
+	// ネットワークマネージャーの生成
+	m_net_work_manager = new CNetWorkManager;
+	if (m_net_work_manager != nullptr)
 	{
-		//プレイヤーの具材情報クラス
-		if (!m_player_ingredient_data[nPlayer])
-		{
-			m_player_ingredient_data[nPlayer] = CPlayer_ingredient_data::Create();
-		}
+		m_net_work_manager->Init();
 	}
 
+	// プレイヤー分のループ
+	for (int count_player = 0; count_player < MAX_PLAYER; count_player++)
+	{
+		m_player_ingredient_data[count_player] = CPlayer_ingredient_data::Create();
+	}
 
 	// シーンマネージャークラスの生成
 	m_scene_manager = new CSceneManager;
@@ -131,8 +142,14 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 		m_scene_manager->Init();
 	}
 
-	// ライトとカメラの生成
+	// サウンドクラスの生成
+	m_sound = new CSound;
+	if (m_sound != nullptr)
+	{
+		m_sound->Init(hWnd);
+	}
 
+	// ライトとカメラの生成
 	m_camera = CCamera::Create(CAMERA_POS_V, CAMERA_POS_R, CAMERA_ROT);
 	m_light[0] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_00, LIGHT_DIR_00);
 	m_light[1] = CLight::Create(D3DLIGHT_DIRECTIONAL, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), LIGHT_POS_01, LIGHT_DIR_01);
@@ -146,7 +163,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	m_key->BindKey(CKey::KEYBIND::SPACE, DIK_SPACE);
 
 	// 初期シーン
-	m_scene_manager->ChangeScene(CSceneManager::MODE::GAME);
+	m_scene_manager->ChangeScene(CSceneManager::MODE::TITLE);
 
 	return S_OK;
 }
@@ -156,11 +173,8 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 //================================================
 void CManager::Uninit(void)
 {
-	// 全てのオブジェクトの破棄
-	CObject::ReleaseAll();
-
-	// モデルの破棄
-	CModel::UnLoad();
+	// サウンドの停止
+	m_sound->Stop();
 
 	// テクスチャの破棄
 	if (m_texture != nullptr)
@@ -194,13 +208,35 @@ void CManager::Uninit(void)
 		delete m_key;
 		m_key = nullptr;
 	}
+
 	// ゲームパッドの破棄
-	if (m_directInput != NULL)
+	if (m_direct_input != nullptr)
 	{
-		m_directInput->Uninit();
-		delete m_directInput;
-		m_directInput = NULL;
+		// 終了処理
+		m_direct_input->Uninit();
+
+		// メモリの開放
+		delete m_direct_input;
+		m_direct_input = nullptr;
 	}
+	if (m_xinput != nullptr) 
+	{
+		// メモリの開放
+		delete m_xinput;
+		m_xinput = nullptr;
+	}
+
+	//ネットワークマネージャーの生成
+	if (m_net_work_manager != nullptr)
+	{
+		//終了処理
+		m_net_work_manager->Uninit();
+
+		//メモリの開放
+		delete m_net_work_manager;
+		m_net_work_manager = nullptr;
+	}
+	// ライト分のループ
 	for (int count_liht = 0; count_liht < MAX_LIGHT; count_liht++)
 	{
 		// ライトクラスの破棄
@@ -248,6 +284,23 @@ void CManager::Uninit(void)
 		m_renderer = nullptr;
 	}
 
+	// サウンドクラスの破棄
+	if (m_sound != nullptr)
+	{
+		// 終了処理
+		m_sound->Uninit();
+
+		// メモリの開放
+		delete m_sound;
+		m_sound = nullptr;
+	}
+
+	// 全てのオブジェクトの破棄
+	CObject::ReleaseAll();
+
+	// モデルの破棄
+	CModel::UnLoad();
+
 	// メモリの開放
 	delete m_single_manager;
 	m_single_manager = nullptr;
@@ -258,21 +311,34 @@ void CManager::Uninit(void)
 //================================================
 void CManager::Update(void)
 {
+	// シーンマネージャークラス
+	if (m_scene_manager != nullptr)
+	{
+		m_scene_manager->Update();
+	}
+
 	// レンダラークラス
 	if (m_renderer != nullptr)
 	{
 		m_renderer->Update();
 	}
+
 	// キーボードクラス
 	if (m_key != nullptr)
 	{
 		m_key->Update();
 	}
+
 	//ゲームパッドのクラス
-	if (m_directInput != nullptr)
+	if (m_direct_input != nullptr)
 	{
-		m_directInput->Update();
+		m_direct_input->Update();
 	}
+	if (m_xinput != nullptr)
+	{
+		m_xinput->UpdateGamepad();
+	}
+
 	// マウスクラス
 	if (m_mouse != nullptr)
 	{
@@ -293,14 +359,6 @@ void CManager::Update(void)
 	{
 		m_camera->Update();
 	}
-
-	// シーンマネージャークラス
-	if (m_scene_manager != nullptr)
-	{
-		m_scene_manager->Update();
-	}
-
-
 }
 
 //================================================

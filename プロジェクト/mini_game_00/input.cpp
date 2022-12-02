@@ -12,15 +12,15 @@
 //=============================================================================
 // 静的メンバ変数宣言
 //=============================================================================
-LPDIRECTINPUT8 CInput::m_input = NULL;
-LPDIRECTINPUTDEVICE8 CInput::m_joy_stick = NULL;
+LPDIRECTINPUT8 CInput::m_input = nullptr;
+LPDIRECTINPUTDEVICE8 CInput::m_joy_stick[MAX_INPUT_PLAYER];
 
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
 CInput::CInput()
 {
-	m_device = NULL;
+	m_device = nullptr;
 }
 
 //=============================================================================
@@ -37,9 +37,9 @@ CInput::~CInput()
 HRESULT CInput::Init(HINSTANCE hInstance, HWND hWnd)
 {
 	HRESULT hr = S_FALSE;
-	if (m_input == NULL)
+	if (m_input == nullptr)
 	{
-		hr = DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_input, NULL);
+		hr = DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_input, nullptr);
 	}
 	return hr;
 }
@@ -50,23 +50,27 @@ HRESULT CInput::Init(HINSTANCE hInstance, HWND hWnd)
 void CInput::Uninit(void)
 {
 	//入力デバイスの開放
-	if (m_device != NULL)
+	if (m_device != nullptr)
 	{
 		m_device->Unacquire();
 		m_device->Release();
-		m_device = NULL;
+		m_device = nullptr;
 	}
-	//入力デバイスの開放
-	if (m_joy_stick != NULL)
+	for (int nCnt = 0; nCnt < MAX_INPUT_PLAYER; nCnt++)
 	{
-		m_joy_stick->Unacquire();
-		m_joy_stick->Release();
-		m_joy_stick = NULL;
+		//入力デバイスの開放
+		if (m_joy_stick[nCnt] != nullptr)
+		{
+			m_joy_stick[nCnt]->Unacquire();
+			m_joy_stick[nCnt]->Release();
+			m_joy_stick[nCnt] = nullptr;
+		}
 	}
+
 	//DirectInputオブジェクトの開放
-	if (m_input != NULL)
+	if (m_input != nullptr)
 	{
 		m_input->Release();
-		m_input = NULL;
+		m_input = nullptr;
 	}
 }

@@ -28,15 +28,15 @@ public:
 	void Uninit(void);	// 終了
 	void Update(void);	// 更新
 	void Draw(void);	// 描画
-	LPDIRECT3DDEVICE9 GetDevice(void) { return m_pD3DDevice; }	// デバイスの取得
-	LPD3DXFONT GetFont(void) { return m_pFont; }	// フォント
+	LPDIRECT3DDEVICE9 GetDevice(void) { return m_direct3d_device; }	// デバイスの取得
+	LPD3DXFONT GetFont(void) { return m_font; }	// フォント
 private:
 #ifdef _DEBUG
 	void DrawFPS(void);
 #endif //!_DEBUG
-	LPDIRECT3D9	m_pD3D;	// Direct3Dオブジェクト
-	LPDIRECT3DDEVICE9	m_pD3DDevice;	// Deviceオブジェクト(描画に必要)
-	LPD3DXFONT	m_pFont;	// フォントへのポインタ
+	LPDIRECT3D9	m_direct3d;	// Direct3Dオブジェクト
+	LPDIRECT3DDEVICE9	m_direct3d_device;	// Deviceオブジェクト(描画に必要)
+	LPD3DXFONT	m_font;	// フォントへのポインタ
 
 #ifdef _DEBUG
 #endif //!_DEBUG

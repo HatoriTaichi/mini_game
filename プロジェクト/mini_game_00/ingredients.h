@@ -18,6 +18,9 @@
 // 前方宣言
 //*****************************************************************************
 static const int IngredientsMax = 3;
+static const int IngredientsTypeMax = 2;
+static const int IngredientsNumMax = 1;
+
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
@@ -45,7 +48,7 @@ public:
 	};
 	struct IngredientsData
 	{
-		CModel* m_IngredientModel[IngredientsMax];	// 具材モデル
+		CModel* m_IngredientModel[IngredientsNumMax];	// 具材モデル
 		CModel* m_BasketModel;	// かごモデル
 	};
 	CIngredients(LAYER_TYPE Layer = LAYER_TYPE::LAYER_01);	// デフォルトコンストラクタ
@@ -60,6 +63,7 @@ public:
 	void Motion(void);//ちょっとした動きの処理
 	void ColisionWall(void);
 	void ColisionPlayer(void);
+	void ColisionEnemyPlayer(void);
 	static CIngredients *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot,
 		D3DXVECTOR3 scale, IngredientsType nType,bool bDoDrop,const int& DropNum);	// 生成(ドロップ用)
 	static CIngredients *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot,
@@ -68,6 +72,8 @@ public:
 	D3DXVECTOR3 GetRot(void) { return m_rot; }	// ゲッダー
 	IngredientsType GetType() { return m_Type; }
 private:
+	void DeleteIngredient(void);//具材を消す
+	void CreateIngredient(void);
 	D3DXVECTOR3 m_pos;	// 位置
 	D3DXVECTOR3 m_oldPos;	// 前回の位置
 	D3DXVECTOR3 m_rot;	// 向き
@@ -79,14 +85,18 @@ private:
 	int m_nNumDropType;//何番目にドロップしたかを記録
 	int m_nTimer;
 	int m_nFlashingTimer;
+	int m_nEndTypeTime[IngredientsMax][IngredientsTypeMax];
 	bool m_bFlash;
 	float m_fDropMoveSpeed;
 	float m_fUpDown;//上下動く用の増減変数
 	bool m_bUpDown;
 	float m_fDropRotY;//ドロップ方向
 	float m_fFall;
+	int m_nPopTimer;//再ポップ時のタイマー
 	bool m_bDoDrop;//ドロップするかどうか
 	bool m_bUninit;
+	bool m_bDelete;
+	bool m_bHit;//プレイヤーに当たったかの判定
 };
 
 #endif
