@@ -327,8 +327,8 @@ void CGame::ItemSpawn(void)
 	{
 		std::random_device random;	// 非決定的な乱数生成器
 		std::mt19937_64 mt(random());// メルセンヌ・ツイスタの64ビット版、引数は初期シード
-		std::uniform_real_distribution<> randItemType(1, 3);
-		std::uniform_real_distribution<> randItemPosType(0, m_MaxItemSpawn);
+		std::uniform_int_distribution<> randItemType(1, 3);
+		std::uniform_int_distribution<> randItemPosType(0, m_MaxItemSpawn);
 		bool *bOverlapPos = nullptr;
 		bOverlapPos = new bool[m_MaxItemSpawn];
 		for (int nCntNum = 0; nCntNum < m_MaxItemSpawn; nCntNum++)
@@ -348,7 +348,7 @@ void CGame::ItemSpawn(void)
 			while (!bStop)
 			{
 				//ランダムな位置を決める
-				int nCntType = static_cast<int>(randItemPosType(mt));
+				int nCntType = randItemPosType(mt);
 
 				for (int nCntPoint = 0; nCntPoint < NormalItemSpawnMin; nCntPoint++)
 				{
@@ -363,7 +363,7 @@ void CGame::ItemSpawn(void)
 				}
 			}
 			//アイテムの種類を代入
-			int nType = static_cast<int>(randItemType(mt));
+			int nType = randItemType(mt);
 			//アイテムを生成
 			CItem::Create({ m_ItemSpawnPoint[m_NumItemSpawnPoint[nCnt]].x ,
 				m_ItemSpawnPoint[m_NumItemSpawnPoint[nCnt]].y + 200.0f,
