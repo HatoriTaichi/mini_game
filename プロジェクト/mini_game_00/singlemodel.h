@@ -29,9 +29,11 @@ public:
 	bool CircleCollision(const D3DXVECTOR3& pos, const float& size);	// 当たり判定
 	static CSingleModel *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale, string namae, CObject::OBJTYPE type = CObject::OBJTYPE::MODEL);	// 生成
 	void SetScale(D3DXVECTOR3 scale) { m_model->SetScale(scale); }	// スケール
+	void SetDraw(bool draw) { m_draw = draw; }
 	D3DXVECTOR3 GetPos(void) { return m_pos; }	// 位置の取得
 	D3DXVECTOR3 GetRot(void) { return m_rot; }	// 向きの取得
 	CModel *GetModel(void) { return m_model; }	// モデルの取得
+	bool GetDraw(void) { return m_draw; }
 private:
 	CModel *m_model;	// モデル
 	string m_name;	// 種類
@@ -39,6 +41,7 @@ private:
 	D3DXVECTOR3 m_rot;	// 向き
 	D3DXVECTOR3 m_scale;	// スケール
 	D3DXMATRIX m_mtx_wold;	// ワールドマトリックス
+	bool m_draw;
 };
 
 #endif

@@ -25,7 +25,8 @@
 #include "onlinegame.h"
 #include "enemyplayer.h"
 #include "sound.h"
-
+#include "camera.h"
+#include "singlemodel.h"
 static const float MoveSpeed = 5.0f;
 static const float SpeedUpDiameter = 1.5f;//スピードアップ倍率
 static const float PossibleAttackSpeedUpDiameter = 1.2f;//攻撃可能時のスピードアップ倍率
@@ -35,6 +36,10 @@ static const float NoDropSize = 35.0f;
 static const float DropDistance = 100.0f;
 static const float PlayerHitSize = 50.0f;
 static const int OperationAgainTime = 60;
+static const float CameraLimit = 10.0f;//慣性の制限値
+static const float RevertTime = 100.0f;
+static const float ObjDrawArea = 900.0f;
+static const float ObjColliArea = 100.0f;
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -167,7 +172,7 @@ void CPlayer::Update(void)
 		DropItem();
 	}
 	////テストで取得した具材を増やす処理
-	TestGetIngredients();
+	//TestGetIngredients();
 	//敵などに当たったら一定時間操作を聞かないようにする
 	if (m_PlayerData.m_bOperationLock)
 	{
@@ -237,7 +242,7 @@ void CPlayer::Update(void)
 	//壁との当たり判定
 	vector<CObject *>ObjWall = CObject::GetObjTypeObject(CObject::OBJTYPE::WALL);
 	int nWallSize = ObjWall.size();
-	; if (nWallSize != 0)
+	if (nWallSize != 0)
 	{
 		for (int nCntWall = 0; nCntWall < nWallSize; nCntWall++)
 		{
@@ -251,6 +256,7 @@ void CPlayer::Update(void)
 	{
 		m_PlayerData.m_bDrop[nCnt] = true;
 	}
+	//障害物
 	vector<CObject *>Obj = CObject::GetObjTypeObject(CObject::OBJTYPE::BLOCK);
 	{
 		int nSize = Obj.size();
@@ -259,26 +265,53 @@ void CPlayer::Update(void)
 			for (int nCnt = 0; nCnt < nSize; nCnt++)
 			{
 				CSingleModel *pSModel = static_cast<CSingleModel*>(Obj[nCnt]);
-				pSModel->GetModel()->BoxCollision(&m_PlayerData.m_pos, m_PlayerData.m_posold);
-				for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
+				D3DXVECTOR3 ModelPos = pSModel->GetPos();
+				D3DXVECTOR3 vec = D3DXVECTOR3(0.0f, 0.0f, 0.0f);//自分と相手のベクトル
+				vec = m_PlayerData.m_pos - ModelPos;
+				float fRadius = ObjDrawArea;
+				float fLength = 0.0f;
+				//相手と自分の距離を求める
+				fLength = sqrtf((vec.z*vec.z) + (vec.x*vec.x));
+				if (m_nNumPlayer == 0)
 				{
-					D3DXVECTOR3 pos = m_pColliNoDrop[nCnt]->GetPos();
-					D3DXVECTOR3 vec = pSModel->GetPos() - pos;
-					float LengthX = sqrtf((vec.x*vec.x));
-					float LengthZ = sqrtf((vec.z*vec.z));
-					if (LengthX <= NoDropSize&&
-						LengthZ <= NoDropSize)
+					if (fLength >= fRadius)
 					{
-						//ドロップしないようにする
-						m_PlayerData.m_bDrop[nCnt] = false;
+						pSModel->SetDraw(false);
+					}
+					else if (fLength < fRadius)
+					{
+						pSModel->SetDraw(true);
 					}
 				}
 
+				bool bDraw = pSModel->GetDraw();
+				if (bDraw)
+				{
+					if (fLength <= ObjColliArea)
+					{
+						pSModel->GetModel()->BoxCollision(&m_PlayerData.m_pos, m_PlayerData.m_posold);
+						for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
+						{
+							D3DXVECTOR3 pos = m_pColliNoDrop[nCnt]->GetPos();
+							D3DXVECTOR3 vec = pSModel->GetPos() - pos;
+							float LengthX = sqrtf((vec.x*vec.x));
+							float LengthZ = sqrtf((vec.z*vec.z));
+							if (LengthX <= NoDropSize&&
+								LengthZ <= NoDropSize)
+							{
+								//ドロップしないようにする
+								m_PlayerData.m_bDrop[nCnt] = false;
+							}
+						}
+					}
+
+				}
 			}
 		}
 
 	}
 	m_PlayerData.m_posold = m_PlayerData.m_pos;
+
 	if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NETWORK_MODE::ON_LINE)
 	{
 		//プレイヤー情報をサーバーに送信
@@ -357,10 +390,66 @@ void CPlayer::Draw(void)
 			m_pColliNoDrop[nCnt]->Draw();
 		}
 	}
+	if (m_nNumPlayer == 0)
+	{
+		FollowingPlayerCamera();
+	}
 #ifdef _DEBUG
 	Drawtext();
 
 #endif
+}
+//=============================================================================
+// カメラの追従
+//=============================================================================
+void CPlayer::FollowingPlayerCamera(void)
+{
+	//カメラの取得
+	CCamera *pCamera = CManager::GetInstance()->GetCamera();
+	D3DXVECTOR3 PosR = pCamera->GetPosR();
+	//キーボードの取得
+
+	{
+		//カメラの注視点とプレイヤーの位置の差分
+		float PosDifference_X = PosR.x - m_PlayerData.m_pos.x;
+
+		//プレイヤーの位置に戻す速度
+		float RevertSpeed = abs(PosDifference_X / CameraLimit);
+		//RevertSpeedが0.0f出はなかったら
+		if (RevertSpeed != 0.0f)
+		{
+			//差分が正の数なら負の数に戻すようにする
+			if (PosDifference_X > 0)
+			{
+				PosR.x -= RevertSpeed;
+			}
+			else
+			{
+				PosR.x += RevertSpeed;
+			}
+		}
+	}
+	{
+		float PosDifference_Z = PosR.z - m_PlayerData.m_pos.z;//カメラの注視点とプレイヤーの位置の差分
+		float RevertSpeed = abs(PosDifference_Z / CameraLimit);//プレイヤーの位置に戻す速度
+															   //RevertSpeedが0.0f出はなかったら
+		if (RevertSpeed != 0.0f)
+		{
+			//差分が正の数なら負の数に戻すようにする
+			if (PosDifference_Z > 0)
+			{
+				PosR.z -= RevertSpeed;
+			}
+			else
+			{
+				PosR.z += RevertSpeed;
+			}
+
+		}
+
+	}
+	pCamera->SetPosR(PosR);
+
 }
 //=============================================================================
 // モーション

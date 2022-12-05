@@ -23,6 +23,7 @@ CSingleModel::CSingleModel(LAYER_TYPE layer) : CObject(layer)
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXMatrixIdentity(&m_mtx_wold);
+	m_draw = true;
 }
 
 //=============================================================================
@@ -100,7 +101,11 @@ void CSingleModel::Draw(void)
 	//マトリックスの設定
 	device->SetTransform(	D3DTS_WORLD,
 							&m_mtx_wold);
-	m_model->Draw();
+	if (m_draw)
+	{
+		m_model->Draw();
+
+	}
 }
 
 //=============================================================================

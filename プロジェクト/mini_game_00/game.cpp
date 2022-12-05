@@ -50,7 +50,7 @@ static const D3DXVECTOR3 GameTimerSize = { 35.0f,40.0f,0.0f };//ゲーム画面上部に
 static const D3DXVECTOR3 GameTimerPos = { SCREEN_WIDTH / 2.0f - 35.0f,50.0f,0.0f };//ゲーム画面上部にある帯みたいなやつ
 static const D3DXVECTOR3 StartSize = { 150.0f,50.0f,0.0f };//スタートUI
 static const D3DXVECTOR3 StartPos = { SCREEN_WIDTH / 2.0f,SCREEN_HEIGHT/2.0f,0.0f };//スタートUI
-static const D3DXVECTOR3 TargetSize = { 250.0f,50.0f,0.0f };//目的UI
+static const D3DXVECTOR3 TargetSize = { 350.0f,60.0f,0.0f };//目的UI
 static const D3DXVECTOR3 TargetPos = { SCREEN_WIDTH / 2.0f,SCREEN_HEIGHT / 2.0f,0.0f };//目的UI
 static const D3DXVECTOR3 FinishSize = { 120.0f,40.0f,0.0f };//終了UI
 static const D3DXVECTOR3 FinishPos = { SCREEN_WIDTH / 2.0f,SCREEN_HEIGHT / 2.0f,0.0f };//終了UI
@@ -179,7 +179,7 @@ HRESULT CGame::Init(void)
 	//	m_pStartUI = CMove_UI::Create(StartPos, StartSize, StartTime, StartFadeTime, "Start000.png", CMove_UI::UI_Type::Type_Start);
 	//	CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_GAME_START);
 	//}
-	CMove_UI::Create(TargetPos, TargetSize, StartTime, StartFadeTime, "Start000.png", CMove_UI::UI_Type::Type_Target);
+	CMove_UI::Create(TargetPos, TargetSize, StartTime, StartFadeTime, "TargetUI000.png", CMove_UI::UI_Type::Type_Target);
 	//ラストスパートUIUIを生成
 	if (!m_pLastSpurtUI)
 	{
@@ -256,7 +256,6 @@ HRESULT CGame::Init(void)
 			Stage.mesh_info[0].division_y_or_z["FIELDSET"][nFloor],
 			"wooden_floor.png");
 	}
-	EnemySpawn();
 	//--------------
 	//音楽再生
 	//--------------

@@ -85,6 +85,7 @@ public:
 	ItemGetState GetItemState() { return m_PlayerData.m_ItemState; }//ゲッター
 	int GetPlayerNum(void) { return m_nNumPlayer; }//ゲッター
 private:
+	void FollowingPlayerCamera(void);
 	void Motion(void);
 	void Drawtext(void);
 	void CreateModel(void);	// モデルの生成
