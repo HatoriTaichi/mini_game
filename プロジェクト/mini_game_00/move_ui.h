@@ -12,6 +12,7 @@
 //*****************************************************************************
 #include "main.h"
 #include "object.h"
+#include "object2D.h"
 
 //*****************************************************************************
 // 前方宣言
@@ -51,13 +52,14 @@ public:
 	void FadeOut(void);//画像のフェードアウト
 	void FadeInOut(void);
 	void Flash(void);
+	void Move(void);
 	void SetState(CMove_UI::State state) { m_state = state; }
 	// 生成(位置、サイズ、出現持続時間、フェードインアウトの時間)
 	static CMove_UI *Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale,
 		int nPopTime,int nFadeTime, string TexType, UI_Type type);
 	D3DXVECTOR3 GetPos(void) { return m_pos; }	// ゲッダー
 	D3DXVECTOR3 GetRot(void) { return m_rot; }	// ゲッダー
-
+	void SetCol(D3DXCOLOR col) { if (m_pUI) { m_pUI->SetCol(col); } }
 private:
 	void SizeUp(void);//ちょっとした動きの処理
 	void Start(void);//スタートUIの処理
@@ -68,14 +70,15 @@ private:
 	State m_state;//状態
 	UI_Type m_Type; //UIの種類
 	D3DXVECTOR3 m_pos;	// 位置
+	D3DXVECTOR3 m_origin_pos;	// 位置
 	D3DXVECTOR3 m_rot;	// 向き
 	D3DXVECTOR3 m_scale;	// スケール
 	D3DXVECTOR3 m_origin_scale;	// スケール
 	D3DXVECTOR3 m_addspeed;	// スケール
-
 	int m_nTimer;
 	int m_nMaxPopTime;//出現時間
 	int m_nMaxFadeTime;//フェードインアウトの時間
+	float m_fFadeSpeed;
 	bool m_bUninit;
 	bool m_bFadeState;
 	bool m_bFlash;

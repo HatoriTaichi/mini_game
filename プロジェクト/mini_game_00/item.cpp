@@ -213,9 +213,11 @@ void CItem::Draw(void)
 		}
 		break;
 	}
-
-	//‰æ‘œ‚Ì•`‰æ”»’è‚ðÝ’è
-	m_pItem->SwitchDraw(m_bFlash);
+	if (m_pItem)
+	{
+		//‰æ‘œ‚Ì•`‰æ”»’è‚ðÝ’è
+		m_pItem->SwitchDraw(m_bFlash);
+	}
 }
 //=============================================================================
 // ‚¿‚å‚Á‚Æ‚µ‚½“®‚«‚Ìˆ—

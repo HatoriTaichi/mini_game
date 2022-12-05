@@ -38,14 +38,20 @@ static const int ClimaxItemSpawnMax = 2;
 static const int EnemySpawnMax = 2;
 static const int LastSpartTime = 30;
 static const int GameMaxTime = 90;//制限時間
-static const int StartTime = 60 * 2;
-static const int StartFadeTime = 30;
+static const int StartTime = 90;
+static const int StartFadeTime = 10;
+static const int TargetFadeTime = 50;
+static const int TargetTime =30;//目的UI持続時間
+static const int StartSpawnTime = TargetTime + (TargetFadeTime*2) + 30;
+static const int StartGameTime = StartSpawnTime + StartTime + (StartFadeTime * 2) + 10;
 static const D3DXVECTOR3 BandUIPos = {SCREEN_WIDTH/2.0f,50.0f,0.0f};//ゲーム画面上部にある帯みたいなやつ
 static const D3DXVECTOR3 BandUISize = { SCREEN_WIDTH / 2.0f,50.0f,0.0f };//ゲーム画面上部にある帯みたいなやつ
 static const D3DXVECTOR3 GameTimerSize = { 35.0f,40.0f,0.0f };//ゲーム画面上部にある帯みたいなやつ
 static const D3DXVECTOR3 GameTimerPos = { SCREEN_WIDTH / 2.0f - 35.0f,50.0f,0.0f };//ゲーム画面上部にある帯みたいなやつ
-static const D3DXVECTOR3 StartSize = { 100.0f,40.0f,0.0f };//スタートUI
+static const D3DXVECTOR3 StartSize = { 150.0f,50.0f,0.0f };//スタートUI
 static const D3DXVECTOR3 StartPos = { SCREEN_WIDTH / 2.0f,SCREEN_HEIGHT/2.0f,0.0f };//スタートUI
+static const D3DXVECTOR3 TargetSize = { 250.0f,50.0f,0.0f };//目的UI
+static const D3DXVECTOR3 TargetPos = { SCREEN_WIDTH / 2.0f,SCREEN_HEIGHT / 2.0f,0.0f };//目的UI
 static const D3DXVECTOR3 FinishSize = { 120.0f,40.0f,0.0f };//終了UI
 static const D3DXVECTOR3 FinishPos = { SCREEN_WIDTH / 2.0f,SCREEN_HEIGHT / 2.0f,0.0f };//終了UI
 static const D3DXVECTOR3 LastSpurtSize = { 180.0f,40.0f,0.0f };//ラストスパートUI
@@ -85,7 +91,8 @@ CGame::CGame()
 	m_pLastSpurtUI = nullptr;
 	memset(m_pIngredientsUI, NULL, sizeof(m_pIngredientsUI));
 	CManager::GetInstance()->GetCamera()->SetRot(CAMERA_ROT);
-
+	m_UITimer = 0;
+	m_bIsGameStart = false;
 }
 
 //=============================================================================
@@ -167,12 +174,12 @@ HRESULT CGame::Init(void)
 		}
 	}
 	////スタートUIを生成
-	if (!m_pStartUI)
-	{
-		m_pStartUI = CMove_UI::Create(StartPos, StartSize, StartTime, StartFadeTime, "Start000.png", CMove_UI::UI_Type::Type_Start);
-		CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_GAME_START);
-	}
-
+	//if (!m_pStartUI)
+	//{
+	//	m_pStartUI = CMove_UI::Create(StartPos, StartSize, StartTime, StartFadeTime, "Start000.png", CMove_UI::UI_Type::Type_Start);
+	//	CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_GAME_START);
+	//}
+	CMove_UI::Create(TargetPos, TargetSize, StartTime, StartFadeTime, "Start000.png", CMove_UI::UI_Type::Type_Target);
 	//ラストスパートUIUIを生成
 	if (!m_pLastSpurtUI)
 	{
@@ -281,15 +288,39 @@ void CGame::Uninit(void)
 //=============================================================================
 void CGame::Update(void)
 {
-	ItemSpawn();
-	IngredientsSpawn();
+
+	//キーボード情報を取得
 	CKey *key = CManager::GetInstance()->GetKey();
-	m_nGameTimeSeconds++;
+
+	//時間を加算
+	m_UITimer++;
+	if (m_UITimer >= StartGameTime)
+	{
+		m_bIsGameStart = true;
+	}
+	if (m_bIsGameStart)
+	{
+		m_nGameTimeSeconds++;
+		//アイテムの出現処理
+		ItemSpawn();
+
+		//具材の出現処理
+		IngredientsSpawn();
+
+	}
+	//スタートUIを生成
+	if (!m_pStartUI&&m_UITimer >= StartSpawnTime)
+	{
+		m_pStartUI = CMove_UI::Create(StartPos, StartSize, StartTime, StartFadeTime, "Start000.png", CMove_UI::UI_Type::Type_Start);
+		m_pStartUI->SetCol({ 1.0,1.0,1.0,0.0f });
+	}
+	//６０フレーム経ったら一秒加算する
 	if (m_nGameTimeSeconds >= 60)
 	{
 		m_nGameTimeSeconds = 0;
 		m_pGameTimer->AddCounter(-1);
 	}
+	//時間切れになったらゲーム終了
 	if (m_pGameTimer->GetCounter() <= 0)
 	{
 		//フィニッシュUIを生成
@@ -299,6 +330,7 @@ void CGame::Update(void)
 		}
 		CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT);
 	}
+	//lastspurtに入る
 	if (m_pGameTimer->GetCounter() <= LastSpartTime)
 	{
 		if (!m_bLastSoundToggle)

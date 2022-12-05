@@ -53,6 +53,7 @@ public:
 	void EnemySpawn(void);
 	void IngredientsSpawn(void);
 	void AddIngredientsCnt(int nNumAdd,int nIngredients, int nPlayer);//具材の加算
+	bool GetGameStart(void) { return m_bIsGameStart; }
 private:
 	vector<D3DXVECTOR3> m_IngredientsSpawnPoint;//具材のスポーンポイント
 	vector<D3DXVECTOR3> m_ItemSpawnPoint;//アイテムのスポーンポイント
@@ -79,8 +80,9 @@ private:
 	int m_IngredientsSpawnMax[ModeMax];//具材の出現個数（大）
 	int m_ItemSpawnMin[ModeMax];//アイテムの出現個数（小）
 	int m_ItemSpawnMax[ModeMax];//アイテムの出現個数（大）
-
+	int m_UITimer;//UI表示用タイマー
 	bool m_bLastSoundToggle;	// ラストスパートの曲が鳴ったか
+	bool m_bIsGameStart;
 };
 
 #endif // !_TITLE_H_処理
