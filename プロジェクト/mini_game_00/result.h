@@ -88,6 +88,8 @@ private:
 	bool m_bIngredientCntMax[C2d_ingredients::IngredientsType::Max][MAX_PLAYER];
 	bool m_bComboCntMax[MaxCombo][MAX_PLAYER];
 	bool m_bNext;
+
+	bool m_bScoreSEToggle;	// ƒXƒRƒA‰ÁZSE‚ª–Â‚Á‚½‚©
 };
 
 #endif // !_TITLE_H_ˆ—

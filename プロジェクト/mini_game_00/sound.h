@@ -37,7 +37,7 @@ public:
 		SOUND_LABEL_SE_GAME_START,	// ゲームスタート
 		SOUND_LABEL_SE_GAME_DAMAGE,	// ダメージ
 		SOUND_LABEL_SE_GAME_ITEM,	// アイテム取得
-		SOUND_LABEL_SE_GAME_SPAWN,	// 具材、アイテムスポーン
+		SOUND_LABEL_SE_GAME_GET,	// 具材取得
 		SOUND_LABEL_SE_GAME_WALK,	// 歩行
 		SOUND_LABEL_SE_GAME_LAST,	// ラストスパート
 		SOUND_LABEL_SE_GAME_END,	// ゲームエンド

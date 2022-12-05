@@ -80,7 +80,11 @@ private:
 	int m_ItemSpawnMin[ModeMax];//アイテムの出現個数（小）
 	int m_ItemSpawnMax[ModeMax];//アイテムの出現個数（大）
 
-	bool m_bLastSoundToggle;	// ラストスパートの曲が鳴ったか
+	float m_fGameSoundFade;		// BGMの音量
+	float m_fLastSoundFade;		// ラストスパートSEの音量
+	int m_nLastSoundCount;		// ラストスパートSEが鳴った時間をカウント
+	bool m_bLastSoundToggle;	// ラストスパートSEが鳴ったか
+	bool m_bLastBGMSoundToggle;	// ラストスパートBGMが鳴ったか
 };
 
 #endif // !_TITLE_H_処理

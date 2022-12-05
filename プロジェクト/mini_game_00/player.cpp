@@ -546,6 +546,7 @@ void CPlayer::DropItem()
 		int nSize = m_PlayerData.m_nGetIngredientsType.size();
 		if (nSize != 0)
 		{
+			CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_GAME_DAMAGE);
 			m_PlayerData.m_bCanDrop = false;
 			float DropRot = 0.0f;
 			for (int nCnt = 0; nCnt < NoDropColli; nCnt++)
