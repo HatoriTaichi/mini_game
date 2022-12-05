@@ -22,6 +22,8 @@ static const int FinishUIEndTime = 30;
 static const int FlashTimeMin = 2;
 static const float LastSpurtMoveSpeed = 7.0f;
 static const float FadeSpeed = 0.05f;
+static const float TargetDifPosY = 100.0f;//目的UIの初期位置
+
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
@@ -310,8 +312,25 @@ CMove_UI *CMove_UI::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale,
 	if (Ingredients != nullptr)
 	{
 		// 値を代入
-		Ingredients->m_pos = pos;
-		Ingredients->m_scale = { scale.x / 100.0f,scale.y / 100.0f ,0.0f };
+		//目的UIだけ位置Yを変える
+		if (type == CMove_UI::UI_Type::Type_Target)
+		{
+			Ingredients->m_pos = {pos.x,pos.y - TargetDifPosY,0.0f};
+		}
+		else
+		{
+			Ingredients->m_pos = pos;
+
+		}
+		if (type == CMove_UI::UI_Type::Type_Start||
+			type == CMove_UI::UI_Type::Type_Finish)
+		{
+			Ingredients->m_scale = { scale.x / 100.0f,scale.y / 100.0f ,0.0f };
+		}
+		else
+		{
+			Ingredients->m_scale = scale;
+		}
 		Ingredients->m_origin_scale = scale;
 		Ingredients->m_addspeed = { scale.x / 50.0f,scale.y / 50.0f ,0.0f };
 		Ingredients->m_nMaxPopTime = nPopTime;

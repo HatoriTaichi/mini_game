@@ -26,6 +26,7 @@ public:
 	enum class UI_Type
 	{
 		Type_Start = 0,
+		Type_Target,//–Ú“I
 		Type_LastSpurt,
 		Type_Finish,
 		Type_PushStart,
