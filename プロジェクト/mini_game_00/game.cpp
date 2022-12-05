@@ -22,6 +22,8 @@
 #include "counter.h"
 #include "camera.h"
 #include "move_ui.h"
+#include "manager.h"
+#include "sound.h"
 
 static const int IngredientsSpawnInterval = 30 * 60;
 static const int NormalItemSpawnInterval = 17 * 60;
@@ -168,6 +170,7 @@ HRESULT CGame::Init(void)
 	if (!m_pStartUI)
 	{
 		m_pStartUI = CMove_UI::Create(StartPos, StartSize, StartTime, StartFadeTime, "Start000.png", CMove_UI::UI_Type::Type_Start);
+		CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_GAME_START);
 	}
 
 	//ラストスパートUIUIを生成
@@ -250,6 +253,8 @@ HRESULT CGame::Init(void)
 	//--------------
 	//音楽再生
 	//--------------
+
+	m_bLastSoundToggle = false;
 	return S_OK;
 }
 
@@ -296,6 +301,13 @@ void CGame::Update(void)
 	}
 	if (m_pGameTimer->GetCounter() <= LastSpartTime)
 	{
+		if (!m_bLastSoundToggle)
+		{
+			CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_GAME_LAST);
+		}
+
+		m_bLastSoundToggle = true;
+
 		m_pLastSpurtUI->SetState(CMove_UI::State::ImmediatelyAfterPop);
 	}
 	//if (key->GetTrigger(CKey::KEYBIND::W) == true)
@@ -315,8 +327,8 @@ void CGame::ItemSpawn(void)
 	{
 		std::random_device random;	// 非決定的な乱数生成器
 		std::mt19937_64 mt(random());// メルセンヌ・ツイスタの64ビット版、引数は初期シード
-		std::uniform_real_distribution<> randItemType(1, 3);
-		std::uniform_real_distribution<> randItemPosType(0, m_MaxItemSpawn);
+		std::uniform_int_distribution<> randItemType(1, 3);
+		std::uniform_int_distribution<> randItemPosType(0, m_MaxItemSpawn);
 		bool *bOverlapPos = nullptr;
 		bOverlapPos = new bool[m_MaxItemSpawn];
 		for (int nCntNum = 0; nCntNum < m_MaxItemSpawn; nCntNum++)
@@ -336,7 +348,7 @@ void CGame::ItemSpawn(void)
 			while (!bStop)
 			{
 				//ランダムな位置を決める
-				int nCntType = static_cast<int>(randItemPosType(mt));
+				int nCntType = randItemPosType(mt);
 
 				for (int nCntPoint = 0; nCntPoint < NormalItemSpawnMin; nCntPoint++)
 				{
@@ -351,7 +363,7 @@ void CGame::ItemSpawn(void)
 				}
 			}
 			//アイテムの種類を代入
-			int nType = static_cast<int>(randItemType(mt));
+			int nType = randItemType(mt);
 			//アイテムを生成
 			CItem::Create({ m_ItemSpawnPoint[m_NumItemSpawnPoint[nCnt]].x ,
 				m_ItemSpawnPoint[m_NumItemSpawnPoint[nCnt]].y + 200.0f,
@@ -370,7 +382,7 @@ void CGame::EnemySpawn(void)
 {
 	std::random_device random;	// 非決定的な乱数生成器
 	std::mt19937_64 mt(random());// メルセンヌ・ツイスタの64ビット版、引数は初期シード
-	std::uniform_real_distribution<> randEnemyPosType(0, m_MaxEnemySpawn);
+	std::uniform_int_distribution<> randEnemyPosType(0, m_MaxEnemySpawn);
 	bool *bOverlapPos = nullptr;
 	bOverlapPos = new bool[m_MaxEnemySpawn];
 	for (int nCntNum = 0; nCntNum < m_MaxEnemySpawn; nCntNum++)
@@ -396,7 +408,7 @@ void CGame::EnemySpawn(void)
 			while (!bHoge)
 			{
 				//ランダムな位置を決める
-				int nCntType = static_cast<int>(randEnemyPosType(mt));
+				int nCntType = randEnemyPosType(mt);
 
 				for (int nCntPoint = 0; nCntPoint < nCntMax; nCntPoint++)
 				{
@@ -425,9 +437,9 @@ void CGame::IngredientsSpawn(void)
 	{
 		std::random_device random;	// 非決定的な乱数生成器
 		std::mt19937_64 mt(random());// メルセンヌ・ツイスタの64ビット版、引数は初期シード
-		std::uniform_real_distribution<> randIngredientsCnt(NormalIngredientsSpawnMin, NormalIngredientsSpawnMax);
-		std::uniform_real_distribution<> randIngredientsType(0, 5);
-		std::uniform_real_distribution<> randIngredientsPosType(0, m_MaxIngredientsSpawn);
+		std::uniform_int_distribution<> randIngredientsCnt(NormalIngredientsSpawnMin, NormalIngredientsSpawnMax);
+		std::uniform_int_distribution<> randIngredientsType(0, 5);
+		std::uniform_int_distribution<> randIngredientsPosType(0, m_MaxIngredientsSpawn);
 		bool *bOverlapPos = nullptr;//ランダムで選出した位置に再度出現しないようにするための変数
 		bOverlapPos = new bool[m_MaxIngredientsSpawn];
 		for (int nCntNum = 0; nCntNum < m_MaxIngredientsSpawn; nCntNum++)
@@ -439,7 +451,7 @@ void CGame::IngredientsSpawn(void)
 		if (nSize != 0)
 		{
 			//具材を配置する最大値を決める
-			int nCntMax = static_cast<int>(randIngredientsCnt(mt));
+			int nCntMax = randIngredientsCnt(mt);
 			m_NumIngredientsSpawnPoint = new int[nCntMax];
 			//数値の初期化
 			for (int nCntNum = 0; nCntNum < nCntMax; nCntNum++)
@@ -452,7 +464,7 @@ void CGame::IngredientsSpawn(void)
 				while (!bHoge)
 				{
 					//ランダムな位置を決める
-					int nCntType = static_cast<int>(randIngredientsPosType(mt));
+					int nCntType = randIngredientsPosType(mt);
 
 					for (int nCntPoint = 0; nCntPoint < nCntMax; nCntPoint++)
 					{
@@ -465,7 +477,7 @@ void CGame::IngredientsSpawn(void)
 						}
 					}
 				}
-				int nType = static_cast<int>(randIngredientsType(mt));
+				int nType = randIngredientsType(mt);
 				//具材を生成
 				CIngredients::Create({ m_IngredientsSpawnPoint[m_NumIngredientsSpawnPoint[nCnt]].x ,
 					m_IngredientsSpawnPoint[m_NumIngredientsSpawnPoint[nCnt]].y + 200.0f,

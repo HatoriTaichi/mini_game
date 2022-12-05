@@ -34,8 +34,8 @@ CEnemy::CEnemy(LAYER_TYPE layer) : CObject(layer)
 	m_nAutoSwingTimer = 0;
 	std::random_device random;	// 非決定的な乱数生成器
 	std::mt19937_64 mt(random());            // メルセンヌ・ツイスタの64ビット版、引数は初期シード
-	std::uniform_real_distribution<> randAutoSwingTime(AutoSwingTimeMin, AutoSwingTimeMax);
-	m_nAutoSwingMaxTime = static_cast <int>(randAutoSwingTime(mt));
+	std::uniform_int_distribution<> randAutoSwingTime(AutoSwingTimeMin, AutoSwingTimeMax);
+	m_nAutoSwingMaxTime = randAutoSwingTime(mt);
 }
 
 //=============================================================================
@@ -328,15 +328,15 @@ void CEnemy::Move(void)
 {
 	std::random_device random;	// 非決定的な乱数生成器
 	std::mt19937_64 mt(random());            // メルセンヌ・ツイスタの64ビット版、引数は初期シード
-	std::uniform_real_distribution<> randPassive(0, 4);
+	std::uniform_int_distribution<> randPassive(0, 4);
 	m_nAutoSwingTimer++;
 
 	//一定時間過ぎたら自動で振り向くようにする
 	if (m_nAutoSwingTimer >= m_nAutoSwingMaxTime)
 	{
 		m_nAutoSwingTimer = 0;
-		std::uniform_real_distribution<> randAutoSwingTime(AutoSwingTimeMin, AutoSwingTimeMax);
-		m_nAutoSwingMaxTime = static_cast <int>(randAutoSwingTime(mt));
+		std::uniform_int_distribution<> randAutoSwingTime(AutoSwingTimeMin, AutoSwingTimeMax);
+		m_nAutoSwingMaxTime = randAutoSwingTime(mt);
 		m_bSwing = true;
 	}
 	//向いてる方向に移動
@@ -404,7 +404,7 @@ void CEnemy::Move(void)
 
 		while (!bOK)
 		{
-			nSwing = (int)randPassive(mt);
+			nSwing = randPassive(mt);
 			for (int nCnt = 0; nCnt < RotColli; nCnt++)
 			{
 				if (!m_bHit[nSwing])

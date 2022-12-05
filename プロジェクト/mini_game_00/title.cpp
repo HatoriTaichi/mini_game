@@ -21,6 +21,8 @@
 #include "camera.h"
 #include "select_botton.h"
 #include "object2D.h"
+#include "sound.h"
+
 #define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(0.0f), D3DXToRadian(30.0f),D3DXToRadian(0.0f)))	// カメラの向き
 #define TITLELOGO_POS (D3DXVECTOR3(640.0f, 200.0f,0.0f))	// タイトルロゴの位置
 #define TITLELOGO_SIZE (D3DXVECTOR3(200.0f, 200.0f,0.0f))	// タイトルロゴの位置
@@ -41,7 +43,6 @@
 //=============================================================================
 CTitle::CTitle()
 {
-	
 	m_pTitleLogo = nullptr;
 	m_bNextMode = false;
 	m_pPushStart = nullptr;
@@ -68,6 +69,8 @@ CTitle::~CTitle()
 HRESULT CTitle::Init(void)
 {
 	CManager::GetInstance()->GetCamera()->SetRot(CAMERA_ROT);
+
+	CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_BGM_TITLE);
 
 	StageCreate();
 	
@@ -99,6 +102,7 @@ HRESULT CTitle::Init(void)
 		m_pTitleMenu->SetCol({ 1.0,1.0,1.0,0.0f });
 	}
 	m_bEnd = false;
+	m_fBGMValue = 0.0f;
 	return S_OK;
 }
 
@@ -205,6 +209,9 @@ void CTitle::Update(void)
 					//UIの動きを止める
 					m_bMoveStop = true;
 
+					CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_TITLE_START);
+					CManager::GetInstance()->GetSound()->ControllVoice(CSound::SOUND_LABEL_SE_TITLE_START, 2.0f);
+
 				}
 			}
 
@@ -222,6 +229,8 @@ void CTitle::Update(void)
 					//UIの色を変える
 					m_pTitleMenu->SetCol({ 1.0,1.0,1.0,1.0f });
 
+					CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_TITLE_MENU);
+					CManager::GetInstance()->GetSound()->ControllVoice(CSound::SOUND_LABEL_SE_TITLE_MENU, 2.0f);
 				}
 			}
 
@@ -241,6 +250,12 @@ void CTitle::Update(void)
 	if (m_bEnd)
 	{
 		m_bEndTimer++;
+
+		// BGMを徐々にフェードアウトさせる
+		m_fBGMValue = 1.0f - (m_bEndTimer * 0.02f);
+		if (m_fBGMValue <= 0.0f)	m_fBGMValue = 0.0f;
+		CManager::GetInstance()->GetSound()->ControllVoice(CSound::SOUND_LABEL_BGM_TITLE, m_fBGMValue);
+
 		if (m_bEndTimer >= ENDTIME)
 		{
 			m_bNextMode = true;
@@ -261,11 +276,13 @@ void CTitle::BottonSelect(void)
 	if (key->GetTrigger(CKey::KEYBIND::A) == true)
 	{
 		m_nSelectBottonType = CTitle::BOTTON_TYPE::Start;
+		CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_TITLE_SELECT);
 	}
+
 	if (key->GetTrigger(CKey::KEYBIND::D) == true)
 	{
 		m_nSelectBottonType = CTitle::BOTTON_TYPE::Menu;
-
+		CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_TITLE_SELECT);
 	}
 }
 //=============================================================================

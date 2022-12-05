@@ -24,6 +24,7 @@
 #include "networkmanager.h"
 #include "onlinegame.h"
 #include "enemyplayer.h"
+#include "sound.h"
 
 static const float MoveSpeed = 5.0f;
 static const float SpeedUpDiameter = 1.5f;//スピードアップ倍率
@@ -371,6 +372,7 @@ void CPlayer::Motion(void)
 	case CPlayer::NUTLARAL:
 		m_motion_controller->PlayMotin("NUTLARAL");
 		memcpy(&m_PlayerData.m_motion_name[0], "NUTLARAL", sizeof(m_PlayerData.m_motion_name));
+		
 		break;
 	case CPlayer::RUN:
 		m_motion_controller->PlayMotin("RUN");
@@ -380,7 +382,6 @@ void CPlayer::Motion(void)
 	case CPlayer::DIZZY:
 		m_motion_controller->PlayMotin("DIZZY");
 		memcpy(&m_PlayerData.m_motion_name[0], "DIZZY", sizeof(m_PlayerData.m_motion_name));
-
 		break;
 	case CPlayer::NECKSWING:
 		m_motion_controller->PlayMotin("NECKSWING");
@@ -690,9 +691,9 @@ void CPlayer::TestGetIngredients(void)
 	{
 		std::random_device random;	// 非決定的な乱数生成器
 		std::mt19937_64 mt(random());            // メルセンヌ・ツイスタの64ビット版、引数は初期シード
-		std::uniform_real_distribution<> randType(0, 5);
-		std::uniform_real_distribution<> randNum(5, 99);
-		int nMax = static_cast <int>(randNum(mt));
+		std::uniform_int_distribution<> randType(0, 5);
+		std::uniform_int_distribution<> randNum(5, 99);
+		int nMax = randNum(mt);
 		for (int nType = 0; nType < 5; nType++)
 		{
 			for (int nCnt = 0; nCnt < nMax; nCnt++)

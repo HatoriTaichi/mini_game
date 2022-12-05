@@ -14,6 +14,8 @@
 #include "manager.h"
 #include "billboard.h"
 #include "object2D.h"
+#include "sound.h"
+
 static const int StartUIEndTime = 30;
 static const int LastSpurtUIEndTime = 30;
 static const int FinishUIEndTime = 30;
@@ -65,7 +67,6 @@ void CMove_UI::Uninit(void)
 //=============================================================================
 void CMove_UI::Update(void)
 {
-
 	switch (m_state)
 	{
 	case CMove_UI::State::ImmediatelyAfterPop:
@@ -74,21 +75,26 @@ void CMove_UI::Update(void)
 		case CMove_UI::UI_Type::Type_Start:
 			FadeIn();
 			SizeUp();
+
 			break;
 		case CMove_UI::UI_Type::Type_LastSpurt:
 			LastSpurt();
+
 			break;
 		case CMove_UI::UI_Type::Type_Finish:
+
 			break;
 		case CMove_UI::UI_Type::Type_PushStart:
 			m_state = CMove_UI::State::Normal;
-			break;
 
+			break;
 		}
 
 		break;
+
 	case CMove_UI::State::Normal:
 		m_nTimer++;
+
 		switch (m_Type)
 		{
 		case CMove_UI::UI_Type::Type_Start:
@@ -97,16 +103,23 @@ void CMove_UI::Update(void)
 				m_nTimer = 0;
 				m_state = CMove_UI::State::End;
 			}
+
 			break;
+
 		case CMove_UI::UI_Type::Type_LastSpurt:
 			break;
+
 		case CMove_UI::UI_Type::Type_Finish:
 			break;
+
 		case CMove_UI::UI_Type::Type_PushStart:
 			FadeInOut();
+
 			break;
 		}
+
 		break;
+
 	case CMove_UI::State::End:
 		m_nTimer++;
 
@@ -116,20 +129,44 @@ void CMove_UI::Update(void)
 			FadeOut();
 
 			break;
+
 		case CMove_UI::UI_Type::Type_LastSpurt:
+			CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_BGM_GAMELAST);
 			m_bUninit = true;
+
 			break;
 		case CMove_UI::UI_Type::Type_Finish:
 			break;
+
 		case CMove_UI::UI_Type::Type_PushStart:
 			Flash();
+
 			break;
 		}
 
 		break;
 	}
+
 	if (m_bUninit)
 	{
+		// ƒTƒEƒ“ƒhÄ¶
+		switch (m_Type)
+		{
+		case CMove_UI::UI_Type::Type_Start:
+			CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_BGM_GAME);
+
+			break;
+
+		case CMove_UI::UI_Type::Type_LastSpurt:
+			break;
+
+		case CMove_UI::UI_Type::Type_Finish:
+			break;
+
+		case CMove_UI::UI_Type::Type_PushStart:
+			break;
+		}
+
 		Uninit();
 	}
 }

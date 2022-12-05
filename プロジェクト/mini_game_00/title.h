@@ -50,6 +50,7 @@ private:
 	CSelect_Botton *m_pPushStart;
 	CSelect_Botton *m_pPushMenu;
 	int m_bEndTimer;
+	float m_fBGMValue;
 	BOTTON_TYPE m_nSelectBottonType;//‘I‘ð‚µ‚½ƒ{ƒ^ƒ“‚ÌŽí—Þ
 
 };
