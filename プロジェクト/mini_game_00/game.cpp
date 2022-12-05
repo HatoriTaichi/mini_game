@@ -169,12 +169,7 @@ HRESULT CGame::Init(void)
 	{
 		m_pStartUI = CMove_UI::Create(StartPos, StartSize, StartTime, StartFadeTime, "Start000.png", CMove_UI::UI_Type::Type_Start);
 	}
-	////フィニッシュUIを生成
-	//if (!m_pFinishUI)
-	//{
-	//	m_pFinishUI = CObject2D::Create(FinishPos, FinishSize, "Finish000.png");
-	//	m_pFinishUI->SetCol({ 1.0,1.0,1.0,0.0 });
-	//}
+
 	//ラストスパートUIUIを生成
 	if (!m_pLastSpurtUI)
 	{
@@ -292,6 +287,11 @@ void CGame::Update(void)
 	}
 	if (m_pGameTimer->GetCounter() <= 0)
 	{
+		//フィニッシュUIを生成
+		if (!m_pFinishUI)
+		{
+			m_pFinishUI = CMove_UI::Create(FinishPos, FinishSize, StartTime, StartFadeTime, "Finish000.png", CMove_UI::UI_Type::Type_Start); 
+		}
 		CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT);
 	}
 	if (m_pGameTimer->GetCounter() <= LastSpartTime)
