@@ -23,6 +23,8 @@
 #include "game.h"
 #include "counter.h"
 #include "telop.h"
+#include "sound.h"
+
 static const int IngredientNumX = 7;
 static const int IngredientNumY = 10;
 static const int IngredientPopTime = 5;
@@ -135,8 +137,6 @@ CResult::CResult()
 	m_ComboNeedMax[(int)ComboType::GigaMeat][C2d_ingredients::IngredientsType::Tomato] = 1;
 	m_ComboNeedMax[(int)ComboType::OrthoRarNa][C2d_ingredients::IngredientsType::Mushroom] = 3;
 	m_ComboNeedMax[(int)ComboType::OrthoRarNa][C2d_ingredients::IngredientsType::Cheese] = 1;
-
-
 }
 
 //=============================================================================
@@ -151,6 +151,7 @@ CResult::~CResult()
 //=============================================================================
 HRESULT CResult::Init(void)
 {
+	m_bScoreSEToggle = false;
 	ComboCalculate();
 	return S_OK;
 }
@@ -203,20 +204,23 @@ void CResult::Update(void)
 	case ResultState::State_IngredientCnt:
 		IngredientCnt();
 		break;
+
 	case ResultState::State_ComboStaging:
 		ComboStaging();
 		break;
+
 	case ResultState::State_ComboCnt:
 		ComboCnt();
 		break;
+
 	case ResultState::State_ComboScoreCnt:
 		ComboScoreCnt();
 		break;
-
-
 	}
+
 	CXInput *pXinput = CManager::GetInstance()->GetXInput();
 	CXInput::GAMEPAD *GamePad = pXinput->GetGamePad();
+
 	for (int nPlayer = 0; nPlayer < 2; nPlayer++)
 	{
 		if (pXinput->GetButtonTrigger(XINPUT_GAMEPAD_A, nPlayer)&& !m_bNext)
@@ -315,6 +319,9 @@ void CResult::ComboStaging(void)
 		//‹ïŞ‚Ì‰æ‘œ‚ğ¶¬
 		if (m_nStateTimer[nCntPlayer] >= ComboPopTime)
 		{
+			// SE‚ğÄ¶
+			CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_RESULT_CONBO);
+
 			m_nStateTimer[nCntPlayer] = 0;
 			D3DXVECTOR3 ComboPos = { posInit[nCntPlayer].x + (ComboPopInterval * m_nCntCombo_X[nCntPlayer]),
 				posInit[nCntPlayer].y + (ComboPopInterval_Y * m_nCntCombo_Y[nCntPlayer]),0.0f };
@@ -368,6 +375,13 @@ void CResult::ComboStaging(void)
 //=============================================================================
 void CResult::ComboCnt(void)
 {
+	if (!m_bScoreSEToggle)
+	{
+		CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_RESULT_SCOREUP);
+
+		m_bScoreSEToggle = true;
+	}
+
 	D3DXVECTOR3 posInit[MAX_PLAYER];
 	posInit[0] = ComboPosInit1;
 	posInit[1] = ComboPosInit2;
@@ -433,6 +447,8 @@ void CResult::ComboCnt(void)
 		m_bComboCntMax[11][1] )
 	{
 		m_state = ResultState::State_ComboScoreCnt;
+		CManager::GetInstance()->GetSound()->Stop(CSound::SOUND_LABEL_SE_RESULT_SCOREUP);
+		m_bScoreSEToggle = false;
 	}
 }
 //=============================================================================
@@ -440,6 +456,13 @@ void CResult::ComboCnt(void)
 //=============================================================================
 void CResult::ComboScoreCnt(void)
 {
+	if (!m_bScoreSEToggle)
+	{
+		CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_RESULT_SCOREUP);
+
+		m_bScoreSEToggle = true;
+	}
+
 	D3DXVECTOR3 posInit[MAX_PLAYER];
 	posInit[0] = ComboScorePosInit1;
 	posInit[1] = ComboScorePosInit2;
@@ -470,6 +493,8 @@ void CResult::ComboScoreCnt(void)
 	}
 	if (m_bComboScoreMaxCnt[0] && m_bComboScoreMaxCnt[1])
 	{
+		CManager::GetInstance()->GetSound()->Stop(CSound::SOUND_LABEL_SE_RESULT_SCOREUP);
+		CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_RESULT_SCORECONFIRM);
 		m_state = ResultState::State_Normal;
 	}
 }
@@ -478,6 +503,13 @@ void CResult::ComboScoreCnt(void)
 //=============================================================================
 void CResult::IngredientCnt(void)
 {
+	if (!m_bScoreSEToggle)
+	{
+		CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_RESULT_SCOREUP);
+
+		m_bScoreSEToggle = true;
+	}
+
 	D3DXVECTOR3 posInit[MAX_PLAYER];
 	posInit[0] = IngredientPosInit1;
 	posInit[1] = IngredientPosInit2;
@@ -516,6 +548,8 @@ void CResult::IngredientCnt(void)
 		m_bIngredientCntMax[4][1])
 	{
 		m_state = ResultState::State_ComboStaging;
+		CManager::GetInstance()->GetSound()->Stop(CSound::SOUND_LABEL_SE_RESULT_SCOREUP);
+		m_bScoreSEToggle = false;
 	}
 }
 //=============================================================================
@@ -538,6 +572,10 @@ void CResult::IngredientStart(void)
 				posInit[nCntPlayer].y,0.0f };
 			//‹ïŞ‚Ì‰æ‘œ‚ğ¶¬
 			m_pIngredient[m_nCntIngredient[nCntPlayer]][nCntPlayer] = C2d_ingredients::Create(IngredientPos, { IngredientPopSize ,IngredientPopSize ,0.0f }, static_cast <C2d_ingredients::IngredientsType>(m_nCntIngredient[nCntPlayer]));
+
+			// SE‚ğÄ¶
+			CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_RESULT_CONBO);
+
 			//‹ïŞŒÂ”‚ğ‰ÁZ
 			m_nCntIngredient[nCntPlayer]++;
 			//Å‘å‹ïŞí—Ş‚É‚È‚Á‚½‚ç‚â‚ß‚é

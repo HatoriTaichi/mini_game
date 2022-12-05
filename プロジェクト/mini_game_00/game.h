@@ -80,6 +80,12 @@ private:
 	int m_IngredientsSpawnMax[ModeMax];//具材の出現個数（大）
 	int m_ItemSpawnMin[ModeMax];//アイテムの出現個数（小）
 	int m_ItemSpawnMax[ModeMax];//アイテムの出現個数（大）
+
+	float m_fGameSoundFade;		// BGMの音量
+	float m_fLastSoundFade;		// ラストスパートSEの音量
+	int m_nLastSoundCount;		// ラストスパートSEが鳴った時間をカウント
+	bool m_bLastSoundToggle;	// ラストスパートSEが鳴ったか
+	bool m_bLastBGMSoundToggle;	// ラストスパートBGMが鳴ったか
 	int m_UITimer;//UI表示用タイマー
 	bool m_bLastSoundToggle;	// ラストスパートの曲が鳴ったか
 	bool m_bIsGameStart;

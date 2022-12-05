@@ -19,12 +19,12 @@ CSound::PARAM CSound::m_aParam[SOUND_LABEL_MAX] =
 	{ "data\\Sound\\Se\\Title_Buttonpress.wav", 0 },	// SEタイトルでのスタート押下
 	{ "data\\Sound\\Se\\Title_Menupress.wav", 0 },		// SEタイトルでのメニュー押下
 
-	{ "data\\Sound\\Se\\Game_Start.wav", 0 },			// SEゲームスタート
+	{ "data\\Sound\\Se\\Game_Start_new.wav", 0 },		// SEゲームスタート
 	{ "data\\Sound\\Se\\Game_Damage.wav", 0 },			// SEダメージ
 	{ "data\\Sound\\Se\\Game_Itemattack.wav", 0 },		// SEアイテム取得
-	{ "data\\Sound\\Se\\Game_Spawn.wav", 0 },			// SE具材、アイテムスポーン
+	{ "data\\Sound\\Se\\Game_Spawn.wav", 0 },			// SE具材取得
 	{ "data\\Sound\\Se\\Game_walk.wav", 0 },			// SE歩行
-	{ "data\\Sound\\Se\\Game_Last.wav", 0 },			// SEラストスパート
+	{ "data\\Sound\\Se\\Game_Lastspurt.wav", 0 },		// SEラストスパート
 	{ "data\\Sound\\Se\\Game_End.wav", 0 },				// SEゲームエンド
 
 	{ "data\\Sound\\Se\\Result_Ingredients.wav", 0 },	// SEコンボ

@@ -261,7 +261,11 @@ HRESULT CGame::Init(void)
 	//音楽再生
 	//--------------
 
+	m_nLastSoundCount = 0;
+	m_fGameSoundFade = 1.0f;
+	m_fLastSoundFade = 1.0f;
 	m_bLastSoundToggle = false;
+	m_bLastBGMSoundToggle = false;
 	return S_OK;
 }
 
@@ -330,15 +334,50 @@ void CGame::Update(void)
 		}
 		CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT);
 	}
-	//lastspurtに入る
+
+	// ラストスパート(今の時間がLastSpartTime以下になったら)
 	if (m_pGameTimer->GetCounter() <= LastSpartTime)
 	{
+		// ラストスパートSEが鳴っていなければ鳴らす
 		if (!m_bLastSoundToggle)
 		{
 			CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_GAME_LAST);
 		}
 
 		m_bLastSoundToggle = true;
+
+		m_nLastSoundCount++;
+
+		// メインBGMをフェードアウト
+		m_fGameSoundFade -= 0.01f;
+		CManager::GetInstance()->GetSound()->ControllVoice(CSound::SOUND_LABEL_BGM_GAME, m_fGameSoundFade);
+
+		// フェードアウトして0になったらBGMを消す
+		if (m_fGameSoundFade <= 0.0f)
+		{
+			CManager::GetInstance()->GetSound()->Stop(CSound::SOUND_LABEL_BGM_GAME);
+		}
+
+		// ラストスパートSE(ベルの音)が一定時間以上鳴ったらフェードアウト
+		if (m_nLastSoundCount >= 120)
+		{
+			m_fLastSoundFade -= 0.01f;
+			CManager::GetInstance()->GetSound()->ControllVoice(CSound::SOUND_LABEL_SE_GAME_LAST, m_fLastSoundFade);
+
+			// フェードアウトして0になったらSEを消す
+			if (m_fLastSoundFade <= 0.0f)
+			{
+				CManager::GetInstance()->GetSound()->Stop(CSound::SOUND_LABEL_SE_GAME_LAST);
+			}
+
+			// ラストスパートBGMが鳴っていなければ鳴らす
+			if (!m_bLastBGMSoundToggle)
+			{
+				CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_BGM_GAMELAST);
+			}
+
+			m_bLastBGMSoundToggle = true;
+		}
 
 		m_pLastSpurtUI->SetState(CMove_UI::State::ImmediatelyAfterPop);
 	}
