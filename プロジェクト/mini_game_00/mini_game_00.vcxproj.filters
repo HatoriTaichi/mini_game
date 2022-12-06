@@ -103,6 +103,12 @@
     <Filter Include="ソース ファイル\サウンド">
       <UniqueIdentifier>{6731ddce-d29a-4c6c-8f2e-fee48de357ab}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\エフェクト">
+      <UniqueIdentifier>{0f2c6bcd-5dc6-4f57-9c3e-4624d1f70e1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\エフェクト\Load">
+      <UniqueIdentifier>{ff52aa8f-3bae-41e6-a309-e33df3ba3f4d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="item.h">
@@ -243,6 +249,39 @@
     <ClInclude Include="sound.h">
       <Filter>ソース ファイル\サウンド</Filter>
     </ClInclude>
+    <ClInclude Include="Basis_Effect.h">
+      <Filter>ソース ファイル\エフェクト</Filter>
+    </ClInclude>
+    <ClInclude Include="billeffect.h">
+      <Filter>ソース ファイル\エフェクト</Filter>
+    </ClInclude>
+    <ClInclude Include="Effect_3D.h">
+      <Filter>ソース ファイル\エフェクト</Filter>
+    </ClInclude>
+    <ClInclude Include="Fountain.h">
+      <Filter>ソース ファイル\エフェクト</Filter>
+    </ClInclude>
+    <ClInclude Include="straight3d.h">
+      <Filter>ソース ファイル\エフェクト</Filter>
+    </ClInclude>
+    <ClInclude Include="Trajectory.h">
+      <Filter>ソース ファイル\エフェクト</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadEffect.h">
+      <Filter>ソース ファイル\エフェクト\Load</Filter>
+    </ClInclude>
+    <ClInclude Include="PresetDelaySet.h">
+      <Filter>ソース ファイル\エフェクト\Load</Filter>
+    </ClInclude>
+    <ClInclude Include="PresetSetEffect.h">
+      <Filter>ソース ファイル\エフェクト\Load</Filter>
+    </ClInclude>
+    <ClInclude Include="Rotate3d.h">
+      <Filter>ソース ファイル\エフェクト</Filter>
+    </ClInclude>
+    <ClInclude Include="BulletHoll.h">
+      <Filter>ソース ファイル\エフェクト</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="item.cpp">
@@ -382,6 +421,39 @@
     </ClCompile>
     <ClCompile Include="sound.cpp">
       <Filter>ソース ファイル\サウンド</Filter>
+    </ClCompile>
+    <ClCompile Include="Basis_Effect.cpp">
+      <Filter>ソース ファイル\エフェクト</Filter>
+    </ClCompile>
+    <ClCompile Include="billeffect.cpp">
+      <Filter>ソース ファイル\エフェクト</Filter>
+    </ClCompile>
+    <ClCompile Include="Effect_3D.cpp">
+      <Filter>ソース ファイル\エフェクト</Filter>
+    </ClCompile>
+    <ClCompile Include="Fountain.cpp">
+      <Filter>ソース ファイル\エフェクト</Filter>
+    </ClCompile>
+    <ClCompile Include="straight3d.cpp">
+      <Filter>ソース ファイル\エフェクト</Filter>
+    </ClCompile>
+    <ClCompile Include="Trajectory.cpp">
+      <Filter>ソース ファイル\エフェクト</Filter>
+    </ClCompile>
+    <ClCompile Include="LoadEffect.cpp">
+      <Filter>ソース ファイル\エフェクト\Load</Filter>
+    </ClCompile>
+    <ClCompile Include="PresetDelaySet.cpp">
+      <Filter>ソース ファイル\エフェクト\Load</Filter>
+    </ClCompile>
+    <ClCompile Include="PresetSetEffect.cpp">
+      <Filter>ソース ファイル\エフェクト\Load</Filter>
+    </ClCompile>
+    <ClCompile Include="Rotate3d.cpp">
+      <Filter>ソース ファイル\エフェクト</Filter>
+    </ClCompile>
+    <ClCompile Include="BulletHoll.cpp">
+      <Filter>ソース ファイル\エフェクト</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

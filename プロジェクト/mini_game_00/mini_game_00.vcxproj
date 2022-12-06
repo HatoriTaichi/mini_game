@@ -155,16 +155,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="2d_ingredients.h" />
+    <ClInclude Include="Basis_Effect.h" />
     <ClInclude Include="billboard.h" />
+    <ClInclude Include="billeffect.h" />
+    <ClInclude Include="BulletHoll.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="communicationdata.h" />
     <ClInclude Include="counter.h" />
     <ClInclude Include="directinput.h" />
+    <ClInclude Include="Effect_3D.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="enemyplayer.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="field.h" />
     <ClInclude Include="fileload.h" />
+    <ClInclude Include="Fountain.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="ingredients.h" />
     <ClInclude Include="input.h" />
@@ -172,6 +177,7 @@
     <ClInclude Include="keyinput.h" />
     <ClInclude Include="letter.h" />
     <ClInclude Include="light.h" />
+    <ClInclude Include="LoadEffect.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="manager.h" />
     <ClInclude Include="move_telop.h" />
@@ -186,32 +192,42 @@
     <ClInclude Include="object.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="player_ingredient_data.h" />
+    <ClInclude Include="PresetDelaySet.h" />
+    <ClInclude Include="PresetSetEffect.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="object2D.h" />
     <ClInclude Include="object3D.h" />
     <ClInclude Include="result.h" />
+    <ClInclude Include="Rotate3d.h" />
     <ClInclude Include="scenemanager.h" />
     <ClInclude Include="select_botton.h" />
     <ClInclude Include="singlemodel.h" />
     <ClInclude Include="sound.h" />
+    <ClInclude Include="straight3d.h" />
     <ClInclude Include="tcp_client.h" />
     <ClInclude Include="telop.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="title.h" />
+    <ClInclude Include="Trajectory.h" />
     <ClInclude Include="wall.h" />
     <ClInclude Include="XInput.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="2d_ingredients.cpp" />
+    <ClCompile Include="Basis_Effect.cpp" />
     <ClCompile Include="billboard.cpp" />
+    <ClCompile Include="billeffect.cpp" />
+    <ClCompile Include="BulletHoll.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="communicationdata.cpp" />
     <ClCompile Include="counter.cpp" />
     <ClCompile Include="directinput.cpp" />
+    <ClCompile Include="Effect_3D.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="field.cpp" />
     <ClCompile Include="fileload.cpp" />
+    <ClCompile Include="Fountain.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="ingredients.cpp" />
     <ClCompile Include="input.cpp" />
@@ -219,6 +235,7 @@
     <ClCompile Include="keyinput.cpp" />
     <ClCompile Include="letter.cpp" />
     <ClCompile Include="light.cpp" />
+    <ClCompile Include="LoadEffect.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="manager.cpp" />
     <ClCompile Include="move_telop.cpp" />
@@ -234,18 +251,23 @@
     <ClCompile Include="object.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="player_ingredient_data.cpp" />
+    <ClCompile Include="PresetDelaySet.cpp" />
+    <ClCompile Include="PresetSetEffect.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="object2D.cpp" />
     <ClCompile Include="object3D.cpp" />
     <ClCompile Include="result.cpp" />
+    <ClCompile Include="Rotate3d.cpp" />
     <ClCompile Include="scenemanager.cpp" />
     <ClCompile Include="select_button.cpp" />
     <ClCompile Include="singlemodel.cpp" />
     <ClCompile Include="sound.cpp" />
+    <ClCompile Include="straight3d.cpp" />
     <ClCompile Include="tcp_client.cpp" />
     <ClCompile Include="telop.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="title.cpp" />
+    <ClCompile Include="Trajectory.cpp" />
     <ClCompile Include="wall.cpp" />
     <ClCompile Include="XInput.cpp" />
   </ItemGroup>

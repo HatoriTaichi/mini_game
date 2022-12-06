@@ -22,6 +22,9 @@
 #include "XInput.h"
 #include "networkmanager.h"
 #include "sound.h"
+//エフェクト
+#include "LoadEffect.h"
+#include "Basis_Effect.h"
 
 //=============================================================================
 // マクロ定義
@@ -35,6 +38,7 @@
 #define CAMERA_POS_V (D3DXVECTOR3(0.0f, 0.0f, -0.0f))	// カメラの位置
 #define CAMERA_POS_R (D3DXVECTOR3(0.0f, 80.0f, 0.0f))	// カメラの注視点
 #define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(0.0f), D3DXToRadian(-90.0f),D3DXToRadian(0.0f)))	// カメラの向き
+#define EFFECT_STATE_TEXT ("data/Txt/Effect_state.txt") //エフェクト
 
 //=============================================================================
 // 静的メンバ変数宣言
@@ -93,6 +97,9 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 
 	// モデルのロード
 	CModel::Load();
+	//エフェクトロード
+	CLoadEffect::EffectStateLoad(EFFECT_STATE_TEXT);
+	CBasis_Effect::CreateTextureFile();	//エフェクトで使うテクスチャ
 
 	// キーボードクラスの生成
 	m_key = new CKey;
