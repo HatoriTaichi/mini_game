@@ -27,6 +27,8 @@
 #include "sound.h"
 #include "camera.h"
 #include "singlemodel.h"
+
+#include "PresetDelaySet.h"	//エフェクト
 static const float MoveSpeed = 5.0f;
 static const float SpeedUpDiameter = 1.5f;//スピードアップ倍率
 static const float PossibleAttackSpeedUpDiameter = 1.2f;//攻撃可能時のスピードアップ倍率
@@ -553,6 +555,12 @@ void CPlayer::KeyMove(void)
 		m_PlayerData.m_pos.z += m_Speed;
 		m_PlayerData.m_rot.y = D3DXToRadian(180.0f);
 		m_PlayerData.m_nFacing = UP;
+		
+		//=============================================================================
+		//歩行エフェクト
+		CPresetDelaySet::Create(5, m_PlayerData.m_pos, {}, {});
+		//CPresetDelaySet::Create(5, m_PlayerData.m_pos, {}, D3DXVECTOR3(0.0, m_PlayerData.m_rot.y + D3DX_PI / 2, 0.0));
+		//=============================================================================
 	}
 	else if (pKey->GetPress(CKey::KEYBIND::S))
 	{
