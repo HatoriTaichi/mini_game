@@ -14,6 +14,7 @@
 #include "manager.h"
 #include "billboard.h"
 #include "enemyplayer.h"
+#include "PresetDelaySet.h"
 static float ItemDropMoveSpeed = 8.0f;
 static const float ItemFallSpeed = 5.0f;
 static const float ItemUpLimit = 2.0f;
@@ -259,6 +260,7 @@ void CItem::ColisionPlayer(void)
 			{
 				if (pPlayer->Collision(m_pos, 50.0f))
 				{
+					CPresetDelaySet::Create(0, m_pos, {}, {});
 					pPlayer->SetItemType(m_type);
 					m_bUninit = true;
 				}

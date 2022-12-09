@@ -103,6 +103,7 @@ private:
 	int m_nCntIngredientsType;
 	int m_nItemTimer;
 	int m_nNumPlayer;//プレイヤー番号
+	int m_nEffectTime;
 	float m_Speed;//プレイヤーの移動速度
 };
 

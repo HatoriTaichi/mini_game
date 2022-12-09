@@ -21,6 +21,7 @@
 #include "onlinegame.h"
 #include "networkmanager.h"
 #include "enemyplayer.h"
+#include "PresetDelaySet.h"
 static float Size = 7.0f;
 static float fDropMoveSpeed = 8.0f;
 static const float FallSpeed = 5.0f;
@@ -406,6 +407,9 @@ void CIngredients::ColisionPlayer(void)
 			{
 				if (!m_bDelete)
 				{
+					CPresetDelaySet::Create(0, m_pos, {}, {});
+					CPresetDelaySet::Create(0, m_pos, {}, {});
+					CPresetDelaySet::Create(0, m_pos, {}, {});
 					pPlayer->SetIngredients(m_Type);
 					if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NETWORK_MODE::ON_LINE)
 					{
@@ -448,6 +452,9 @@ void CIngredients::ColisionEnemyPlayer(void)
 			{
 				if (!m_bDelete)
 				{
+					CPresetDelaySet::Create(0, m_pos, {}, {});
+					CPresetDelaySet::Create(0, m_pos, {}, {});
+					CPresetDelaySet::Create(0, m_pos, {}, {});
 					pEnemyPlayer->SetIngredients(m_Type);
 					if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NETWORK_MODE::ON_LINE)
 					{

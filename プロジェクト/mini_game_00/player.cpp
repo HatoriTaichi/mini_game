@@ -201,6 +201,7 @@ void CPlayer::Update(void)
 					CEnemy *pEnemy = static_cast<CEnemy*>(ObjEnemy[nCnt]);
 					if (pEnemy->Collision(m_PlayerData.m_pos, PlayerHitSize))
 					{
+						CPresetDelaySet::Create(1, { m_PlayerData.m_pos.x, m_PlayerData.m_pos.y + 50.0f, m_PlayerData.m_pos.z }, {}, {});
 						//具材ドロップを可能にする
 						m_PlayerData.m_bCanDrop = true;
 						m_PlayerData.m_bOperationLock = true;
@@ -222,6 +223,7 @@ void CPlayer::Update(void)
 						//自身が敵プレイヤーに当たったら
 						if (pEnemyPlayer->Collision(m_PlayerData.m_pos, PlayerHitSize))
 						{
+							CPresetDelaySet::Create(1, { m_PlayerData.m_pos.x, m_PlayerData.m_pos.y + 50.0f, m_PlayerData.m_pos.z }, {}, {});
 							//アイテム取得状態をなしにする
 							m_PlayerData.m_ItemState = Nown;
 							//敵プレイヤーの状態を具材が落ちる状態にする
@@ -550,35 +552,48 @@ void CPlayer::KeyMove(void)
 {
 	//キーボード情報取得
 	CKey * pKey = CManager::GetInstance()->GetKey();
+
+	m_nEffectTime++;
+
 	if (pKey->GetPress(CKey::KEYBIND::W))
 	{
 		m_PlayerData.m_pos.z += m_Speed;
 		m_PlayerData.m_rot.y = D3DXToRadian(180.0f);
 		m_PlayerData.m_nFacing = UP;
-		
-		//=============================================================================
-		//歩行エフェクト
-		CPresetDelaySet::Create(5, m_PlayerData.m_pos, {}, {});
-		//CPresetDelaySet::Create(5, m_PlayerData.m_pos, {}, D3DXVECTOR3(0.0, m_PlayerData.m_rot.y + D3DX_PI / 2, 0.0));
-		//=============================================================================
+		if ((m_nEffectTime % 6) == 0)
+		{
+			CPresetDelaySet::Create(5, m_PlayerData.m_pos, {}, {});
+		}
 	}
 	else if (pKey->GetPress(CKey::KEYBIND::S))
 	{
 		m_PlayerData.m_pos.z -= m_Speed;
 		m_PlayerData.m_rot.y = D3DXToRadian(0.0f);
 		m_PlayerData.m_nFacing = DOWN;
+		if ((m_nEffectTime % 6) == 0)
+		{
+			CPresetDelaySet::Create(5, m_PlayerData.m_pos, {}, {});
+		}
 	}
 	else if (pKey->GetPress(CKey::KEYBIND::A))
 	{
 		m_PlayerData.m_pos.x -= m_Speed;
 		m_PlayerData.m_rot.y = D3DXToRadian(90.0f);
 		m_PlayerData.m_nFacing = LEFT;
+		if ((m_nEffectTime % 6) == 0)
+		{
+			CPresetDelaySet::Create(5, m_PlayerData.m_pos, {}, {});
+		}
 	}
 	else if (pKey->GetPress(CKey::KEYBIND::D))
 	{
 		m_PlayerData.m_pos.x += m_Speed;
 		m_PlayerData.m_rot.y = D3DXToRadian(-90.0f);
 		m_PlayerData.m_nFacing = RIGHT;
+		if ((m_nEffectTime % 6) == 0)
+		{
+			CPresetDelaySet::Create(5, m_PlayerData.m_pos, {}, {});
+		}
 	}
 }
 void CPlayer::PadMove(void)
@@ -599,6 +614,10 @@ void CPlayer::PadMove(void)
 		if ((float)GamePad->m_state[m_nNumPlayer].Gamepad.sThumbLX >= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE || (float)GamePad->m_state[m_nNumPlayer].Gamepad.sThumbLY >= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ||
 		(float)GamePad->m_state[m_nNumPlayer].Gamepad.sThumbLX <= -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE || (float)GamePad->m_state[m_nNumPlayer].Gamepad.sThumbLY <= -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 	{
+		if ((m_nEffectTime % 6) == 0)
+		{
+			CPresetDelaySet::Create(5, m_PlayerData.m_pos, {}, {});
+		}
 		//移動モーションにする
 		m_PlayerData.m_moitonState = MotionState::RUN;
 			//スティックの傾きの長さを求める
@@ -728,6 +747,7 @@ void CPlayer::Item(void)
 		m_nItemTimer++;
 		SpeedUpSpeed = static_cast<int>(MoveSpeed * SpeedUpDiameter);
 		m_Speed = static_cast<float>(SpeedUpSpeed);
+		CPresetDelaySet::Create(2, { m_PlayerData.m_pos.x, m_PlayerData.m_pos.y + 50.0f, m_PlayerData.m_pos.z }, {}, { 0.0f, m_PlayerData.m_rot.y + D3DX_PI / 2, 0.0f });
 		//時間になったら終わる
 		if (m_nItemTimer >= SpeedUpTimeLimit)
 		{
@@ -740,6 +760,7 @@ void CPlayer::Item(void)
 		m_nItemTimer++;
 		SpeedUpSpeed = static_cast<int>(MoveSpeed * PossibleAttackSpeedUpDiameter);
 		m_Speed = static_cast<float>(SpeedUpSpeed);
+		CPresetDelaySet::Create(3, { m_PlayerData.m_pos.x, m_PlayerData.m_pos.y + 50.0f, m_PlayerData.m_pos.z }, {}, { 0.0f, m_PlayerData.m_rot.y + D3DX_PI / 2, 0.0f });
 		//時間になったら終わる
 		if (m_nItemTimer >= PossibleAttackTimeLimit)
 		{
