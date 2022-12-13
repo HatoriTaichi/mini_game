@@ -15,8 +15,11 @@ CFade::CFade()
 {
 	m_vtx_buff = nullptr;
 	m_next_mode = CSceneManager::MODE::TITLE;
+	m_fade_mode = "up_to_buttom";
 	m_fade_in = false;
 	m_col_a = 0.0f;
+	m_col_up_a = 0.0f;
+	m_col_buttom_a = 0.0f;
 }
 
 //=============================================================================
@@ -91,44 +94,104 @@ void CFade::Uninit(void)
 //=============================================================================
 void CFade::Update(void) 
 {
-	// フェードアウト
-	if (m_fade_in == false && m_col_a > 0.0f)
+	if (m_fade_mode == "normal")
 	{
-		m_col_a -= 0.02f;
-		if (m_col_a < 0.0f)
+		// フェードアウト
+		if (m_fade_in == false && m_col_a > 0.0f)
 		{
-			m_col_a = 0.0f;
+			m_col_a -= 0.02f;
+			if (m_col_a < 0.0f)
+			{
+				m_col_a = 0.0f;
+			}
+		}
+
+		// フェードイン
+		if (m_fade_in == true && m_col_a <= 1.0f)
+		{
+			m_col_a += 0.02f;
+			if (m_col_a >= 1.0f)
+			{
+				m_col_a = 1.0f;
+				m_fade_in = false;
+				CManager::GetInstance()->GetSceneManager()->SetMode(m_next_mode);
+			}
+		}
+
+		// フェード中のみ更新
+		if (m_fade_in == true || m_col_a > 0.0f)
+		{
+			VERTEX_2D *vtx;	// 頂点情報
+
+			// 頂点バッファをロックする
+			m_vtx_buff->Lock(0, 0, (void**)&vtx, 0);
+
+			// 頂点情報を設定
+			vtx[0].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, m_col_a);
+			vtx[1].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, m_col_a);
+			vtx[2].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, m_col_a);
+			vtx[3].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, m_col_a);
+
+			// 頂点バッファをアンロックする
+			m_vtx_buff->Unlock();
 		}
 	}
 
-	// フェードイン
-	if (m_fade_in == true && m_col_a <= 1.0f)
+	else if (m_fade_mode == "up_to_buttom")
 	{
-		m_col_a += 0.02f;
-		if (m_col_a >= 1.0f)
+		// フェードアウト
+		if (!m_fade_in)
 		{
-			m_col_a = 1.0f;
-			m_fade_in = false;
-			CManager::GetInstance()->GetSceneManager()->SetMode(m_next_mode);
+			m_col_buttom_a -= 0.02f;
+			if (m_col_buttom_a < 0.0f)
+			{
+				m_col_buttom_a = 0.1f;
+				m_col_up_a -= 0.02f;
+				if (m_col_up_a < 0.0f)
+				{
+					m_col_up_a = 0.0f;
+					m_col_buttom_a = 0.0f;
+				}
+			}
 		}
-	}
 
-	// フェード中のみ更新
-	if (m_fade_in == true || m_col_a > 0.0f)
-	{
-		VERTEX_2D *vtx;	// 頂点情報
+		// フェードイン
+		if (m_fade_in)
+		{
+			m_col_up_a += 0.02f;
+			if (m_col_up_a >= 1.0f)
+			{
+				m_col_up_a = 1.0f;
+				if (m_col_buttom_a <=1.0f)
+				{
+					m_col_buttom_a += 0.02f;
+					if (m_col_buttom_a >= 1.0f)
+					{
+						m_col_buttom_a = 1.0f;
+						m_fade_in = false;
+						CManager::GetInstance()->GetSceneManager()->SetMode(m_next_mode);
+					}
+				}
+			}
+		}
 
-		// 頂点バッファをロックする
-		m_vtx_buff->Lock(0, 0, (void**)&vtx, 0);
+		// フェード中のみ更新
+		if (m_fade_in == true || m_col_up_a > 0.0f || m_col_buttom_a > 0.0f)
+		{
+			VERTEX_2D *vtx;	// 頂点情報
 
-		// 頂点情報を設定
-		vtx[0].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, m_col_a);
-		vtx[1].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, m_col_a);
-		vtx[2].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, m_col_a);
-		vtx[3].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, m_col_a);
+			// 頂点バッファをロックする
+			m_vtx_buff->Lock(0, 0, (void**)&vtx, 0);
 
-		// 頂点バッファをアンロックする
-		m_vtx_buff->Unlock();
+			// 頂点情報を設定
+			vtx[0].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, m_col_up_a);
+			vtx[1].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, m_col_up_a);
+			vtx[2].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, m_col_buttom_a);
+			vtx[3].col = D3DXCOLOR(0.0f, 0.0f, 0.0f, m_col_buttom_a);
+
+			// 頂点バッファをアンロックする
+			m_vtx_buff->Unlock();
+		}
 	}
 }
 

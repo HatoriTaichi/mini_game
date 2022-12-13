@@ -12,6 +12,7 @@
 //*****************************************************************************
 #include "main.h"
 #include "texture.h"
+#include <mutex>
 
 //*****************************************************************************
 // クラス定義
@@ -55,22 +56,21 @@ public:
 	static void ReleaseAll(void);	// 全破棄
 	static void UpdateAll(void);	// 全更新
 	static void DrawAll(void);	// 全描画
-	bool GetDeath(void) { return m_deth; }	// 死亡フラグのゲッダー
+	bool GetDeath(void) { return m_is_deth; }	// 死亡フラグのゲッダー
 	OBJTYPE GetObjType(void) { return m_obj_type; }	// オブジェクトタイプのゲッダー
 	void SetObjType(const OBJTYPE &obj_type) { m_obj_type = obj_type; }	// オブジェクトタイプのセッター
 	void ChangeLayer(const int &next_layer);	// レイヤー変更処理
 	static vector<CObject*> GetObject(const int &priority) { return m_object[priority]; }	// 全オブジェクトのゲッダー
 	static vector<CObject*> GetObjTypeObject(const OBJTYPE &ObjType);	// 全オブジェクトのゲッダー
-	static bool IsReleaseAll(void) { return m_is_release_all; }	// リリースオールフラグのゲッダー
 
 private:
 	static vector<CObject*> m_object[(int)LAYER_TYPE::MAX];	// オブジェクト
-	static bool m_is_release_all;	// リリースオールされたか
 	OBJTYPE m_obj_type;	// オブジェクトの種類
 	int m_layer;	// 描画順
-	bool m_deth;	// 死亡フラグ
+	bool m_is_deth;	// 死亡フラグ
+
 protected:
-	void Release(void) { m_deth = true; }		// 死亡フラグ立てる
+	void Release(void) { m_is_deth = true; }		// 死亡フラグ立てる
 };
 
 #endif

@@ -14,7 +14,6 @@
 // 静的メンバ変数宣言
 //=============================================================================
 vector<CObject*> CObject::m_object[(int)LAYER_TYPE::MAX];
-bool CObject::m_is_release_all = false;
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -23,7 +22,7 @@ CObject::CObject(LAYER_TYPE layer)
 {
 	m_obj_type = OBJTYPE::NONE;
 	m_layer = static_cast<int>(layer);
-	m_deth = false;
+	m_is_deth = false;
 
 	m_object[m_layer].push_back(this);
 }
@@ -62,9 +61,6 @@ void CObject::ReleaseAll(void)
 			object_count--;
 		}
 	}
-
-	// リリースオールした
-	m_is_release_all = true;
 }
 
 //=============================================================================
@@ -82,7 +78,7 @@ void CObject::UpdateAll(void)
 		for (int count_object = 0; count_object < object_size; count_object++)
 		{
 			// 死亡フラグが立ってたら
-			if (m_object[count_layer][count_object]->m_deth == true)
+			if (m_object[count_layer][count_object]->m_is_deth = true)
 			{
 				delete m_object[count_layer][count_object];	// 削除
 				m_object[count_layer][count_object] = nullptr;	// nullptrを代入
@@ -96,7 +92,6 @@ void CObject::UpdateAll(void)
 				// 更新
 				m_object[count_layer][count_object]->Update();
 			}
-
 		}
 	}
 }
@@ -116,7 +111,7 @@ void CObject::DrawAll(void)
 		for (int count_object = 0; count_object < object_size; count_object++)
 		{
 			// 死亡フラグが立ってなかったら
-			if (m_object[count_priolty][count_object]->m_deth == false)
+			if (m_object[count_priolty][count_object]->m_is_deth == false)
 			{
 				// 描画
 				m_object[count_priolty][count_object]->Draw();
