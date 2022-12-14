@@ -147,9 +147,6 @@
     <ClInclude Include="directinput.h">
       <Filter>ソース ファイル\入力系\DirectXInput</Filter>
     </ClInclude>
-    <ClInclude Include="fade.h">
-      <Filter>ソース ファイル\フェード</Filter>
-    </ClInclude>
     <ClInclude Include="fileload.h">
       <Filter>ソース ファイル\ファイル読み込み</Filter>
     </ClInclude>
@@ -281,6 +278,9 @@
     </ClInclude>
     <ClInclude Include="BulletHoll.h">
       <Filter>ソース ファイル\エフェクト</Filter>
+    </ClInclude>
+    <ClInclude Include="fade.h">
+      <Filter>ソース ファイル\マネージャー系</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

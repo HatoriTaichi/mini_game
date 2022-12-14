@@ -227,14 +227,14 @@ void CResult::Update(void)
 		{
 			m_bNext = true;
 
-			CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::GAME);
+			CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::GAME, CSceneManager::FADE_MODE::NORMAL, 1.0f);
 		}
 	}
 	//キーボード情報取得
 	CKey * pKey = CManager::GetInstance()->GetKey();
 	if (pKey->GetTrigger(CKey::KEYBIND::SPACE))
 	{
-		CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::GAME);
+		CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::GAME, CSceneManager::FADE_MODE::NORMAL, 1.0f);
 	}
 }
 

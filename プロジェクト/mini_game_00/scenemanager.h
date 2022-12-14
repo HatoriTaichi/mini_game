@@ -40,6 +40,12 @@ public:
 		RESULT,	// リザルト
 		MAX
 	};
+	enum class FADE_MODE
+	{
+		NORMAL = 0,	// 通常
+		UP_TO_BOTTOM,	// 上から下
+		MAX
+	};
 	CSceneManager();	// デフォルトコンストラクタ
 	~CSceneManager();	// デフォルトデストラクタ
 	HRESULT Init(void);	// 初期化
@@ -52,7 +58,7 @@ public:
 	CResult *GetResult(void) { return m_result; }	// リザルトクラスの取得
 	void SetMode(CSceneManager::MODE mode);	// モード設定
 	MODE GetMode(void) { return m_mode; }	// モード取得
-	void ChangeScene(CSceneManager::MODE mode);	// フェード
+	void ChangeScene(CSceneManager::MODE mode, CSceneManager::FADE_MODE fade_mode, float fade_time);	// フェード
 	NETWORK_MODE GetNetWorkMode(void) { return m_network_mode; }	// フェード
 
 private:

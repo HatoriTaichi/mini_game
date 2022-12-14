@@ -11,10 +11,10 @@
 #include "title.h"
 #include "game.h"
 #include "onlinegame.h"
-#include "fade.h"
 #include "result.h"
 #include "manager.h"
 #include "sound.h"
+#include "fade.h"
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -273,7 +273,7 @@ void CSceneManager::SetMode(MODE mode)
 //=======================================================================
 // フェード
 //=======================================================================
-void CSceneManager::ChangeScene(CSceneManager::MODE mode)
+void CSceneManager::ChangeScene(CSceneManager::MODE mode, CSceneManager::FADE_MODE fade_mode, float fade_time)
 {
-	m_fade->SetFade(mode);
+	m_fade->SetFade(mode, fade_mode, fade_time);
 }
