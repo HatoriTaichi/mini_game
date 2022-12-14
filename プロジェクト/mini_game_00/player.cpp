@@ -564,6 +564,9 @@ void CPlayer::KeyMove(void)
 		{
 			CPresetDelaySet::Create(5, m_PlayerData.m_pos, {}, {});
 		}
+		//移動モーションにする
+		m_PlayerData.m_moitonState = MotionState::RUN;
+
 	}
 	else if (pKey->GetPress(CKey::KEYBIND::S))
 	{
@@ -574,6 +577,9 @@ void CPlayer::KeyMove(void)
 		{
 			CPresetDelaySet::Create(5, m_PlayerData.m_pos, {}, {});
 		}
+		//移動モーションにする
+		m_PlayerData.m_moitonState = MotionState::RUN;
+
 	}
 	else if (pKey->GetPress(CKey::KEYBIND::A))
 	{
@@ -584,6 +590,9 @@ void CPlayer::KeyMove(void)
 		{
 			CPresetDelaySet::Create(5, m_PlayerData.m_pos, {}, {});
 		}
+		//移動モーションにする
+		m_PlayerData.m_moitonState = MotionState::RUN;
+
 	}
 	else if (pKey->GetPress(CKey::KEYBIND::D))
 	{
@@ -594,6 +603,18 @@ void CPlayer::KeyMove(void)
 		{
 			CPresetDelaySet::Create(5, m_PlayerData.m_pos, {}, {});
 		}
+		//移動モーションにする
+		m_PlayerData.m_moitonState = MotionState::RUN;
+
+	}
+	if (!pKey->GetPress(CKey::KEYBIND::A) &&
+		!pKey->GetPress(CKey::KEYBIND::S) &&
+		!pKey->GetPress(CKey::KEYBIND::D) &&
+		!pKey->GetPress(CKey::KEYBIND::W))
+	{
+		//移動モーションにする
+		m_PlayerData.m_moitonState = MotionState::NUTLARAL;
+
 	}
 }
 void CPlayer::PadMove(void)

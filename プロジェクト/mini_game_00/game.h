@@ -15,6 +15,7 @@ static const int MaxPlayer = 2;
 static const int MaxIngredients = 5;
 static const int IngredientsSpawnMax = 6;
 static const int ItemSpawnMax = 2;
+static const int OffSetArrayMax = 3;//最大配列
 
 #define MAXINGREDIENTS (5)
 
@@ -50,13 +51,19 @@ public:
 	void Uninit(void);	// 終了
 	void Update(void);	// 更新
 	void ItemSpawn(void);
-	void EnemySpawn(void);
 	void IngredientsSpawn(void);
+	void RandomItemSpawn(void);
+	void RandomIngredientsSpawn(void);
+
 	void AddIngredientsCnt(int nNumAdd,int nIngredients, int nPlayer);//具材の加算
 	bool GetGameStart(void) { return m_bIsGameStart; }
+	void ItemConfigLoad(const char* FileName);//アイテムや具材の設定を読み込む
 private:
+	void EnemySpawn(void);
 	vector<D3DXVECTOR3> m_IngredientsSpawnPoint;//具材のスポーンポイント
 	vector<D3DXVECTOR3> m_ItemSpawnPoint;//アイテムのスポーンポイント
+	static vector<int> m_IngredientsSpawnNum[OffSetArrayMax];//具材の事前出現番号
+	static vector<int> m_ItemSpawnNum[OffSetArrayMax];//具材の事前出現番号
 	GameMode m_Mode;//ゲーム中のモード
 	CPlayer *m_pPlayer[MaxPlayer];
 	CObject2D *m_pBandUI;
@@ -68,6 +75,8 @@ private:
 	CMove_UI *m_pLastSpurtUI;
 	int *m_NumIngredientsSpawnPoint;
 	int *m_NumItemSpawnPoint;
+	int m_IngredientsSpawnNumType;
+	int m_ItemSpawnNumType;
 	int m_MaxIngredientsSpawn;
 	int m_MaxItemSpawn;
 	int m_MaxEnemySpawn;
