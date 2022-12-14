@@ -24,6 +24,11 @@
 #include "move_ui.h"
 #include "manager.h"
 #include "sound.h"
+//=============================================================================
+// 静的メンバ変数宣言
+//=============================================================================
+vector<int> CGame::m_IngredientsSpawnNum[OffSetArrayMax];
+vector<int> CGame::m_ItemSpawnNum[OffSetArrayMax];
 
 static const int IngredientsSpawnInterval = 30 * 60;
 static const int NormalItemSpawnInterval = 17 * 60;
@@ -44,6 +49,7 @@ static const int TargetFadeTime = 50;
 static const int TargetTime =30;//目的UI持続時間
 static const int StartSpawnTime = TargetTime + (TargetFadeTime*2) + 30;
 static const int StartGameTime = StartSpawnTime + StartTime + (StartFadeTime * 2) + 10;
+
 static const D3DXVECTOR3 BandUIPos = {SCREEN_WIDTH/2.0f,50.0f,0.0f};//ゲーム画面上部にある帯みたいなやつ
 static const D3DXVECTOR3 BandUISize = { SCREEN_WIDTH / 2.0f,50.0f,0.0f };//ゲーム画面上部にある帯みたいなやつ
 static const D3DXVECTOR3 GameTimerSize = { 35.0f,40.0f,0.0f };//ゲーム画面上部にある帯みたいなやつ
@@ -69,6 +75,8 @@ static const D3DXVECTOR3 NumberPos2 = { 805.0f ,40.0f ,0.0f };//ラストスパートUI
 //=============================================================================
 CGame::CGame()
 {
+	m_ItemSpawnNumType = 0;
+	m_IngredientsSpawnNumType = 0;
 	m_ItemSpawnInterval[NormalMode] = NormalItemSpawnInterval;
 	m_ItemSpawnInterval[ClimaxMode] = ClimaxItemSpawnInterval;
 	m_IngredientsSpawnTimer = IngredientsSpawnInterval;
@@ -93,6 +101,12 @@ CGame::CGame()
 	CManager::GetInstance()->GetCamera()->SetRot(CAMERA_ROT);
 	m_UITimer = 0;
 	m_bIsGameStart = false;
+	for (int nCnt = 0; nCnt < OffSetArrayMax; nCnt++)
+	{
+		m_ItemSpawnNum[nCnt].clear();
+		m_IngredientsSpawnNum[nCnt].clear();
+	}
+
 }
 
 //=============================================================================
@@ -108,6 +122,7 @@ CGame::~CGame()
 //=============================================================================
 HRESULT CGame::Init(void)
 {
+	ItemConfigLoad("data/Txt/ItemConfig.txt");
 	//CMeshsphere::Create(D3DXVECTOR3(0.0f, 10.0f, 0.0f), D3DXVECTOR3(0.0f, 10.0f, 0.0f), 32, 32, 5200, "Sky.jpg");
 	//プレイヤーの生成
 	if (!m_pPlayer[0])
@@ -389,7 +404,7 @@ void CGame::Update(void)
 //=============================================================================
 // アイテム出現処理
 //=============================================================================
-void CGame::ItemSpawn(void)
+void CGame::RandomItemSpawn(void)
 {
 	m_ItemSpawnTimer++;
 
@@ -445,6 +460,31 @@ void CGame::ItemSpawn(void)
 	}
 
 }
+void CGame::ItemSpawn(void)
+{
+	m_ItemSpawnTimer++;
+	int nType = 0;
+	if (m_ItemSpawnTimer >= m_ItemSpawnInterval[m_Mode])
+	{
+		for (int nCnt = 0; nCnt < NormalItemSpawnMax; nCnt++, nType++)
+		{
+			if (nCnt >= CItem::ItemType::TypeMax)
+			{
+				nCnt = 0;
+			}
+			//アイテムを生成
+			CItem::Create({ m_ItemSpawnPoint[m_ItemSpawnNum[m_ItemSpawnNumType][nCnt]].x ,
+				m_ItemSpawnPoint[m_ItemSpawnNum[m_ItemSpawnNumType][nCnt]].y + 200.0f,
+				m_ItemSpawnPoint[m_ItemSpawnNum[m_ItemSpawnNumType][nCnt]].z }, { 7.0f,7.0f,0.0f }, static_cast<CItem::ItemType>(nType));
+
+		}
+		m_ItemSpawnNumType++;
+		//アイテムをスポーン
+		m_ItemSpawnTimer = 0;
+	}
+
+}
+
 //=============================================================================
 // 敵出現処理
 //=============================================================================
@@ -499,7 +539,7 @@ void CGame::EnemySpawn(void)
 //=============================================================================
 // 具材出現処理
 //=============================================================================
-void CGame::IngredientsSpawn(void)
+void CGame::RandomIngredientsSpawn(void)
 {
 	m_IngredientsSpawnTimer++;
 
@@ -562,6 +602,30 @@ void CGame::IngredientsSpawn(void)
 	}
 
 }
+void CGame::IngredientsSpawn(void)
+{
+	m_IngredientsSpawnTimer++;
+	int nType = 0;
+	if (m_IngredientsSpawnTimer >= IngredientsSpawnInterval)
+	{
+		for (int nCnt = 0; nCnt < NormalIngredientsSpawnMax; nCnt++, nType++)
+		{
+			if (nType >= CIngredients::IngredientsType::Max)
+			{
+				nType = 0;
+			}
+			//具材を生成
+			CIngredients::Create({ m_IngredientsSpawnPoint[m_IngredientsSpawnNum[m_IngredientsSpawnNumType][nCnt]].x ,
+				m_IngredientsSpawnPoint[m_IngredientsSpawnNum[m_IngredientsSpawnNumType][nCnt]].y + 200.0f,
+				m_IngredientsSpawnPoint[m_IngredientsSpawnNum[m_IngredientsSpawnNumType][nCnt]].z }, { 0.0f,0.0f,0.0f }, { 1.0,1.0,1.0 }, static_cast<CIngredients::IngredientsType>(nType));
+
+		}
+		m_IngredientsSpawnNumType++;
+		m_IngredientsSpawnTimer = 0;
+	}
+
+}
+
 //=============================================================================
 // 具材の加算
 //=============================================================================
@@ -569,4 +633,101 @@ void CGame::IngredientsSpawn(void)
 void CGame::AddIngredientsCnt(int nNumAdd, int nIngredients, int nPlayer)
 {
 	m_pIngredientsCnt[nIngredients][nPlayer]->AddCounter(nNumAdd);
+}
+//================================
+//アイテムや具材の設定を読み込む
+//================================
+void CGame::ItemConfigLoad(const char* FileName)
+{
+	FILE *pFile;
+	char string[10][255];
+	int nPosNum = 0;//今読み取っているフェーズ数
+	int nNumIngredients = 0;//今読み取っている敵の数
+	int nNumItem = 0;//今読み取っている敵の数
+	int nInterval = 0;
+	pFile = fopen(FileName, "r");
+	//pFileのNULLチェック
+	if (pFile != NULL)
+	{
+
+		//空白来るまで読み込む
+		fscanf(pFile, "%s", &string[0]);
+		//具材の出現位置を読み込む
+		while (strcmp(string[0], "BEGIN_SCRIPT") == 0)
+		{
+ 			fscanf(pFile, "%s", &string[1]);
+
+			//具材の出現位置を読み込む
+			while (strcmp(string[1], "INGREDIENTS_POSNUM") == 0)
+			{
+
+				//空白来るまで読み込む
+				fscanf(pFile, "%s", &string[2]);
+				while (strcmp(string[2], "SET_POSNUM") == 0)
+				{
+					//空白来るまで読み込む
+					fscanf(pFile, "%s", &string[3]);
+
+					//位置の番号
+					if (strcmp(string[3], "POS_NUM") == 0)
+					{
+						for (int nCnt = 0; nCnt < NormalIngredientsSpawnMax; nCnt++)
+						{
+							fscanf(pFile, "%d", &nPosNum);
+							m_IngredientsSpawnNum[nNumIngredients].push_back(nPosNum);
+						}
+					}
+
+					if (strcmp(string[3], "END_POS_NUM") == 0)
+					{
+						nNumIngredients++;
+						break;
+					}
+				}
+				if (strcmp(string[2], "END_INGREDIENTS_POSNUM") == 0)
+				{
+					break;
+				}
+			}	//具材の出現位置を読み込む
+			//アイテムの出現位置を読み込む
+			while (strcmp(string[1], "ITEM_POSNUM") == 0)
+			{
+
+				//空白来るまで読み込む
+				fscanf(pFile, "%s", &string[2]);
+				while (strcmp(string[2], "SET_POSNUM") == 0)
+				{
+					fscanf(pFile, "%s", &string[3]);
+
+					//位置の番号
+					if (strcmp(string[3], "POS_NUM") == 0)
+					{
+						for (int nCnt = 0; nCnt < NormalItemSpawnMax; nCnt++)
+						{
+							fscanf(pFile, "%d", &nPosNum);
+							m_ItemSpawnNum[nNumItem].push_back(nPosNum);
+						}
+					}
+					if (strcmp(string[3], "END_POS_NUM") == 0)
+					{
+						nNumItem++;
+						break;
+					}
+				}
+				if (strcmp(string[2], "END_ITEM_POSNUM") == 0)
+				{
+					break;
+				}
+			}	//アイテムの出現位置を読み込む
+
+				//テキストの読み込み終了を読み込む
+			if (strcmp(string[1], "END_SCRIPT") == 0)
+			{
+				break;
+			}
+
+		}
+	}	//pFileのNULLチェック
+	fclose(pFile);
+
 }
