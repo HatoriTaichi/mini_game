@@ -330,7 +330,7 @@ void COnlineGame::Update(void)
 		}
 		if (m_pGameTimer->GetCounter() <= 0)
 		{
-			CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT);
+			CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT, CSceneManager::FADE_MODE::NORMAL, 1.0f);
 		}
 	}
 

@@ -821,7 +821,7 @@ void CPlayer::TestGetIngredients(void)
 			}
 		}
 
-		CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT);
+		CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT, CSceneManager::FADE_MODE::NORMAL, 1.0f);
 
 	}
 

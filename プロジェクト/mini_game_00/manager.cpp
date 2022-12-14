@@ -170,7 +170,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	m_key->BindKey(CKey::KEYBIND::SPACE, DIK_SPACE);
 
 	// ‰ŠúƒV[ƒ“
-	m_scene_manager->ChangeScene(CSceneManager::MODE::TITLE);
+	m_scene_manager->ChangeScene(CSceneManager::MODE::TITLE, CSceneManager::FADE_MODE::NORMAL, 1.0f);
 
 	return S_OK;
 }
