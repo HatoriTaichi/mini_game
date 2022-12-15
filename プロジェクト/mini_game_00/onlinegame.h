@@ -50,6 +50,7 @@ public:
 	void RandomIngredientsSpawn(void);
 	void AddIngredientsCnt(int nNumAdd, int nIngredients, int nPlayer);//具材の加算
 	void ItemConfigLoad(const char* FileName);//アイテムや具材の設定を読み込む
+	void DrawDebugText();
 
 private:
 	void Matching(void);	// マッチング

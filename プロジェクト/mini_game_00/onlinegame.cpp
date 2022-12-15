@@ -27,7 +27,7 @@
 #include "camera.h"
 #include "move_ui.h"
 #include "sound.h"
-
+#include "renderer.h"
 //=============================================================================
 // 静的メンバ変数宣言
 //=============================================================================
@@ -828,5 +828,25 @@ void COnlineGame::ItemConfigLoad(const char* FileName)
 		}
 	}	//pFileのNULLチェック
 	fclose(pFile);
+
+}
+
+void COnlineGame::DrawDebugText()
+{
+	RECT rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+	char str[3000];
+	int nNum = 0;
+
+
+	nNum = sprintf(&str[0], "\n\n\n\n\n\n\n\n 情報 \n");
+
+	//プレイヤー情報をサーバーに送信
+	CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
+	char aSendData[MAX_COMMU_DATA];
+
+	nNum += sprintf(&str[nNum], " [GameTimer] %d\n", data->game_timer);
+	LPD3DXFONT pFont = CManager::GetInstance()->GetRenderer()->GetFont();
+	// テキスト描画
+	pFont->DrawText(NULL, str, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));
 
 }

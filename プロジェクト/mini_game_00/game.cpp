@@ -731,3 +731,4 @@ void CGame::ItemConfigLoad(const char* FileName)
 	fclose(pFile);
 
 }
+

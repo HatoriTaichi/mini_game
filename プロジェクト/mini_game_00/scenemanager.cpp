@@ -144,6 +144,9 @@ void CSceneManager::Update(void)
 		{
 			// XVˆ—
 			m_online_game->Update();
+			#ifdef _DEBUG
+			m_online_game->DrawDebugText();
+			#endif //!_DEBUG
 		}
 		break;
 	case MODE::RESULT:
