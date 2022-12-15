@@ -344,22 +344,22 @@ void COnlineGame::Uninit(void)
 void COnlineGame::Update(void)
 {
 	//プレイヤー情報をサーバーに送信
-	CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
+	CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetEnemyData()->GetCmmuData();
 	char aSendData[MAX_COMMU_DATA];
+	CCommunicationData::COMMUNICATION_DATA *player_data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
+	char aPlayerSendData[MAX_COMMU_DATA];
+	player_data->game_timer = data->game_timer;
 	CKey *key = CManager::GetInstance()->GetKey();
 	if (m_bIsGameStart)
 	{
 		ItemSpawn();
 		IngredientsSpawn();
 	}
-	else
-	{
-		//時間を加算
-		m_UITimer++;
-	}
+	//時間を加算
+	m_UITimer++;
+
 	if (m_UITimer >= StartGameTime)
 	{
-		m_UITimer = 0;
 		data->is_game_start = true;
 		m_bIsGameStart = true;
 	}
@@ -433,9 +433,11 @@ void COnlineGame::Update(void)
 		}
 
 	}
-
+	//DrawDebugText();
 	memcpy(&aSendData[0], data, sizeof(CCommunicationData::COMMUNICATION_DATA));
 	CManager::GetInstance()->GetNetWorkManager()->Send(&aSendData[0], sizeof(CCommunicationData::COMMUNICATION_DATA));
+	memcpy(&aPlayerSendData[0], player_data, sizeof(CCommunicationData::COMMUNICATION_DATA));
+	CManager::GetInstance()->GetNetWorkManager()->Send(&aPlayerSendData[0], sizeof(CCommunicationData::COMMUNICATION_DATA));
 
 
 }
@@ -831,22 +833,3 @@ void COnlineGame::ItemConfigLoad(const char* FileName)
 
 }
 
-void COnlineGame::DrawDebugText()
-{
-	RECT rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
-	char str[3000];
-	int nNum = 0;
-
-
-	nNum = sprintf(&str[0], "\n\n\n\n\n\n\n\n 情報 \n");
-
-	//プレイヤー情報をサーバーに送信
-	CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
-	char aSendData[MAX_COMMU_DATA];
-
-	nNum += sprintf(&str[nNum], " [GameTimer] %d\n", data->game_timer);
-	LPD3DXFONT pFont = CManager::GetInstance()->GetRenderer()->GetFont();
-	// テキスト描画
-	pFont->DrawText(NULL, str, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));
-
-}
