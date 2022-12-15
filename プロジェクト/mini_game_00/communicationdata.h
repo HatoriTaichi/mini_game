@@ -4,8 +4,8 @@
 // Author : 羽鳥 太一
 //
 //====================================================
-#ifndef _COMUNICASION_DATA_H_
-#define _COMUNICASION_DATA_H_
+#ifndef COMUNICASION_DATA_H_
+#define COMUNICASION_DATA_H_
 
 //-------------------------------
 // インクルード

@@ -343,19 +343,27 @@ void COnlineGame::Uninit(void)
 //=============================================================================
 void COnlineGame::Update(void)
 {
+	//プレイヤー情報をサーバーに送信
+	CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
+	char aSendData[MAX_COMMU_DATA];
 	CKey *key = CManager::GetInstance()->GetKey();
-	//時間を加算
-	m_UITimer++;
-	if (m_UITimer >= StartGameTime)
-	{
-		m_bIsGameStart = true;
-	}
 	if (m_bIsGameStart)
 	{
-		m_nGameTimeSeconds++;
 		ItemSpawn();
 		IngredientsSpawn();
 	}
+	else
+	{
+		//時間を加算
+		m_UITimer++;
+	}
+	if (m_UITimer >= StartGameTime)
+	{
+		m_UITimer = 0;
+		data->is_game_start = true;
+		m_bIsGameStart = true;
+	}
+
 	//スタートUIを生成
 	if (!m_pStartUI&&m_UITimer >= StartSpawnTime)
 	{
@@ -364,12 +372,8 @@ void COnlineGame::Update(void)
 	}
 	if (m_pGameTimer)
 	{
-		//６０フレーム経ったら一秒加算する
-		if (m_nGameTimeSeconds >= 60)
-		{
-			m_nGameTimeSeconds = 0;
-			m_pGameTimer->AddCounter(-1);
-		}
+		//サーバーから取得したタイマーを設定
+		m_pGameTimer->SetCounterNum(data->game_timer);
 		//時間切れになったらゲーム終了
 		if (m_pGameTimer->GetCounter() <= 0)
 		{
@@ -430,6 +434,8 @@ void COnlineGame::Update(void)
 
 	}
 
+	memcpy(&aSendData[0], data, sizeof(CCommunicationData::COMMUNICATION_DATA));
+	CManager::GetInstance()->GetNetWorkManager()->Send(&aSendData[0], sizeof(CCommunicationData::COMMUNICATION_DATA));
 
 
 }
@@ -469,11 +475,11 @@ void COnlineGame::Matching(void)
 		//プレイヤー識別番号で生成する敵プレイヤーのモデルを変える
 		switch (player_data->player.number)
 		{
-		case 0:
+		case 1:
 			m_enemy_player = CEnemyPlayer::Create({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f }, "data/Txt/player_motion_2.txt", player_data->player.number);
 			break;
 
-		case 1:
+		case 2:
 			m_enemy_player = CEnemyPlayer::Create({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f }, "data/Txt/player_motion_1.txt", player_data->player.number);
 			break;
 		default:
