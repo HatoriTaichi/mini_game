@@ -28,6 +28,8 @@
 #include "move_ui.h"
 #include "sound.h"
 #define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(0.0f), D3DXToRadian(90.0f),D3DXToRadian(0.0f)))	// ƒJƒƒ‰‚ÌŒü‚«
+vector<int> COnlineGame::m_IngredientsSpawnNum[OffSetArrayMax];
+vector<int> COnlineGame::m_ItemSpawnNum[OffSetArrayMax];
 
 //=============================================================================
 // Ã“Iƒƒ“ƒo•Ï”éŒ¾
