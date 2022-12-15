@@ -25,6 +25,8 @@
 #include "object2D.h"
 #include "counter.h"
 #include "camera.h"
+#include "move_ui.h"
+#include "sound.h"
 #define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(0.0f), D3DXToRadian(90.0f),D3DXToRadian(0.0f)))	// カメラの向き
 
 //=============================================================================
@@ -47,16 +49,27 @@ static const int NormalItemSpawnMax = 2;
 static const int ClimaxItemSpawnMin = 2;
 static const int ClimaxItemSpawnMax = 2;
 static const int EnemySpawnMax = 2;
+static const int LastSpartTime = 30;
+static const int GameMaxTime = 90;//制限時間
+static const int StartTime = 90;
+static const int StartFadeTime = 10;
+static const int TargetFadeTime = 50;
+static const int TargetTime = 30;//目的UI持続時間
+static const int StartSpawnTime = TargetTime + (TargetFadeTime * 2) + 30;
+static const int StartGameTime = StartSpawnTime + StartTime + (StartFadeTime * 2) + 10;
+
 static const D3DXVECTOR3 BandUIPos = { SCREEN_WIDTH / 2.0f,50.0f,0.0f };//ゲーム画面上部にある帯みたいなやつ
 static const D3DXVECTOR3 BandUISize = { SCREEN_WIDTH / 2.0f,50.0f,0.0f };//ゲーム画面上部にある帯みたいなやつ
 static const D3DXVECTOR3 GameTimerSize = { 35.0f,40.0f,0.0f };//ゲーム画面上部にある帯みたいなやつ
 static const D3DXVECTOR3 GameTimerPos = { SCREEN_WIDTH / 2.0f - 35.0f,50.0f,0.0f };//ゲーム画面上部にある帯みたいなやつ
-static const D3DXVECTOR3 StartSize = { 100.0f,40.0f,0.0f };//スタートUI
+static const D3DXVECTOR3 StartSize = { 150.0f,50.0f,0.0f };//スタートUI
 static const D3DXVECTOR3 StartPos = { SCREEN_WIDTH / 2.0f,SCREEN_HEIGHT / 2.0f,0.0f };//スタートUI
+static const D3DXVECTOR3 TargetSize = { 350.0f,60.0f,0.0f };//目的UI
+static const D3DXVECTOR3 TargetPos = { SCREEN_WIDTH / 2.0f,SCREEN_HEIGHT / 2.0f,0.0f };//目的UI
 static const D3DXVECTOR3 FinishSize = { 120.0f,40.0f,0.0f };//終了UI
 static const D3DXVECTOR3 FinishPos = { SCREEN_WIDTH / 2.0f,SCREEN_HEIGHT / 2.0f,0.0f };//終了UI
-static const D3DXVECTOR3 LastSpurtSize = { 150.0f,40.0f,0.0f };//ラストスパートUI
-static const D3DXVECTOR3 LastSpurtPos = { SCREEN_WIDTH + 150.0f ,SCREEN_HEIGHT / 2.0f,0.0f };//ラストスパートUI
+static const D3DXVECTOR3 LastSpurtSize = { 180.0f,40.0f,0.0f };//ラストスパートUI
+static const D3DXVECTOR3 LastSpurtPos = { SCREEN_WIDTH + LastSpurtSize.x ,SCREEN_HEIGHT / 2.0f,0.0f };//ラストスパートUI
 static const D3DXVECTOR3 IngredientsSize = { 50.0f,50.0f,0.0f };//ラストスパートUI
 static const D3DXVECTOR3 IngredientsPos = { 60.0f ,40.0f ,0.0f };//ラストスパートUI
 static const D3DXVECTOR3 IngredientsPos2 = { 820.0f ,40.0f ,0.0f };//ラストスパートUI
@@ -69,6 +82,8 @@ static const D3DXVECTOR3 NumberPos2 = { 805.0f ,40.0f ,0.0f };//ラストスパートUI
 //=============================================================================
 COnlineGame::COnlineGame()
 {
+	m_ItemSpawnNumType = 0;
+	m_IngredientsSpawnNumType = 0;
 	m_ItemSpawnInterval[NormalMode] = NormalItemSpawnInterval;
 	m_ItemSpawnInterval[ClimaxMode] = ClimaxItemSpawnInterval;
 	m_IngredientsSpawnTimer = IngredientsSpawnInterval;
@@ -107,6 +122,8 @@ COnlineGame::~COnlineGame()
 //=============================================================================
 HRESULT COnlineGame::Init(void)
 {
+	ItemConfigLoad("data/Txt/ItemConfig.txt");
+
 	// マッチング
 	Matching();
 
@@ -195,12 +212,13 @@ HRESULT COnlineGame::Init(void)
 						m_pIngredientsUI[nCnt][1] = CObject2D::Create({ IngredientsPos2.x + (IngredientsSize.x * 2 * nCnt),IngredientsPos2.y,0.0f }, IngredientsSize, TexName);
 					}
 				}
-				////スタートUIを生成
-				//if (!m_pStartUI)
-				//{
-				//	m_pStartUI = CObject2D::Create(StartPos, StartSize, "Start000.png");
-				//	m_pStartUI->SetCol({ 1.0,1.0,1.0,0.0 });
-				//}
+				CMove_UI::Create(TargetPos, TargetSize, StartTime, StartFadeTime, "TargetUI000.png", CMove_UI::UI_Type::Type_Target);
+				//ラストスパートUIUIを生成
+				if (!m_pLastSpurtUI)
+				{
+					m_pLastSpurtUI = CMove_UI::Create(LastSpurtPos, LastSpurtSize, 0, 0, "lastspurt000.png", CMove_UI::UI_Type::Type_LastSpurt);
+					m_pLastSpurtUI->SetState(CMove_UI::State::Normal);
+				}
 				////フィニッシュUIを生成
 				//if (!m_pFinishUI)
 				//{
@@ -285,6 +303,12 @@ HRESULT COnlineGame::Init(void)
 				}
 				//EnemySpawn();
 				m_is_onece = false;
+				m_nLastSoundCount = 0;
+				m_fGameSoundFade = 1.0f;
+				m_fLastSoundFade = 1.0f;
+				m_bLastSoundToggle = false;
+				m_bLastBGMSoundToggle = false;
+
 			}
 		}
 		else if (CNetWorkManager::GetAllConnect())
@@ -317,22 +341,83 @@ void COnlineGame::Uninit(void)
 //=============================================================================
 void COnlineGame::Update(void)
 {
-	ItemSpawn();
-	IngredientsSpawn();
 	CKey *key = CManager::GetInstance()->GetKey();
-	m_nGameTimeSeconds++;
-	if (m_pGameTimer)
+	//時間を加算
+	m_UITimer++;
+	if (m_UITimer >= StartGameTime)
 	{
-		if (m_nGameTimeSeconds >= 60)
-		{
-			m_nGameTimeSeconds = 0;
-			m_pGameTimer->AddCounter(-1);
-		}
-		if (m_pGameTimer->GetCounter() <= 0)
-		{
-			CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT, CSceneManager::FADE_MODE::NORMAL, 1.0f);
-		}
+		m_bIsGameStart = true;
 	}
+	if (m_bIsGameStart)
+	{
+		m_nGameTimeSeconds++;
+		ItemSpawn();
+		IngredientsSpawn();
+	}
+	//スタートUIを生成
+	if (!m_pStartUI&&m_UITimer >= StartSpawnTime)
+	{
+		m_pStartUI = CMove_UI::Create(StartPos, StartSize, StartTime, StartFadeTime, "Start000.png", CMove_UI::UI_Type::Type_Start);
+		m_pStartUI->SetCol({ 1.0,1.0,1.0,0.0f });
+	}
+	//時間切れになったらゲーム終了
+	if (m_pGameTimer->GetCounter() <= 0)
+	{
+		//フィニッシュUIを生成
+		if (!m_pFinishUI)
+		{
+			m_pFinishUI = CMove_UI::Create(FinishPos, FinishSize, StartTime, StartFadeTime, "Finish000.png", CMove_UI::UI_Type::Type_Start);
+		}
+		CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT, CSceneManager::FADE_MODE::NORMAL, 1.0f);
+	}
+
+	// ラストスパート(今の時間がLastSpartTime以下になったら)
+	if (m_pGameTimer->GetCounter() <= LastSpartTime)
+	{
+		// ラストスパートSEが鳴っていなければ鳴らす
+		if (!m_bLastSoundToggle)
+		{
+			CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_SE_GAME_LAST);
+		}
+
+		m_bLastSoundToggle = true;
+
+		m_nLastSoundCount++;
+
+		// メインBGMをフェードアウト
+		m_fGameSoundFade -= 0.01f;
+		CManager::GetInstance()->GetSound()->ControllVoice(CSound::SOUND_LABEL_BGM_GAME, m_fGameSoundFade);
+
+		// フェードアウトして0になったらBGMを消す
+		if (m_fGameSoundFade <= 0.0f)
+		{
+			CManager::GetInstance()->GetSound()->Stop(CSound::SOUND_LABEL_BGM_GAME);
+		}
+
+		// ラストスパートSE(ベルの音)が一定時間以上鳴ったらフェードアウト
+		if (m_nLastSoundCount >= 120)
+		{
+			m_fLastSoundFade -= 0.01f;
+			CManager::GetInstance()->GetSound()->ControllVoice(CSound::SOUND_LABEL_SE_GAME_LAST, m_fLastSoundFade);
+
+			// フェードアウトして0になったらSEを消す
+			if (m_fLastSoundFade <= 0.0f)
+			{
+				CManager::GetInstance()->GetSound()->Stop(CSound::SOUND_LABEL_SE_GAME_LAST);
+			}
+
+			// ラストスパートBGMが鳴っていなければ鳴らす
+			if (!m_bLastBGMSoundToggle)
+			{
+				CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_BGM_GAMELAST);
+			}
+
+			m_bLastBGMSoundToggle = true;
+		}
+
+		m_pLastSpurtUI->SetState(CMove_UI::State::ImmediatelyAfterPop);
+	}
+
 
 
 }
@@ -390,7 +475,7 @@ void COnlineGame::Matching(void)
 //=============================================================================
 // アイテム出現処理
 //=============================================================================
-void COnlineGame::ItemSpawn(void)
+void COnlineGame::RandomItemSpawn(void)
 {
 	m_ItemSpawnTimer++;
 
@@ -446,6 +531,34 @@ void COnlineGame::ItemSpawn(void)
 	}
 
 }
+//=============================================================================
+// アイテム出現処理
+//=============================================================================
+void COnlineGame::ItemSpawn(void)
+{
+	m_ItemSpawnTimer++;
+	int nType = 0;
+	if (m_ItemSpawnTimer >= m_ItemSpawnInterval[m_Mode])
+	{
+		for (int nCnt = 0; nCnt < NormalItemSpawnMax; nCnt++, nType++)
+		{
+			if (nCnt >= CItem::ItemType::TypeMax)
+			{
+				nCnt = 0;
+			}
+			//アイテムを生成
+			CItem::Create({ m_ItemSpawnPoint[m_ItemSpawnNum[m_ItemSpawnNumType][nCnt]].x ,
+				m_ItemSpawnPoint[m_ItemSpawnNum[m_ItemSpawnNumType][nCnt]].y + 200.0f,
+				m_ItemSpawnPoint[m_ItemSpawnNum[m_ItemSpawnNumType][nCnt]].z }, { 7.0f,7.0f,0.0f }, static_cast<CItem::ItemType>(nType));
+
+		}
+		m_ItemSpawnNumType++;
+		//アイテムをスポーン
+		m_ItemSpawnTimer = 0;
+	}
+
+}
+
 ////=============================================================================
 //// 敵出現処理
 ////=============================================================================
@@ -501,7 +614,7 @@ void COnlineGame::ItemSpawn(void)
 //=============================================================================
 // 具材出現処理
 //=============================================================================
-void COnlineGame::IngredientsSpawn(void)
+void COnlineGame::RandomIngredientsSpawn(void)
 {
 	//スポーンタイマーを加算
 	m_IngredientsSpawnTimer++;
@@ -566,10 +679,134 @@ void COnlineGame::IngredientsSpawn(void)
 
 }
 //=============================================================================
+// 具材出現処理
+//=============================================================================
+void COnlineGame::IngredientsSpawn(void)
+{
+	m_IngredientsSpawnTimer++;
+	int nType = 0;
+	if (m_IngredientsSpawnTimer >= IngredientsSpawnInterval)
+	{
+		for (int nCnt = 0; nCnt < NormalIngredientsSpawnMax; nCnt++, nType++)
+		{
+			if (nType >= CIngredients::IngredientsType::Max)
+			{
+				nType = 0;
+			}
+			//具材を生成
+			CIngredients::Create({ m_IngredientsSpawnPoint[m_IngredientsSpawnNum[m_IngredientsSpawnNumType][nCnt]].x ,
+				m_IngredientsSpawnPoint[m_IngredientsSpawnNum[m_IngredientsSpawnNumType][nCnt]].y + 200.0f,
+				m_IngredientsSpawnPoint[m_IngredientsSpawnNum[m_IngredientsSpawnNumType][nCnt]].z }, { 0.0f,0.0f,0.0f }, { 1.0,1.0,1.0 }, static_cast<CIngredients::IngredientsType>(nType));
+
+		}
+		m_IngredientsSpawnNumType++;
+		m_IngredientsSpawnTimer = 0;
+	}
+
+}
+
+//=============================================================================
 // 具材の加算
 //=============================================================================
 
 void COnlineGame::AddIngredientsCnt(int nNumAdd, int nIngredients, int nPlayer)
 {
 	m_pIngredientsCnt[nIngredients][nPlayer]->AddCounter(nNumAdd);
+}
+//================================
+//アイテムや具材の設定を読み込む
+//================================
+void COnlineGame::ItemConfigLoad(const char* FileName)
+{
+	FILE *pFile;
+	char string[10][255];
+	int nPosNum = 0;//今読み取っているフェーズ数
+	int nNumIngredients = 0;//今読み取っている敵の数
+	int nNumItem = 0;//今読み取っている敵の数
+	int nInterval = 0;
+	pFile = fopen(FileName, "r");
+	//pFileのNULLチェック
+	if (pFile != NULL)
+	{
+
+		//空白来るまで読み込む
+		fscanf(pFile, "%s", &string[0]);
+		//具材の出現位置を読み込む
+		while (strcmp(string[0], "BEGIN_SCRIPT") == 0)
+		{
+			fscanf(pFile, "%s", &string[1]);
+
+			//具材の出現位置を読み込む
+			while (strcmp(string[1], "INGREDIENTS_POSNUM") == 0)
+			{
+
+				//空白来るまで読み込む
+				fscanf(pFile, "%s", &string[2]);
+				while (strcmp(string[2], "SET_POSNUM") == 0)
+				{
+					//空白来るまで読み込む
+					fscanf(pFile, "%s", &string[3]);
+
+					//位置の番号
+					if (strcmp(string[3], "POS_NUM") == 0)
+					{
+						for (int nCnt = 0; nCnt < NormalIngredientsSpawnMax; nCnt++)
+						{
+							fscanf(pFile, "%d", &nPosNum);
+							m_IngredientsSpawnNum[nNumIngredients].push_back(nPosNum);
+						}
+					}
+
+					if (strcmp(string[3], "END_POS_NUM") == 0)
+					{
+						nNumIngredients++;
+						break;
+					}
+				}
+				if (strcmp(string[2], "END_INGREDIENTS_POSNUM") == 0)
+				{
+					break;
+				}
+			}	//具材の出現位置を読み込む
+				//アイテムの出現位置を読み込む
+			while (strcmp(string[1], "ITEM_POSNUM") == 0)
+			{
+
+				//空白来るまで読み込む
+				fscanf(pFile, "%s", &string[2]);
+				while (strcmp(string[2], "SET_POSNUM") == 0)
+				{
+					fscanf(pFile, "%s", &string[3]);
+
+					//位置の番号
+					if (strcmp(string[3], "POS_NUM") == 0)
+					{
+						for (int nCnt = 0; nCnt < NormalItemSpawnMax; nCnt++)
+						{
+							fscanf(pFile, "%d", &nPosNum);
+							m_ItemSpawnNum[nNumItem].push_back(nPosNum);
+						}
+					}
+					if (strcmp(string[3], "END_POS_NUM") == 0)
+					{
+						nNumItem++;
+						break;
+					}
+				}
+				if (strcmp(string[2], "END_ITEM_POSNUM") == 0)
+				{
+					break;
+				}
+			}	//アイテムの出現位置を読み込む
+
+				//テキストの読み込み終了を読み込む
+			if (strcmp(string[1], "END_SCRIPT") == 0)
+			{
+				break;
+			}
+
+		}
+	}	//pFileのNULLチェック
+	fclose(pFile);
+
 }

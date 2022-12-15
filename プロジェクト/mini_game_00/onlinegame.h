@@ -29,6 +29,8 @@ static const int OnLineMaxIngredients = 5;
 class COnlineGame
 {
 public:
+	static const int OffSetArrayMax = 3;//最大配列
+
 	enum GameMode
 	{
 		NormalMode = 0,
@@ -44,13 +46,18 @@ public:
 	void ItemSpawn(void);
 	void EnemySpawn(void);
 	void IngredientsSpawn(void);
+	void RandomItemSpawn(void);
+	void RandomIngredientsSpawn(void);
 	void AddIngredientsCnt(int nNumAdd, int nIngredients, int nPlayer);//具材の加算
+	void ItemConfigLoad(const char* FileName);//アイテムや具材の設定を読み込む
 
 private:
 	void Matching(void);	// マッチング
 	CEnemyPlayer *m_enemy_player;	// 敵
 	vector<D3DXVECTOR3> m_IngredientsSpawnPoint;//具材のスポーンポイント
 	vector<D3DXVECTOR3> m_ItemSpawnPoint;//アイテムのスポーンポイント
+	static vector<int> m_IngredientsSpawnNum[OffSetArrayMax];//具材の事前出現番号
+	static vector<int> m_ItemSpawnNum[OffSetArrayMax];//具材の事前出現番号
 	GameMode m_Mode;//ゲーム中のモード
 	CPlayer *m_pPlayer[OnLineMaxPlayer];
 	CObject2D *m_pBandUI;
@@ -62,10 +69,13 @@ private:
 	CMove_UI *m_pLastSpurtUI;
 	int *m_NumIngredientsSpawnPoint;
 	int *m_NumItemSpawnPoint;
+	int m_IngredientsSpawnNumType;
+	int m_ItemSpawnNumType;
 	int m_MaxIngredientsSpawn;
 	int m_MaxItemSpawn;
 	int m_MaxEnemySpawn;
 	int m_nGameTimeSeconds;//秒数を数えるやつ
+	int m_nGameStartTimer;//始まるまでの時間
 	int m_IngredientsSpawnTimer;//具材の出現タイマー
 	int m_ItemSpawnTimer;//アイテムの出現タイマー
 	int m_ItemSpawnInterval[ModeMax];//アイテムの出現間隔
@@ -75,6 +85,14 @@ private:
 	int m_ItemSpawnMax[ModeMax];//アイテムの出現個数（大）
 	int m_nPlayerNumber;//プレイヤー識別番号
 	static bool m_is_onece;
+	float m_fGameSoundFade;		// BGMの音量
+	float m_fLastSoundFade;		// ラストスパートSEの音量
+	int m_nLastSoundCount;		// ラストスパートSEが鳴った時間をカウント
+	bool m_bLastSoundToggle;	// ラストスパートSEが鳴ったか
+	bool m_bLastBGMSoundToggle;	// ラストスパートBGMが鳴ったか
+	int m_UITimer;//UI表示用タイマー
+	bool m_bIsGameStart;
+
 
 };
 
