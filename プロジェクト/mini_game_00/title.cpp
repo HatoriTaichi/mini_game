@@ -259,7 +259,7 @@ void CTitle::Update(void)
 		if (m_bEndTimer >= ENDTIME)
 		{
 			m_bNextMode = true;
-			CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::GAME, CSceneManager::FADE_MODE::UP_TO_BOTTOM, 0.5f);
+			CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::ONLINE_GAME, CSceneManager::FADE_MODE::UP_TO_BOTTOM, 0.5f);
 		}
 	}
 }
