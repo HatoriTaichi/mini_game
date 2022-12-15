@@ -27,7 +27,6 @@
 #include "camera.h"
 #include "move_ui.h"
 #include "sound.h"
-#define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(0.0f), D3DXToRadian(90.0f),D3DXToRadian(0.0f)))	// ƒJƒƒ‰‚ÌŒü‚«
 
 //=============================================================================
 // Ã“Iƒƒ“ƒo•Ï”éŒ¾
@@ -78,6 +77,7 @@ static const D3DXVECTOR3 IngredientsPos2 = { 820.0f ,40.0f ,0.0f };//ƒ‰ƒXƒgƒXƒp
 static const D3DXVECTOR3 NumberSize = { 15.0f ,20.0f ,0.0f };//ƒ‰ƒXƒgƒXƒp[ƒgUI
 static const D3DXVECTOR3 NumberPos = { 45.0f ,40.0f ,0.0f };//ƒ‰ƒXƒgƒXƒp[ƒgUI
 static const D3DXVECTOR3 NumberPos2 = { 805.0f ,40.0f ,0.0f };//ƒ‰ƒXƒgƒXƒp[ƒgUI
+#define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(180.0f), D3DXToRadian(-90.0f),D3DXToRadian(0.0f)))	// ƒJƒƒ‰‚ÌŒü‚«
 
 //=============================================================================
 // ƒfƒtƒHƒ‹ƒgƒRƒ“ƒXƒgƒ‰ƒNƒ^
