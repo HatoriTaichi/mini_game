@@ -544,9 +544,9 @@ void COnlineGame::ItemSpawn(void)
 	{
 		for (int nCnt = 0; nCnt < NormalItemSpawnMax; nCnt++, nType++)
 		{
-			if (nCnt >= CItem::ItemType::TypeMax)
+			if (m_ItemSpawnNumType >= CItem::ItemType::TypeMax)
 			{
-				nCnt = 0;
+				m_ItemSpawnNumType = 0;
 			}
 			//ÉAÉCÉeÉÄÇê∂ê¨
 			CItem::Create({ m_ItemSpawnPoint[m_ItemSpawnNum[m_ItemSpawnNumType][nCnt]].x ,
@@ -691,9 +691,9 @@ void COnlineGame::IngredientsSpawn(void)
 	{
 		for (int nCnt = 0; nCnt < NormalIngredientsSpawnMax; nCnt++, nType++)
 		{
-			if (nType >= CIngredients::IngredientsType::Max)
+			if (m_IngredientsSpawnNumType >= CIngredients::IngredientsType::Max)
 			{
-				nType = 0;
+				m_IngredientsSpawnNumType = 0;
 			}
 			//ãÔçﬁÇê∂ê¨
 			CIngredients::Create({ m_IngredientsSpawnPoint[m_IngredientsSpawnNum[m_IngredientsSpawnNumType][nCnt]].x ,
