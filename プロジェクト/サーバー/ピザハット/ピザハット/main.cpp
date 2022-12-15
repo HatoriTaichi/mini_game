@@ -169,6 +169,13 @@ void CreateRoom(vector<CCommunication*> communication, int room_num)
 		// 1秒に指定した回数だけ
 		if ((current_time - exec_last_time) >= ((1000) / SEND_FRAME))
 		{
+			// 
+			if (data[0]->is_game_start == true && data[1]->is_game_start == true)
+			{
+				data[0]->game_timer--;
+				data[1]->game_timer--;
+			}
+
 			// 現在の時間を保存
 			exec_last_time = current_time;
 
@@ -257,6 +264,7 @@ void AllAcceptInit(CTcpListener *listener, int room_num)
 		// 初期化
 		data.player.number = count_player + 1;
 		data.connect = true;
+		data.game_timer = MAX_TIMER;
 
 		// メモリのコピー
 		memcpy(&recv_data[0], &data, sizeof(CCommunicationData::COMMUNICATION_DATA));

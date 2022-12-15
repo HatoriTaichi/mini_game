@@ -20,6 +20,7 @@
 #define MAX_COMMU_DATA (1024)
 #define MAX_NO_DROP (4)
 #define SEND_FRAME (6)
+#define MAX_TIMER (90)
 
 //-------------------------------
 // Classの定義
@@ -48,6 +49,8 @@ public:
 	{
 		PLAYER_DATA player;	// プレイヤーデータ
 		CANDIDATES_PLACE_DATA candidates_place_data;//候補地の情報
+		int game_timer;	// タイマー
+		bool is_game_start;	// ゲームスタート
 		bool connect;	// 接続確認
 	} COMMUNICATION_DATA;
 
