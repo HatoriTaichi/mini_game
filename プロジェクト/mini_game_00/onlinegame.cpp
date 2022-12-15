@@ -170,7 +170,7 @@ HRESULT COnlineGame::Init(void)
 				if (!m_pGameTimer)
 				{
 					m_pGameTimer = CCounter::Create(GameTimerPos, GameTimerSize, 2, "Number000.png");
-					m_pGameTimer->SetCounterNum(90);
+					m_pGameTimer->SetCounterNum(GameMaxTime);
 				}
 				//‹ïŞ‚ÌUI¶¬
 				for (int nCnt = 0; nCnt < OnLineMaxIngredients; nCnt++)
@@ -361,6 +361,12 @@ void COnlineGame::Update(void)
 	{
 		m_pStartUI = CMove_UI::Create(StartPos, StartSize, StartTime, StartFadeTime, "Start000.png", CMove_UI::UI_Type::Type_Start);
 		m_pStartUI->SetCol({ 1.0,1.0,1.0,0.0f });
+	}
+	//‚U‚OƒtƒŒ[ƒ€Œo‚Á‚½‚çˆê•b‰ÁZ‚·‚é
+	if (m_nGameTimeSeconds >= 60)
+	{
+		m_nGameTimeSeconds = 0;
+		m_pGameTimer->AddCounter(-1);
 	}
 	//ŠÔØ‚ê‚É‚È‚Á‚½‚çƒQ[ƒ€I—¹
 	if (m_pGameTimer->GetCounter() <= 0)
