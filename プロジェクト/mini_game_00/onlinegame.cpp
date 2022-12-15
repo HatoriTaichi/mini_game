@@ -344,10 +344,9 @@ void COnlineGame::Uninit(void)
 void COnlineGame::Update(void)
 {
 	//プレイヤー情報をサーバーに送信
+	CCommunicationData::COMMUNICATION_DATA *player_data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
 	CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetEnemyData()->GetCmmuData();
 	char aSendData[MAX_COMMU_DATA];
-	CCommunicationData::COMMUNICATION_DATA *player_data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
-	char aPlayerSendData[MAX_COMMU_DATA];
 	player_data->game_timer = data->game_timer;
 	CKey *key = CManager::GetInstance()->GetKey();
 	if (m_bIsGameStart)
@@ -360,7 +359,7 @@ void COnlineGame::Update(void)
 
 	if (m_UITimer >= StartGameTime)
 	{
-		data->is_game_start = true;
+		player_data->is_game_start = true;
 		m_bIsGameStart = true;
 	}
 
@@ -434,12 +433,6 @@ void COnlineGame::Update(void)
 
 	}
 	//DrawDebugText();
-	memcpy(&aSendData[0], data, sizeof(CCommunicationData::COMMUNICATION_DATA));
-	CManager::GetInstance()->GetNetWorkManager()->Send(&aSendData[0], sizeof(CCommunicationData::COMMUNICATION_DATA));
-	memcpy(&aPlayerSendData[0], player_data, sizeof(CCommunicationData::COMMUNICATION_DATA));
-	CManager::GetInstance()->GetNetWorkManager()->Send(&aPlayerSendData[0], sizeof(CCommunicationData::COMMUNICATION_DATA));
-
-
 }
 
 //=============================================================================
@@ -564,7 +557,11 @@ void COnlineGame::ItemSpawn(void)
 	{
 		for (int nCnt = 0; nCnt < NormalItemSpawnMax; nCnt++, nType++)
 		{
-			if (m_ItemSpawnNumType >= CItem::ItemType::TypeMax)
+			if (nType >= CItem::ItemType::TypeMax)
+			{
+				m_ItemSpawnNumType = 0;
+			}
+			if (m_ItemSpawnNumType >= OffSetArrayMax)
 			{
 				m_ItemSpawnNumType = 0;
 			}
@@ -711,7 +708,11 @@ void COnlineGame::IngredientsSpawn(void)
 	{
 		for (int nCnt = 0; nCnt < NormalIngredientsSpawnMax; nCnt++, nType++)
 		{
-			if (m_IngredientsSpawnNumType >= CIngredients::IngredientsType::Max)
+			if (nType >= CIngredients::IngredientsType::Max)
+			{
+				m_IngredientsSpawnNumType = 0;
+			}
+			if (m_IngredientsSpawnNumType >= OffSetArrayMax)
 			{
 				m_IngredientsSpawnNumType = 0;
 			}
