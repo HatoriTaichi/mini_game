@@ -16,6 +16,11 @@
 #include "communicationdata.h"
 
 //------------------------
+// マクロ定義
+//------------------------
+#define FPS (60)
+
+//------------------------
 // グローバル変数
 //------------------------
 int g_room_count;	// 部屋数
@@ -118,19 +123,14 @@ void CreateRoom(vector<CCommunication*> communication, int room_num)
 	// 最大ソケット
 	SOCKET max_socket = maxfd[0];
 
-	DWORD current_time;
-	DWORD exec_last_time;
-	DWORD exec_last_time_start[MAX_PLAYER];
+	DWORD current_time, current_time_fps;
+	DWORD exec_last_time, exec_last_time_fps;
 
 	// フレームカウント初期化
 	current_time = 0;
 	exec_last_time = 0;
-
-	// プレイヤー分のループ
-	for (int count_player = 0; count_player < MAX_PLAYER; count_player++)
-	{
-		exec_last_time_start[count_player] = 0;
-	}
+	current_time_fps = 0;
+	exec_last_time_fps = 0;
 
 	// レシーブでなんも来なかったら
 	while (recv > 0)
@@ -149,6 +149,7 @@ void CreateRoom(vector<CCommunication*> communication, int room_num)
 
 		// 現在の時間を取得
 		current_time = timeGetTime();
+		current_time_fps = timeGetTime();
 
 		// プレイヤー分回す
 		for (int count_player = 0; count_player < MAX_PLAYER; count_player++)
@@ -167,15 +168,23 @@ void CreateRoom(vector<CCommunication*> communication, int room_num)
 		}
 
 		// 1秒に指定した回数だけ
-		if ((current_time - exec_last_time) >= ((1000) / SEND_FRAME))
+		if ((current_time_fps - exec_last_time_fps) >= (1000))
 		{
-			// 
+			// ゲームスタートしてたら
 			if (data[0]->is_game_start == true && data[1]->is_game_start == true)
 			{
+				// タイマー減算
 				data[0]->game_timer--;
 				data[1]->game_timer--;
 			}
 
+			// 現在の時間を保存
+			exec_last_time_fps = current_time_fps;
+		}
+
+		// 1秒に指定した回数だけ
+		if ((current_time - exec_last_time) >= ((1000) / SEND_FRAME))
+		{
 			// 現在の時間を保存
 			exec_last_time = current_time;
 
