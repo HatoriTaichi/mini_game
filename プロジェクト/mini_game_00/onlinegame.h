@@ -42,7 +42,7 @@ public:
 	~COnlineGame();	// デフォルトデストラクタ
 	HRESULT Init(void);	// 初期化
 	void Uninit(void);	// 終了
-	void Update(void);	// 更新
+	void Update(void);	// 更新 
 	void ItemSpawn(void);
 	void EnemySpawn(void);
 	void IngredientsSpawn(void);
@@ -50,7 +50,6 @@ public:
 	void RandomIngredientsSpawn(void);
 	void AddIngredientsCnt(int nNumAdd, int nIngredients, int nPlayer);//具材の加算
 	void ItemConfigLoad(const char* FileName);//アイテムや具材の設定を読み込む
-	void DrawDebugText();
 
 private:
 	void Matching(void);	// マッチング

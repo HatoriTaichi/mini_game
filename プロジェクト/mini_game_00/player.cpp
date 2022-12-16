@@ -509,13 +509,19 @@ void CPlayer::Drawtext(void)
 
 	float fLength = (float)sqrt(ThumbL.x  * ThumbL.x +
 		ThumbL.y * ThumbL.y);
+	//プレイヤー情報をサーバーに送信
+	CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetEnemyData()->GetCmmuData();
+	char aSendData[MAX_COMMU_DATA];
 
-	nNum = sprintf(&str[0], "\n\n\n\n\n 情報 \n");
+
+	nNum = sprintf(&str[0], "\n\n\n\n\n\n\n 情報 \n");
 	int nSize = m_PlayerData.m_nGetIngredientsType.size();
 	//for (int nCnt = 0; nCnt < nSize; nCnt++)
 	//{
 	//	nNum += sprintf(&str[nNum], " [Ingredients%d] %d\n", nCnt, m_PlayerData.m_nGetIngredientsType[nCnt]);
 	//}
+	nNum += sprintf(&str[nNum], " [GameTimer] %d\n", data->game_timer);
+
 	nNum += sprintf(&str[nNum], " [numPlayer] %d\n",m_nNumPlayer);
 	//nNum += sprintf(&str[nNum], " [fLength] %.6f\n", fLength);
 	//nNum += sprintf(&str[nNum], " [sThumbLY] %.2f\n", ThumbL.y);
