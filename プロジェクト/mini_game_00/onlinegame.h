@@ -17,6 +17,7 @@ class CCounter;
 class CMove_UI;
 static const int OnLineMaxPlayer = 2;
 static const int OnLineMaxIngredients = 5;
+static const int OnlineGame_OffSetArrayMax = 20;//最大配列
 
 //*****************************************************************************
 // ヘッダファイルのインクルード
@@ -29,7 +30,6 @@ static const int OnLineMaxIngredients = 5;
 class COnlineGame
 {
 public:
-	static const int OffSetArrayMax = 20;//最大配列
 
 	enum GameMode
 	{
@@ -56,8 +56,8 @@ private:
 	CEnemyPlayer *m_enemy_player;	// 敵
 	vector<D3DXVECTOR3> m_IngredientsSpawnPoint;//具材のスポーンポイント
 	vector<D3DXVECTOR3> m_ItemSpawnPoint;//アイテムのスポーンポイント
-	static vector<int> m_IngredientsSpawnNum[OffSetArrayMax];//具材の事前出現番号
-	static vector<int> m_ItemSpawnNum[OffSetArrayMax];//具材の事前出現番号
+	static vector<int> m_IngredientsSpawnNum[OnlineGame_OffSetArrayMax];//具材の事前出現番号
+	static vector<int> m_ItemSpawnNum[OnlineGame_OffSetArrayMax];//具材の事前出現番号
 	GameMode m_Mode;//ゲーム中のモード
 	CPlayer *m_pPlayer[OnLineMaxPlayer];
 	CObject2D *m_pBandUI;

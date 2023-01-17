@@ -32,8 +32,8 @@
 // Ã“Iƒƒ“ƒo•Ï”éŒ¾
 //=============================================================================
 bool COnlineGame::m_is_onece = true;
-vector<int> COnlineGame::m_IngredientsSpawnNum[OffSetArrayMax];
-vector<int> COnlineGame::m_ItemSpawnNum[OffSetArrayMax];
+vector<int> COnlineGame::m_IngredientsSpawnNum[OnlineGame_OffSetArrayMax];
+vector<int> COnlineGame::m_ItemSpawnNum[OnlineGame_OffSetArrayMax];
 
 //=============================================================================
 // 
@@ -561,7 +561,7 @@ void COnlineGame::ItemSpawn(void)
 			{
 				nType = 0;
 			}
-			if (m_ItemSpawnNumType > OffSetArrayMax)
+			if (m_ItemSpawnNumType > OnlineGame_OffSetArrayMax)
 			{
 				m_ItemSpawnNumType = 0;
 			}
@@ -712,7 +712,7 @@ void COnlineGame::IngredientsSpawn(void)
 			{
 				nType = 0;
 			}
-			if (m_IngredientsSpawnNumType > OffSetArrayMax)
+			if (m_IngredientsSpawnNumType > OnlineGame_OffSetArrayMax)
 			{
 				m_IngredientsSpawnNumType = 0;
 			}
