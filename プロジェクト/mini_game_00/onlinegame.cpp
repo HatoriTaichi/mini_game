@@ -762,11 +762,11 @@ void COnlineGame::ItemConfigLoad(const char* FileName)
 		{
 			fscanf(pFile, "%s", &string[1]);
 
-			if (strcmp(string[3], "ITEM_SPAWN_NUM") == 0)
+			if (strcmp(string[1], "ITEM_SPAWN_NUM") == 0)
 			{
 				fscanf(pFile, "%d", &nMaxItem);
 			}
-			if (strcmp(string[3], "INGREDIENTS_SPAWN_NUM") == 0)
+			if (strcmp(string[1], "INGREDIENTS_SPAWN_NUM") == 0)
 			{
 				fscanf(pFile, "%d", &nMaxIngredients);
 			}
