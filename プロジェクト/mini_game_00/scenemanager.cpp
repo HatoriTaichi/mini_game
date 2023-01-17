@@ -241,8 +241,9 @@ void CSceneManager::SetMode(MODE mode)
 		if (m_game != nullptr)
 		{
 			// ‰Šú‰»
-			m_game->Init();
 			m_network_mode = NETWORK_MODE::OFF_LINE;
+
+			m_game->Init();
 		}
 		break;
 	case MODE::ONLINE_GAME:
@@ -252,8 +253,9 @@ void CSceneManager::SetMode(MODE mode)
 		if (m_online_game != nullptr)
 		{
 			// ‰Šú‰»
-			m_online_game->Init();
 			m_network_mode = NETWORK_MODE::ON_LINE;
+
+			m_online_game->Init();
 
 		}
 		break;
