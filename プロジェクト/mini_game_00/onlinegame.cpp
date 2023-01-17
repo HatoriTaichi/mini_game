@@ -559,7 +559,7 @@ void COnlineGame::ItemSpawn(void)
 		{
 			if (nType >= CItem::ItemType::TypeMax)
 			{
-				m_ItemSpawnNumType = 0;
+				nType = 0;
 			}
 			if (m_ItemSpawnNumType >= OffSetArrayMax)
 			{
@@ -708,9 +708,9 @@ void COnlineGame::IngredientsSpawn(void)
 	{
 		for (int nCnt = 0; nCnt < NormalIngredientsSpawnMax; nCnt++, nType++)
 		{
-			if (nType >= CIngredients::IngredientsType::Max)
+			if (nType > CIngredients::IngredientsType::Max)
 			{
-				m_IngredientsSpawnNumType = 0;
+				nType = 0;
 			}
 			if (m_IngredientsSpawnNumType >= OffSetArrayMax)
 			{
@@ -747,6 +747,9 @@ void COnlineGame::ItemConfigLoad(const char* FileName)
 	int nNumIngredients = 0;//今読み取っている敵の数
 	int nNumItem = 0;//今読み取っている敵の数
 	int nInterval = 0;
+	int nMaxItem = 0;
+	int nMaxIngredients = 0;//今読み取っている敵の数
+
 	pFile = fopen(FileName, "r");
 	//pFileのNULLチェック
 	if (pFile != NULL)
@@ -759,6 +762,14 @@ void COnlineGame::ItemConfigLoad(const char* FileName)
 		{
 			fscanf(pFile, "%s", &string[1]);
 
+			if (strcmp(string[3], "ITEM_SPAWN_NUM") == 0)
+			{
+				fscanf(pFile, "%d", &nMaxItem);
+			}
+			if (strcmp(string[3], "INGREDIENTS_SPAWN_NUM") == 0)
+			{
+				fscanf(pFile, "%d", &nMaxIngredients);
+			}
 			//具材の出現位置を読み込む
 			while (strcmp(string[1], "INGREDIENTS_POSNUM") == 0)
 			{
@@ -773,7 +784,7 @@ void COnlineGame::ItemConfigLoad(const char* FileName)
 					//位置の番号
 					if (strcmp(string[3], "POS_NUM") == 0)
 					{
-						for (int nCnt = 0; nCnt < NormalIngredientsSpawnMax; nCnt++)
+						for (int nCnt = 0; nCnt < nMaxIngredients; nCnt++)
 						{
 							fscanf(pFile, "%d", &nPosNum);
 							m_IngredientsSpawnNum[nNumIngredients].push_back(nPosNum);
@@ -804,7 +815,7 @@ void COnlineGame::ItemConfigLoad(const char* FileName)
 					//位置の番号
 					if (strcmp(string[3], "POS_NUM") == 0)
 					{
-						for (int nCnt = 0; nCnt < NormalItemSpawnMax; nCnt++)
+						for (int nCnt = 0; nCnt < nMaxItem; nCnt++)
 						{
 							fscanf(pFile, "%d", &nPosNum);
 							m_ItemSpawnNum[nNumItem].push_back(nPosNum);

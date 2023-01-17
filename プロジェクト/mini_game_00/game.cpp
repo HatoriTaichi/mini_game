@@ -617,7 +617,8 @@ void CGame::IngredientsSpawn(void)
 			//ãÔçﬁÇê∂ê¨
 			CIngredients::Create({ m_IngredientsSpawnPoint[m_IngredientsSpawnNum[m_IngredientsSpawnNumType][nCnt]].x ,
 				m_IngredientsSpawnPoint[m_IngredientsSpawnNum[m_IngredientsSpawnNumType][nCnt]].y + 200.0f,
-				m_IngredientsSpawnPoint[m_IngredientsSpawnNum[m_IngredientsSpawnNumType][nCnt]].z }, { 0.0f,0.0f,0.0f }, { 1.0,1.0,1.0 }, static_cast<CIngredients::IngredientsType>(nType));
+				m_IngredientsSpawnPoint[m_IngredientsSpawnNum[m_IngredientsSpawnNumType][nCnt]].z },
+				{ 0.0f,0.0f,0.0f }, { 1.0,1.0,1.0 }, static_cast<CIngredients::IngredientsType>(nType));
 
 		}
 		m_IngredientsSpawnNumType++;

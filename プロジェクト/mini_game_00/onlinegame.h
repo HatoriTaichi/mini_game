@@ -29,7 +29,7 @@ static const int OnLineMaxIngredients = 5;
 class COnlineGame
 {
 public:
-	static const int OffSetArrayMax = 3;//Å‘å”z—ñ
+	static const int OffSetArrayMax = 20;//Å‘å”z—ñ
 
 	enum GameMode
 	{
