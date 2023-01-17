@@ -561,7 +561,7 @@ void COnlineGame::ItemSpawn(void)
 			{
 				nType = 0;
 			}
-			if (m_ItemSpawnNumType > OnlineGame_OffSetArrayMax)
+			if (m_ItemSpawnNumType > NormalItemSpawnMax)
 			{
 				m_ItemSpawnNumType = 0;
 			}
@@ -712,7 +712,7 @@ void COnlineGame::IngredientsSpawn(void)
 			{
 				nType = 0;
 			}
-			if (m_IngredientsSpawnNumType > OnlineGame_OffSetArrayMax)
+			if (m_IngredientsSpawnNumType > NormalIngredientsSpawnMax)
 			{
 				m_IngredientsSpawnNumType = 0;
 			}
