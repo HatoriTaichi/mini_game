@@ -291,11 +291,11 @@ HRESULT COnlineGame::Init(void)
 					{
 					case 1:
 						m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_2.txt", m_nPlayerNumber);
+							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt", m_nPlayerNumber);
 						break;
 					case 2:
 						m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt", m_nPlayerNumber);
+							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_2.txt", m_nPlayerNumber);
 						break;
 					}
 				}
@@ -339,6 +339,7 @@ void COnlineGame::Uninit(void)
 //=============================================================================
 void COnlineGame::Update(void)
 {
+
 	//プレイヤー情報をサーバーに送信
 	CCommunicationData::COMMUNICATION_DATA *player_data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
 	CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetEnemyData()->GetCmmuData();
@@ -429,6 +430,24 @@ void COnlineGame::Update(void)
 
 	}
 	//DrawDebugText();
+}
+//=============================================================================
+// デバッグテキスト
+//=============================================================================
+void COnlineGame::Drawtext(void)
+{
+	RECT rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+	char str[3000];
+	int nNum = 0;
+
+	nNum = sprintf(&str[0], "\n\n\n\n\n\n\n\n\n\n 情報 \n");
+
+	nNum += sprintf(&str[nNum], " [numPlayer] %d\n", m_nPlayerNumber);
+	LPD3DXFONT pFont = CManager::GetInstance()->GetRenderer()->GetFont();
+	// テキスト描画
+	pFont->DrawText(NULL, str, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));
+
+
 }
 
 //=============================================================================

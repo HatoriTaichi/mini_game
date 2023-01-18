@@ -52,6 +52,7 @@ public:
 	void ItemConfigLoad(const char* FileName);//アイテムや具材の設定を読み込む
 
 private:
+	void Drawtext(void);
 	void Matching(void);	// マッチング
 	CEnemyPlayer *m_enemy_player;	// 敵
 	vector<D3DXVECTOR3> m_IngredientsSpawnPoint;//具材のスポーンポイント
