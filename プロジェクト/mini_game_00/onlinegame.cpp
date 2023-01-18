@@ -286,21 +286,16 @@ HRESULT COnlineGame::Init(void)
 				//プレイヤーの生成
 				if (!m_pPlayer[0])
 				{
-					// データを取得
-					CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetEnemyData()->GetCmmuData();
-
-					//プレイヤー識別番号を保存
-					m_nPlayerNumber = data->player.number;
 					//プレイヤー識別番号によってプレイヤーのモデルを変える
-					switch (data->player.number)
+					switch (m_nPlayerNumber)
 					{
 					case 1:
 						m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_2.txt", data->player.number);
+							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_2.txt", m_nPlayerNumber);
 						break;
 					case 2:
 						m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt", data->player.number);
+							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt", m_nPlayerNumber);
 						break;
 					}
 				}
@@ -483,6 +478,8 @@ void COnlineGame::Matching(void)
 		}
 
 	}
+	//プレイヤー識別番号を保存
+	m_nPlayerNumber = player_data->player.number;
 
 	// 送信
 	memcpy(&send_data[0], player_data, sizeof(CCommunicationData::COMMUNICATION_DATA));

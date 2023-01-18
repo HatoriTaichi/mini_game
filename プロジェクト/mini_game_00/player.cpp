@@ -394,10 +394,9 @@ void CPlayer::Draw(void)
 			m_pColliNoDrop[nCnt]->Draw();
 		}
 	}
-	if (m_nNumPlayer == 0)
-	{
-		FollowingPlayerCamera();
-	}
+
+	FollowingPlayerCamera();
+
 #ifdef _DEBUG
 	Drawtext();
 
