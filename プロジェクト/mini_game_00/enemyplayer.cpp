@@ -215,15 +215,6 @@ bool CEnemyPlayer::Collision(const D3DXVECTOR3& pos, const float& fSize)
 //=============================================================================
 void CEnemyPlayer::Drawtext(void)
 {
-	RECT rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
-	char str[3000];
-	int nNum = 0;
-
-	nNum = sprintf(&str[0], "\n\n\n\n\n\n\n\n\n\n\n\n 情報 \n");
-	nNum += sprintf(&str[nNum], " [numEnemyPlayer] %d\n", m_number);
-	LPD3DXFONT pFont = CManager::GetInstance()->GetRenderer()->GetFont();
-	// テキスト描画
-	pFont->DrawText(NULL, str, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));
 
 }
 //=============================================================================

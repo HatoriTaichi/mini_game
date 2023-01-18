@@ -1,0 +1,16 @@
+#*********************************************************
+#テクスチャのパス読み込む(主にエフェクト、パーティクル)
+#*********************************************************
+
+#*********************************************************
+# テクスチャファイル名
+#*********************************************************
+TEXTURE_FILENAME = data/Texture/Effect/Effect000.jpg				//０丸
+TEXTURE_FILENAME = data/Texture/Effect/GraySmoke.png				//１灰煙
+TEXTURE_FILENAME = data/Texture/Effect/BrownSmoke.png				//２茶煙
+TEXTURE_FILENAME = data/Texture/Effect/Target0.png				//３円
+TEXTURE_FILENAME = data/Texture/Effect/ster.png					//４星
+TEXTURE_FILENAME = data/Texture/Effect/wind_cut.png				//５風切り
+TEXTURE_FILENAME = data/Texture/Effect/trans.png					//６四角
+
+END_SCRIPT

@@ -32,8 +32,8 @@
 // 静的メンバ変数宣言
 //=============================================================================
 bool COnlineGame::m_is_onece = true;
-vector<int> COnlineGame::m_IngredientsSpawnNum[OffSetArrayMax];
-vector<int> COnlineGame::m_ItemSpawnNum[OffSetArrayMax];
+vector<int> COnlineGame::m_IngredientsSpawnNum[OnlineGame_OffSetArrayMax];
+vector<int> COnlineGame::m_ItemSpawnNum[OnlineGame_OffSetArrayMax];
 
 //=============================================================================
 // 
@@ -135,27 +135,6 @@ HRESULT COnlineGame::Init(void)
 		{
 			if (m_is_onece)
 			{
-				//プレイヤーの生成
-				if (!m_pPlayer[0])
-				{
-					// データを取得
-					CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetEnemyData()->GetCmmuData();
-
-					//プレイヤー識別番号を保存
-					m_nPlayerNumber = data->player.number;
-					//プレイヤー識別番号によってプレイヤーのモデルを変える
-					switch (data->player.number)
-					{
-					case 0:
-						m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt", data->player.number);
-						break;
-					case 1:
-						m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_2.txt", data->player.number);
-						break;
-					}
-				}
 				//if (!m_pPlayer[1])
 				//{
 				//	m_pPlayer[1] = CPlayer::Create(D3DXVECTOR3(100.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
@@ -303,6 +282,24 @@ HRESULT COnlineGame::Init(void)
 						Stage.mesh_info[0].division_y_or_z["FIELDSET"][nFloor],
 						"wooden_floor.png");
 				}
+
+				//プレイヤーの生成
+				if (!m_pPlayer[0])
+				{
+					//プレイヤー識別番号によってプレイヤーのモデルを変える
+					switch (m_nPlayerNumber)
+					{
+					case 1:
+						m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt", m_nPlayerNumber);
+						break;
+					case 2:
+						m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_2.txt", m_nPlayerNumber);
+						break;
+					}
+				}
+
 				//EnemySpawn();
 				m_is_onece = false;
 				m_nLastSoundCount = 0;
@@ -318,7 +315,6 @@ HRESULT COnlineGame::Init(void)
 			break;
 		}
 	}
-
 	return S_OK;
 }
 
@@ -343,6 +339,7 @@ void COnlineGame::Uninit(void)
 //=============================================================================
 void COnlineGame::Update(void)
 {
+
 	//プレイヤー情報をサーバーに送信
 	CCommunicationData::COMMUNICATION_DATA *player_data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
 	CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetEnemyData()->GetCmmuData();
@@ -434,6 +431,24 @@ void COnlineGame::Update(void)
 	}
 	//DrawDebugText();
 }
+//=============================================================================
+// デバッグテキスト
+//=============================================================================
+void COnlineGame::Drawtext(void)
+{
+	RECT rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+	char str[3000];
+	int nNum = 0;
+
+	nNum = sprintf(&str[0], "\n\n\n\n\n\n\n\n\n\n 情報 \n");
+
+	nNum += sprintf(&str[nNum], " [numPlayer] %d\n", m_nPlayerNumber);
+	LPD3DXFONT pFont = CManager::GetInstance()->GetRenderer()->GetFont();
+	// テキスト描画
+	pFont->DrawText(NULL, str, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));
+
+
+}
 
 //=============================================================================
 // マッチング
@@ -482,6 +497,8 @@ void COnlineGame::Matching(void)
 		}
 
 	}
+	//プレイヤー識別番号を保存
+	m_nPlayerNumber = player_data->player.number;
 
 	// 送信
 	memcpy(&send_data[0], player_data, sizeof(CCommunicationData::COMMUNICATION_DATA));
@@ -559,9 +576,9 @@ void COnlineGame::ItemSpawn(void)
 		{
 			if (nType >= CItem::ItemType::TypeMax)
 			{
-				m_ItemSpawnNumType = 0;
+				nType = 0;
 			}
-			if (m_ItemSpawnNumType >= OffSetArrayMax)
+			if (m_ItemSpawnNumType >= OnlineGame_OffSetArrayMax)
 			{
 				m_ItemSpawnNumType = 0;
 			}
@@ -710,9 +727,9 @@ void COnlineGame::IngredientsSpawn(void)
 		{
 			if (nType >= CIngredients::IngredientsType::Max)
 			{
-				m_IngredientsSpawnNumType = 0;
+				nType = 0;
 			}
-			if (m_IngredientsSpawnNumType >= OffSetArrayMax)
+			if (m_IngredientsSpawnNumType >= OnlineGame_OffSetArrayMax)
 			{
 				m_IngredientsSpawnNumType = 0;
 			}
@@ -747,6 +764,9 @@ void COnlineGame::ItemConfigLoad(const char* FileName)
 	int nNumIngredients = 0;//今読み取っている敵の数
 	int nNumItem = 0;//今読み取っている敵の数
 	int nInterval = 0;
+	int nMaxItem = 0;
+	int nMaxIngredients = 0;//今読み取っている敵の数
+
 	pFile = fopen(FileName, "r");
 	//pFileのNULLチェック
 	if (pFile != NULL)
@@ -759,6 +779,14 @@ void COnlineGame::ItemConfigLoad(const char* FileName)
 		{
 			fscanf(pFile, "%s", &string[1]);
 
+			if (strcmp(string[1], "ITEM_SPAWN_NUM") == 0)
+			{
+				fscanf(pFile, "%d", &nMaxItem);
+			}
+			if (strcmp(string[1], "INGREDIENTS_SPAWN_NUM") == 0)
+			{
+				fscanf(pFile, "%d", &nMaxIngredients);
+			}
 			//具材の出現位置を読み込む
 			while (strcmp(string[1], "INGREDIENTS_POSNUM") == 0)
 			{
@@ -773,7 +801,7 @@ void COnlineGame::ItemConfigLoad(const char* FileName)
 					//位置の番号
 					if (strcmp(string[3], "POS_NUM") == 0)
 					{
-						for (int nCnt = 0; nCnt < NormalIngredientsSpawnMax; nCnt++)
+						for (int nCnt = 0; nCnt < nMaxIngredients; nCnt++)
 						{
 							fscanf(pFile, "%d", &nPosNum);
 							m_IngredientsSpawnNum[nNumIngredients].push_back(nPosNum);
@@ -804,7 +832,7 @@ void COnlineGame::ItemConfigLoad(const char* FileName)
 					//位置の番号
 					if (strcmp(string[3], "POS_NUM") == 0)
 					{
-						for (int nCnt = 0; nCnt < NormalItemSpawnMax; nCnt++)
+						for (int nCnt = 0; nCnt < nMaxItem; nCnt++)
 						{
 							fscanf(pFile, "%d", &nPosNum);
 							m_ItemSpawnNum[nNumItem].push_back(nPosNum);

@@ -6,6 +6,10 @@ BEGIN_SCRIPT
 // 具材、アイテムそれぞれSET_POSNUMを3つまで書くことが出来る(それ以上だと過剰分読み込まれない)
 //=============================================================================
 
+ITEM_SPAWN_NUM 2
+
+INGREDIENTS_SPAWN_NUM 8
+
 
 INGREDIENTS_POSNUM
 
