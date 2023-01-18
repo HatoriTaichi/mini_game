@@ -42,6 +42,8 @@ private:
 	static CCommunicationData m_player_data;	// プレイヤーデータ
 	static CCommunicationData m_enemy_data;	// 敵データ
 	static CTcpClient *m_communication;	// 通信クラス
+	static bool m_is_recv;	// レシーブしたか
+	static bool m_is_recv_success;	// レシーブ成功したか
 };
 
 #endif // _TCP_CLIENT_H_

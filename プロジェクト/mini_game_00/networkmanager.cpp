@@ -18,6 +18,8 @@
 CCommunicationData CNetWorkManager::m_player_data;
 CCommunicationData CNetWorkManager::m_enemy_data;
 CTcpClient *CNetWorkManager::m_communication;
+bool CNetWorkManager::m_is_recv;
+bool CNetWorkManager::m_is_recv_success;
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -77,6 +79,7 @@ void CNetWorkManager::Uninit(void)
 //=============================================================================
 void CNetWorkManager::Recv(void)
 {
+	m_is_recv = false;
 	int recv_size = 1;	// 受信データサイズ(初期値は最初の為1)
 
 	// 生成されていたら
@@ -94,6 +97,7 @@ void CNetWorkManager::Recv(void)
 
 				// 受信
 				recv_size = m_communication->Recv(&recv_data[0], sizeof(CCommunicationData::COMMUNICATION_DATA));
+				m_is_recv = true;
 
 				// メモリのコピー
 				memcpy(data_buf, &recv_data[0], sizeof(CCommunicationData::COMMUNICATION_DATA));
@@ -101,6 +105,7 @@ void CNetWorkManager::Recv(void)
 				// 受信されてなかったら
 				if (recv_size <= 0)
 				{
+					m_is_recv_success = false;
 					break;
 				}
 				// それ以外
@@ -120,6 +125,7 @@ void CNetWorkManager::Recv(void)
 						// 情報を入れる
 						*data = *data_buf;
 					}
+					m_is_recv_success = true;
 				}
 			}
 			CCommunicationData::COMMUNICATION_DATA *data = m_player_data.GetCmmuData();	// 自分の情報を取得
