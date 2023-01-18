@@ -294,11 +294,11 @@ HRESULT COnlineGame::Init(void)
 					//プレイヤー識別番号によってプレイヤーのモデルを変える
 					switch (data->player.number)
 					{
-					case 0:
+					case 1:
 						m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_2.txt", data->player.number);
 						break;
-					case 1:
+					case 2:
 						m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt", data->player.number);
 						break;
