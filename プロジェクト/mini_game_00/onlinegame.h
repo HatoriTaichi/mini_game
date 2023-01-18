@@ -17,7 +17,7 @@ class CCounter;
 class CMove_UI;
 static const int OnLineMaxPlayer = 2;
 static const int OnLineMaxIngredients = 5;
-static const int OnlineGame_OffSetArrayMax = 20;//最大配列
+static const int OnlineGame_OffSetArrayMax = 3;//最大配列
 
 //*****************************************************************************
 // ヘッダファイルのインクルード

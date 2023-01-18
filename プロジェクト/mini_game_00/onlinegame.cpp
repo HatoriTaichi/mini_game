@@ -135,27 +135,6 @@ HRESULT COnlineGame::Init(void)
 		{
 			if (m_is_onece)
 			{
-				//プレイヤーの生成
-				if (!m_pPlayer[0])
-				{
-					// データを取得
-					CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetEnemyData()->GetCmmuData();
-
-					//プレイヤー識別番号を保存
-					m_nPlayerNumber = data->player.number;
-					//プレイヤー識別番号によってプレイヤーのモデルを変える
-					switch (data->player.number)
-					{
-					case 0:
-						m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt", data->player.number);
-						break;
-					case 1:
-						m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_2.txt", data->player.number);
-						break;
-					}
-				}
 				//if (!m_pPlayer[1])
 				//{
 				//	m_pPlayer[1] = CPlayer::Create(D3DXVECTOR3(100.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
@@ -303,6 +282,29 @@ HRESULT COnlineGame::Init(void)
 						Stage.mesh_info[0].division_y_or_z["FIELDSET"][nFloor],
 						"wooden_floor.png");
 				}
+
+				//プレイヤーの生成
+				if (!m_pPlayer[0])
+				{
+					// データを取得
+					CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetEnemyData()->GetCmmuData();
+
+					//プレイヤー識別番号を保存
+					m_nPlayerNumber = data->player.number;
+					//プレイヤー識別番号によってプレイヤーのモデルを変える
+					switch (data->player.number)
+					{
+					case 0:
+						m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_2.txt", data->player.number);
+						break;
+					case 1:
+						m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt", data->player.number);
+						break;
+					}
+				}
+
 				//EnemySpawn();
 				m_is_onece = false;
 				m_nLastSoundCount = 0;
@@ -318,7 +320,6 @@ HRESULT COnlineGame::Init(void)
 			break;
 		}
 	}
-
 	return S_OK;
 }
 
@@ -557,11 +558,11 @@ void COnlineGame::ItemSpawn(void)
 	{
 		for (int nCnt = 0; nCnt < NormalItemSpawnMax; nCnt++, nType++)
 		{
-			if (nType > CItem::ItemType::TypeMax)
+			if (nType >= CItem::ItemType::TypeMax)
 			{
 				nType = 0;
 			}
-			if (m_ItemSpawnNumType > NormalItemSpawnMax)
+			if (m_ItemSpawnNumType >= OnlineGame_OffSetArrayMax)
 			{
 				m_ItemSpawnNumType = 0;
 			}
@@ -708,11 +709,11 @@ void COnlineGame::IngredientsSpawn(void)
 	{
 		for (int nCnt = 0; nCnt < NormalIngredientsSpawnMax; nCnt++, nType++)
 		{
-			if (nType > CIngredients::IngredientsType::Max)
+			if (nType >= CIngredients::IngredientsType::Max)
 			{
 				nType = 0;
 			}
-			if (m_IngredientsSpawnNumType > NormalIngredientsSpawnMax)
+			if (m_IngredientsSpawnNumType >= OnlineGame_OffSetArrayMax)
 			{
 				m_IngredientsSpawnNumType = 0;
 			}

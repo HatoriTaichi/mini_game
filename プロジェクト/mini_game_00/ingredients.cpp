@@ -458,7 +458,7 @@ void CIngredients::ColisionEnemyPlayer(void)
 					pEnemyPlayer->SetIngredients(m_Type);
 					if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NETWORK_MODE::ON_LINE)
 					{
-						CManager::GetInstance()->GetSceneManager()->GetOnloineGame()->AddIngredientsCnt(1, m_Type, nCnt -1);
+						CManager::GetInstance()->GetSceneManager()->GetOnloineGame()->AddIngredientsCnt(1, m_Type, nCnt + 1);
 					}
 					if (!m_bDoDrop)
 					{
