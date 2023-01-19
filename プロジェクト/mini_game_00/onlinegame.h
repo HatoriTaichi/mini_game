@@ -44,10 +44,7 @@ public:
 	void Uninit(void);	// 終了
 	void Update(void);	// 更新 
 	void ItemSpawn(void);
-	void EnemySpawn(void);
 	void IngredientsSpawn(void);
-	void RandomItemSpawn(void);
-	void RandomIngredientsSpawn(void);
 	void AddIngredientsCnt(int nNumAdd, int nIngredients, int nPlayer);//具材の加算
 	void ItemConfigLoad(const char* FileName);//アイテムや具材の設定を読み込む
 
@@ -60,7 +57,7 @@ private:
 	static vector<int> m_IngredientsSpawnNum[OnlineGame_OffSetArrayMax];//具材の事前出現番号
 	static vector<int> m_ItemSpawnNum[OnlineGame_OffSetArrayMax];//具材の事前出現番号
 	GameMode m_Mode;//ゲーム中のモード
-	CPlayer *m_pPlayer[OnLineMaxPlayer];
+	CPlayer *m_pPlayer;
 	CObject2D *m_pBandUI;
 	CObject2D *m_pIngredientsUI[OnLineMaxIngredients][OnLineMaxPlayer];//具材のUI 
 	CCounter *m_pIngredientsCnt[OnLineMaxIngredients][OnLineMaxPlayer];//具材のカウント
@@ -68,8 +65,6 @@ private:
 	CMove_UI *m_pStartUI;
 	CMove_UI *m_pFinishUI;
 	CMove_UI *m_pLastSpurtUI;
-	int *m_NumIngredientsSpawnPoint;
-	int *m_NumItemSpawnPoint;
 	int m_IngredientsSpawnNumType;
 	int m_ItemSpawnNumType;
 	int m_MaxIngredientsSpawn;

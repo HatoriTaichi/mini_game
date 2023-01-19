@@ -97,8 +97,6 @@ COnlineGame::COnlineGame()
 	m_IngredientsSpawnMax[ClimaxMode] = ClimaxIngredientsSpawnMax;
 	m_ItemSpawnMin[ClimaxMode] = ClimaxItemSpawnMin;
 	m_ItemSpawnMax[ClimaxMode] = ClimaxItemSpawnMax;
-	m_NumIngredientsSpawnPoint = nullptr;
-	m_NumItemSpawnPoint = nullptr;
 	m_ItemSpawnTimer = NormalItemSpawnInterval;
 	m_pBandUI = nullptr;
 	m_pGameTimer = nullptr;
@@ -108,7 +106,13 @@ COnlineGame::COnlineGame()
 	m_pLastSpurtUI = nullptr;
 	memset(m_pIngredientsUI, NULL, sizeof(m_pIngredientsUI));
 	CManager::GetInstance()->GetCamera()->SetRot(CAMERA_ROT);
-
+	m_ItemSpawnPoint.clear();
+	m_UITimer = 0;
+	m_bIsGameStart = false;
+	m_nPlayerNumber = 0;
+	m_MaxIngredientsSpawn = 0;
+	m_MaxItemSpawn = 0;
+	m_MaxEnemySpawn = 0;
 }
 
 //=============================================================================
@@ -284,17 +288,17 @@ HRESULT COnlineGame::Init(void)
 				}
 
 				//プレイヤーの生成
-				if (!m_pPlayer[0])
+				if (!m_pPlayer)
 				{
 					//プレイヤー識別番号によってプレイヤーのモデルを変える
 					switch (m_nPlayerNumber)
 					{
 					case 1:
-						m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+						m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt", m_nPlayerNumber);
 						break;
 					case 2:
-						m_pPlayer[0] = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+						m_pPlayer = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 							D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_2.txt", m_nPlayerNumber);
 						break;
 					}
@@ -323,14 +327,71 @@ HRESULT COnlineGame::Init(void)
 //=============================================================================
 void COnlineGame::Uninit(void)
 {
-	for (int nPlayer = 0; nPlayer < OnLineMaxPlayer; nPlayer++)
+	if (m_pPlayer)
 	{
-		if (m_pPlayer[nPlayer])
+		m_pPlayer->Uninit();
+		m_pPlayer = nullptr;
+	}
+
+	m_ItemSpawnPoint.clear();
+	m_IngredientsSpawnPoint.clear();
+	for (int nCnt = 0; nCnt < OnlineGame_OffSetArrayMax; nCnt++)
+	{
+		m_IngredientsSpawnNum[nCnt].clear();
+		m_ItemSpawnNum[nCnt].clear();
+	}
+	if (m_pStartUI)
+	{
+		m_pStartUI->Uninit();
+		m_pStartUI = nullptr;
+	}
+	if (m_enemy_player)
+	{
+		m_enemy_player->Uninit();
+		m_enemy_player = nullptr;
+	}
+	if (m_pBandUI)
+	{
+		m_pBandUI->Uninit();
+		m_pBandUI = nullptr;
+	}
+	for (int nCnt = 0; nCnt < OnLineMaxIngredients; nCnt++)
+	{
+		for (int nPlayer = 0; nPlayer < OnLineMaxPlayer; nPlayer++)
 		{
-			m_pPlayer[nPlayer]->Uninit();
-			m_pPlayer[nPlayer] = nullptr;
+			if (m_pIngredientsUI[nCnt][nPlayer])
+			{
+				m_pIngredientsUI[nCnt][nPlayer]->Uninit();
+				m_pIngredientsUI[nCnt][nPlayer] = nullptr;
+			}
+			if (m_pIngredientsCnt[nCnt][nPlayer])
+			{
+				m_pIngredientsCnt[nCnt][nPlayer]->Uninit();
+				m_pIngredientsCnt[nCnt][nPlayer] = nullptr;
+			}
 		}
 	}
+	if (m_pGameTimer)
+	{
+		m_pGameTimer->Uninit();
+		m_pGameTimer = nullptr;
+	}
+	if (m_pStartUI)
+	{
+		m_pStartUI->Uninit();
+		m_pStartUI = nullptr;
+	}
+	if (m_pFinishUI)
+	{
+		m_pFinishUI->Uninit();
+		m_pFinishUI = nullptr;
+	}
+	if (m_pLastSpurtUI)
+	{
+		m_pLastSpurtUI->Uninit();
+		m_pLastSpurtUI = nullptr;
+	}
+
 
 }
 
@@ -507,65 +568,6 @@ void COnlineGame::Matching(void)
 //=============================================================================
 // アイテム出現処理
 //=============================================================================
-void COnlineGame::RandomItemSpawn(void)
-{
-	m_ItemSpawnTimer++;
-
-	if (m_ItemSpawnTimer >= m_ItemSpawnInterval[m_Mode])
-	{
-		std::random_device random;	// 非決定的な乱数生成器
-		std::mt19937_64 mt(random());// メルセンヌ・ツイスタの64ビット版、引数は初期シード
-		std::uniform_int_distribution<> randItemType(1, 3);
-		std::uniform_int_distribution<> randItemPosType(0, m_MaxItemSpawn);
-		bool *bOverlapPos = nullptr;
-		bOverlapPos = new bool[m_MaxItemSpawn];
-		for (int nCntNum = 0; nCntNum < m_MaxItemSpawn; nCntNum++)
-		{
-			bOverlapPos[nCntNum] = false;
-		}
-		//アイテムのスポーンポイント番号を動的確保
-		m_NumItemSpawnPoint = new int[NormalItemSpawnMin];
-		//アイテムのスポーンポイント番号を初期化
-		for (int nCntNum = 0; nCntNum < NormalItemSpawnMin; nCntNum++)
-		{
-			m_NumItemSpawnPoint[nCntNum] = -1;
-		}
-		for (int nCnt = 0; nCnt < NormalItemSpawnMin; nCnt++)
-		{
-			bool bStop = false;//ループ終了用変数
-			while (!bStop)
-			{
-				//ランダムな位置を決める
-				int nCntType = randItemPosType(mt);
-
-				for (int nCntPoint = 0; nCntPoint < NormalItemSpawnMin; nCntPoint++)
-				{
-					if (!bOverlapPos[nCntType])
-					{
-						//アイテムのスポーンポイントを代入
-						m_NumItemSpawnPoint[nCnt] = nCntType;
-						bOverlapPos[nCntType] = true;
-						bStop = true;
-						break;
-					}
-				}
-			}
-			//アイテムの種類を代入
-			int nType = randItemType(mt);
-			//アイテムを生成
-			CItem::Create({ m_ItemSpawnPoint[m_NumItemSpawnPoint[nCnt]].x ,
-				m_ItemSpawnPoint[m_NumItemSpawnPoint[nCnt]].y + 200.0f,
-				m_ItemSpawnPoint[m_NumItemSpawnPoint[nCnt]].z }, { 7.0f,7.0f,0.0f }, static_cast<CItem::ItemType>(nType));
-		}
-
-		//スポーンタイマーを初期化
-		m_ItemSpawnTimer = 0;
-	}
-
-}
-//=============================================================================
-// アイテム出現処理
-//=============================================================================
 void COnlineGame::ItemSpawn(void)
 {
 	m_ItemSpawnTimer++;
@@ -595,125 +597,7 @@ void COnlineGame::ItemSpawn(void)
 
 }
 
-////=============================================================================
-//// 敵出現処理
-////=============================================================================
-//void COnlineGame::EnemySpawn(void)
-//{
-//	std::random_device random;	// 非決定的な乱数生成器
-//	std::mt19937_64 mt(random());// メルセンヌ・ツイスタの64ビット版、引数は初期シード
-//	std::uniform_int_distribution<> randEnemyPosType(0, m_MaxEnemySpawn);
-//	bool *bOverlapPos = nullptr;
-//	bOverlapPos = new bool[m_MaxEnemySpawn];
-//	for (int nCntNum = 0; nCntNum < m_MaxEnemySpawn; nCntNum++)
-//	{
-//		bOverlapPos[nCntNum] = false;
-//	}
-//	//具材をスポーン
-//	int nSize = m_IngredientsSpawnPoint.size();
-//	if (nSize != 0)
-//	{
-//		//具材を配置する最大値を決める
-//		int nCntMax = EnemySpawnMax;
-//		//具材の
-//		m_NumIngredientsSpawnPoint = new int[nCntMax];
-//		//数値の初期化
-//		for (int nCntNum = 0; nCntNum < nCntMax; nCntNum++)
-//		{
-//			m_NumIngredientsSpawnPoint[nCntNum] = -1;
-//		}
-//		for (int nCnt = 0; nCnt < nCntMax; nCnt++)
-//		{
-//			bool bHoge = false;
-//			while (!bHoge)
-//			{
-//				//ランダムな位置を決める
-//				int nCntType = randEnemyPosType(mt);
-//
-//				for (int nCntPoint = 0; nCntPoint < nCntMax; nCntPoint++)
-//				{
-//					if (!bOverlapPos[nCntType])
-//					{
-//						m_NumIngredientsSpawnPoint[nCnt] = nCntType;
-//						bOverlapPos[nCntType] = true;
-//						bHoge = true;
-//						break;
-//					}
-//				}
-//			}
-//			CEnemy::Create(m_IngredientsSpawnPoint[m_NumIngredientsSpawnPoint[nCnt]], D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/motion.txt");
-//		}
-//	}
-//
-//}
 
-//=============================================================================
-// 具材出現処理
-//=============================================================================
-void COnlineGame::RandomIngredientsSpawn(void)
-{
-	//スポーンタイマーを加算
-	m_IngredientsSpawnTimer++;
-
-	if (m_IngredientsSpawnTimer >= IngredientsSpawnInterval)
-	{
-		std::random_device random;	// 非決定的な乱数生成器
-		std::mt19937_64 mt(random());// メルセンヌ・ツイスタの64ビット版、引数は初期シード
-		//ランダムな具材の個数
-		std::uniform_int_distribution<> randIngredientsCnt(NormalIngredientsSpawnMin, NormalIngredientsSpawnMax);
-		//ランダムな具材の種類
-		std::uniform_int_distribution<> randIngredientsType(0, 5);
-		//ランダムな出現位置
-		std::uniform_int_distribution<> randIngredientsPosType(0, m_MaxIngredientsSpawn);
-		bool *bOverlapPos = nullptr;//一度出現したところに出現しないようにするためのストッパー
-		//最大出現数まで動的確保
-		bOverlapPos = new bool[m_MaxIngredientsSpawn];
-		//初期化
-		for (int nCntNum = 0; nCntNum < m_MaxIngredientsSpawn; nCntNum++)
-		{
-			bOverlapPos[nCntNum] = false;
-		}
-		//具材を配置する最大値を決める
-		int nCntMax = randIngredientsCnt(mt);
-		//具材の出現数を動的確保
-		m_NumIngredientsSpawnPoint = new int[nCntMax];
-		//数値の初期化
-		for (int nCntNum = 0; nCntNum < nCntMax; nCntNum++)
-		{
-			m_NumIngredientsSpawnPoint[nCntNum] = -1;
-		}
-		for (int nCnt = 0; nCnt < nCntMax; nCnt++)
-		{
-			bool bStop = false;//ループ終了用変数
-			while (!bStop)
-			{
-				//ランダムな位置を決める
-				int nCntType = randIngredientsPosType(mt);
-
-				for (int nCntPoint = 0; nCntPoint < nCntMax; nCntPoint++)
-				{
-					if (!bOverlapPos[nCntType])
-					{
-						m_NumIngredientsSpawnPoint[nCnt] = nCntType;
-						bOverlapPos[nCntType] = true;
-						bStop = true;
-						break;
-					}
-				}
-			}
-			//ランダムな具材の種類を求める
-			int nType = randIngredientsType(mt);
-			//具材を生成
-			CIngredients::Create({ m_IngredientsSpawnPoint[m_NumIngredientsSpawnPoint[nCnt]].x ,
-				m_IngredientsSpawnPoint[m_NumIngredientsSpawnPoint[nCnt]].y + 200.0f,
-				m_IngredientsSpawnPoint[m_NumIngredientsSpawnPoint[nCnt]].z }, { 0.0f,0.0f,0.0f }, { 1.0,1.0,1.0 }, static_cast<CIngredients::IngredientsType>(nType));
-		}
-
-		//出現時間を初期化
-		m_IngredientsSpawnTimer = 0;
-	}
-
-}
 //=============================================================================
 // 具材出現処理
 //=============================================================================
