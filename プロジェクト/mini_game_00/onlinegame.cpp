@@ -425,6 +425,7 @@ void COnlineGame::Update(void)
 			CMove_UI::Create(FinishPos, FinishSize, StartTime, StartFadeTime, "Finish000.png", CMove_UI::UI_Type::Type_Start);
 			m_bIsFinishUiSet = true;
 			CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT, CSceneManager::FADE_MODE::NORMAL, 1.0f);
+			CManager::GetInstance()->GetNetWorkManager()->Uninit();
 		}
 
 		// ラストスパート(今の時間がLastSpartTime以下になったら)
