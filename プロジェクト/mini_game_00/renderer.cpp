@@ -122,7 +122,7 @@ HRESULT CRenderer::Init(const HWND &hWnd, const bool &bWindow)
 	m_direct3d_device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 	m_direct3d_device->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	// デバッグ情報表示用フォントの生成
 	D3DXCreateFont(	m_direct3d_device,
 					20,
@@ -136,7 +136,7 @@ HRESULT CRenderer::Init(const HWND &hWnd, const bool &bWindow)
 					DEFAULT_PITCH,
 					"Terminal", 
 					&m_font);
-#endif //!_DEBUG
+//#endif //!_DEBUG
 
 	return S_OK;
 }
@@ -146,14 +146,14 @@ HRESULT CRenderer::Init(const HWND &hWnd, const bool &bWindow)
 //=============================================================================
 void CRenderer::Uninit(void)
 {
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	// デバッグ情報表示用フォントの破棄
 	if (m_font != nullptr)
 	{
 		m_font->Release();
 		m_font = nullptr;
 	}
-#endif //!_DEBUG
+//#endif //!_DEBUG
 
 	// デバイスの破棄
 	if (m_direct3d_device != nullptr)
@@ -211,10 +211,10 @@ void CRenderer::Draw(void)
 			fade->Draw();
 		}
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 		// FPS表示
 		DrawFPS();
-#endif //!_DEBUG
+//#endif //!_DEBUG
 		// Direct3Dによる描画の終了
 		m_direct3d_device->EndScene();
 	}
@@ -222,7 +222,7 @@ void CRenderer::Draw(void)
 	m_direct3d_device->Present(nullptr, nullptr, nullptr, nullptr);
 }
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 //=============================================================================
 // FPS表示
 //=============================================================================
@@ -238,4 +238,4 @@ void CRenderer::DrawFPS(void)
 	// テキスト描画
 	m_font->DrawText(nullptr, str, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));
 }
-#endif //!_DEBUG
+//#endif //!_DEBUG
