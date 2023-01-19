@@ -20,7 +20,7 @@
 #define MAX_COMMU_DATA (1024)
 #define MAX_NO_DROP (4)
 #define SEND_FRAME (6)
-#define MAX_TIMER (90)
+#define MAX_TIMER (2)
 
 //-------------------------------
 // Classの定義
