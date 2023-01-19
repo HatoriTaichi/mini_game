@@ -60,7 +60,7 @@ public:
 	MODE GetMode(void) { return m_mode; }	// モード取得
 	void ChangeScene(CSceneManager::MODE mode, CSceneManager::FADE_MODE fade_mode, float fade_time);	// フェード
 	NETWORK_MODE GetNetWorkMode(void) { return m_network_mode; }	// フェード
-
+	void SetNetworkMode(NETWORK_MODE mode) { m_network_mode = mode; }
 private:
 	CFade *m_fade;	// フェードクラス
 	CTitle *m_title;	// タイトルクラス

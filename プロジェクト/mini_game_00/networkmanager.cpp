@@ -26,6 +26,8 @@ bool CNetWorkManager::m_is_recv_success;
 //=============================================================================
 CNetWorkManager::CNetWorkManager()
 {
+	// WSASÇÃèâä˙âª
+	CTcpClient::WSASInit();
 	m_player_data.Init();
 	m_enemy_data.Init();
 	m_communication = nullptr;
@@ -36,6 +38,8 @@ CNetWorkManager::CNetWorkManager()
 //=============================================================================
 CNetWorkManager::~CNetWorkManager()
 {
+	// WSASÇÃèIóπ
+	CTcpClient::WSASUninit();
 	m_player_data.Init();
 	m_enemy_data.Init();
 	m_communication = nullptr;
@@ -46,9 +50,6 @@ CNetWorkManager::~CNetWorkManager()
 //=============================================================================
 void CNetWorkManager::Init(void)
 {
-	// // WSASÇÃèâä˙âª
-	CTcpClient::WSASInit();
-
 	// ê∂ê¨ÇµÇƒÇ»Ç©Ç¡ÇΩÇÁ
 	if (m_communication == nullptr)
 	{
@@ -69,9 +70,6 @@ void CNetWorkManager::Uninit(void)
 		delete m_communication;
 		m_communication = nullptr;
 	}
-
-	// WSASÇÃèIóπ
-	CTcpClient::WSASUninit();
 }
 
 //=============================================================================

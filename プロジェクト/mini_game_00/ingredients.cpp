@@ -423,7 +423,11 @@ void CIngredients::ColisionPlayer(void)
 					}
 					if (!m_bDoDrop)
 					{
-						DeleteIngredient();
+						CSceneManager::NETWORK_MODE nNetWorkMode = CManager::GetInstance()->GetSceneManager()->GetNetWorkMode();
+						if (nNetWorkMode == CSceneManager::NETWORK_MODE::ON_LINE)
+						{
+							DeleteIngredient();
+						}
 					}
 					else
 					{

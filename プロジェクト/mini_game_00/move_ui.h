@@ -56,7 +56,7 @@ public:
 	void SetState(CMove_UI::State state) { m_state = state; }
 	// 生成(位置、サイズ、出現持続時間、フェードインアウトの時間)
 	static CMove_UI *Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale,
-		int nPopTime,int nFadeTime, string TexType, UI_Type type);
+		int nPopTime, int nFadeTime, string TexType, UI_Type type, D3DXCOLOR col = {1.0,1.0,1.0,1.0});
 	D3DXVECTOR3 GetPos(void) { return m_pos; }	// ゲッダー
 	D3DXVECTOR3 GetRot(void) { return m_rot; }	// ゲッダー
 	void SetCol(D3DXCOLOR col) { if (m_pUI) { m_pUI->SetCol(col); } }

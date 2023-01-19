@@ -222,9 +222,6 @@
     <ClInclude Include="communicationdata.h">
       <Filter>ソース ファイル\ネットワーク</Filter>
     </ClInclude>
-    <ClInclude Include="enemyplayer.h">
-      <Filter>ソース ファイル\キャラクター\敵</Filter>
-    </ClInclude>
     <ClInclude Include="onlinegame.h">
       <Filter>ソース ファイル\シーン\ゲームシーン</Filter>
     </ClInclude>
@@ -281,6 +278,9 @@
     </ClInclude>
     <ClInclude Include="fade.h">
       <Filter>ソース ファイル\マネージャー系</Filter>
+    </ClInclude>
+    <ClInclude Include="enemyplayer.h">
+      <Filter>ソース ファイル\キャラクター\敵</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

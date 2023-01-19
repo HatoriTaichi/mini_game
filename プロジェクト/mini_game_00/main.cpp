@@ -22,9 +22,9 @@
 // グローバル変数:
 //===========================================================
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 int	g_count_fps;	// FPSカウンタ
-#endif
+//#endif
 
 //=============================================================================
 // メイン関数
@@ -115,10 +115,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
 			// 0.5秒ごとに実行
 			if((current_time - fps_last_time) >= 500)
 			{
-#ifdef _DEBUG
+//#ifdef _DEBUG
 				// FPSを算出
 				g_count_fps = frame_count * 1000 / (current_time - fps_last_time);
-#endif
+//#endif
 				fps_last_time = current_time;	// 現在の時間を保存
 				frame_count = 0;
 			}
@@ -202,7 +202,7 @@ D3DXVECTOR3 VTransform(D3DXVECTOR3 InV, D3DXMATRIX InM)
 	return bif;
 }
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 //=============================================================================
 // FPS取得処理
 //=============================================================================
@@ -210,4 +210,4 @@ int GetFPS(void)
 {
 	return g_count_fps;
 }
-#endif
+//#endif

@@ -52,8 +52,8 @@ using namespace std;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 D3DXVECTOR3 VTransform(D3DXVECTOR3 InV, D3DXMATRIX InM);	//行列を使ったベクトルの変換
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 int GetFPS(void);
-#endif
+//#endif
 
 #endif // !_MAIN_H_

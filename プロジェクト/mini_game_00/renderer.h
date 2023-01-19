@@ -31,9 +31,9 @@ public:
 	LPDIRECT3DDEVICE9 GetDevice(void) { return m_direct3d_device; }	// デバイスの取得
 	LPD3DXFONT GetFont(void) { return m_font; }	// フォント
 private:
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	void DrawFPS(void);
-#endif //!_DEBUG
+//#endif //!_DEBUG
 	LPDIRECT3D9	m_direct3d;	// Direct3Dオブジェクト
 	LPDIRECT3DDEVICE9	m_direct3d_device;	// Deviceオブジェクト(描画に必要)
 	LPD3DXFONT	m_font;	// フォントへのポインタ
