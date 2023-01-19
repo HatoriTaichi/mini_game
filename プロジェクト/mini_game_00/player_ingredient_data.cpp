@@ -14,7 +14,12 @@
 //=============================================================================
 CPlayer_ingredient_data::CPlayer_ingredient_data()
 {
-	m_nGetIngredientsType.clear();
+	int nSize = m_nGetIngredientsType.size();
+	for (int nCnt = 0; nCnt < nSize; nCnt++)
+	{
+		m_nGetIngredientsType.pop_back();
+
+	}
 }
 
 //=============================================================================
@@ -38,8 +43,12 @@ HRESULT CPlayer_ingredient_data::Init(void)
 //=============================================================================
 void CPlayer_ingredient_data::Uninit(void)
 {
-	m_nGetIngredientsType.clear();
+	int nSize = m_nGetIngredientsType.size();
+	for (int nCnt = 0; nCnt < nSize; nCnt++)
+	{
+		m_nGetIngredientsType.pop_back();
 
+	}
 }
 
 //=============================================================================
