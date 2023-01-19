@@ -62,7 +62,7 @@ CPlayer_ingredient_data *CPlayer_ingredient_data::Create(void)
 //=============================================================================
 // ‹ïŞ‚Ìî•ñ‚ğ•Û‘¶
 //=============================================================================
-void CPlayer_ingredient_data::SetIngredientsType(vector<int> nGetIngredientsType)
+void CPlayer_ingredient_data::SetIngredientsType(const vector<int>& nGetIngredientsType)
 {
  	int nSize = nGetIngredientsType.size();
 	for (int nCnt = 0; nCnt < nSize; nCnt++)
