@@ -244,7 +244,6 @@ void CSceneManager::SetMode(MODE mode)
 		{
 			// ‰Šú‰»
 			m_network_mode = NETWORK_MODE::OFF_LINE;
-			CManager::GetInstance()->CreatePlayerData();
 			m_game->Init();
 		}
 		break;
@@ -256,6 +255,7 @@ void CSceneManager::SetMode(MODE mode)
 		{
 			// ‰Šú‰»
 			m_network_mode = NETWORK_MODE::ON_LINE;
+			CManager::GetInstance()->CreatePlayerData();
 
 			m_online_game->Init();
 

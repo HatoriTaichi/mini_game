@@ -43,14 +43,13 @@ HRESULT CPlayer_ingredient_data::Init(void)
 //=============================================================================
 void CPlayer_ingredient_data::Uninit(void)
 {
-	//int nSize = m_nGetIngredientsType.size();
-	//for (int nCnt = 0; nCnt < nSize; nCnt++)
-	//{
-	//	m_nGetIngredientsType.pop_back();
+	int nSize = m_nGetIngredientsType.size();
+	for (int nCnt = 0; nCnt < nSize; nCnt++)
+	{
+		m_nGetIngredientsType.pop_back();
 
-	//}
+	}
 
-	//int n = 0;
 }
 
 //=============================================================================
