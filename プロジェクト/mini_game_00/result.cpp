@@ -184,7 +184,6 @@ void CResult::Uninit(void)
 				m_pComboCounter[nCombo][nCntPlayer] = nullptr;
 			}
 		}
-		CManager::GetInstance()->GetPlayerIngredientData(nCntPlayer)->ResetGetIngredientsType();
 
 	}
 }
