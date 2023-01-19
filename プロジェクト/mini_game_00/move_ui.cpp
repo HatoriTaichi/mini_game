@@ -353,7 +353,7 @@ void CMove_UI::Move(void)
 // 生成(位置、サイズ、出現持続時間、フェードインアウトの時間)
 //=============================================================================
 CMove_UI *CMove_UI::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale,
-	int nPopTime, int nFadeTime, string TexType, UI_Type type)
+	int nPopTime, int nFadeTime, string TexType, UI_Type type, D3DXCOLOR col)
 {
 	// モデルのポインタ
 	CMove_UI *Ingredients = nullptr;
@@ -392,6 +392,7 @@ CMove_UI *CMove_UI::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale,
 		if (!Ingredients->m_pUI)
 		{
 			Ingredients->m_pUI = CObject2D::Create(Ingredients->m_pos, scale, TexType);
+			Ingredients->m_pUI->SetCol(col);
 		}
 		Ingredients->m_state = CMove_UI::State::ImmediatelyAfterPop;
 

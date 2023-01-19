@@ -62,8 +62,6 @@ private:
 	CObject2D *m_pIngredientsUI[OnLineMaxIngredients][OnLineMaxPlayer];//具材のUI 
 	CCounter *m_pIngredientsCnt[OnLineMaxIngredients][OnLineMaxPlayer];//具材のカウント
 	CCounter *m_pGameTimer;//ゲームのたいまー
-	CMove_UI *m_pStartUI;
-	CMove_UI *m_pFinishUI;
 	CMove_UI *m_pLastSpurtUI;
 	int m_IngredientsSpawnNumType;
 	int m_ItemSpawnNumType;

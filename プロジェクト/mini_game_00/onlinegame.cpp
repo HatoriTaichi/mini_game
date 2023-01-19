@@ -101,8 +101,6 @@ COnlineGame::COnlineGame()
 	m_pBandUI = nullptr;
 	m_pGameTimer = nullptr;
 	m_nGameTimeSeconds = 0;
-	m_pStartUI = nullptr;
-	m_pFinishUI = nullptr;
 	m_pLastSpurtUI = nullptr;
 	memset(m_pIngredientsUI, NULL, sizeof(m_pIngredientsUI));
 	CManager::GetInstance()->GetCamera()->SetRot(CAMERA_ROT);
@@ -340,11 +338,7 @@ void COnlineGame::Uninit(void)
 		m_IngredientsSpawnNum[nCnt].clear();
 		m_ItemSpawnNum[nCnt].clear();
 	}
-	if (m_pStartUI)
-	{
-		m_pStartUI->Uninit();
-		m_pStartUI = nullptr;
-	}
+
 	if (m_enemy_player)
 	{
 		m_enemy_player->Uninit();
@@ -376,16 +370,7 @@ void COnlineGame::Uninit(void)
 		m_pGameTimer->Uninit();
 		m_pGameTimer = nullptr;
 	}
-	if (m_pStartUI)
-	{
-		m_pStartUI->Uninit();
-		m_pStartUI = nullptr;
-	}
-	if (m_pFinishUI)
-	{
-		m_pFinishUI->Uninit();
-		m_pFinishUI = nullptr;
-	}
+
 	if (m_pLastSpurtUI)
 	{
 		m_pLastSpurtUI->Uninit();
@@ -422,10 +407,9 @@ void COnlineGame::Update(void)
 	}
 
 	//スタートUIを生成
-	if (!m_pStartUI&&m_UITimer >= StartSpawnTime)
+	if (m_UITimer >= StartSpawnTime)
 	{
-		m_pStartUI = CMove_UI::Create(StartPos, StartSize, StartTime, StartFadeTime, "Start000.png", CMove_UI::UI_Type::Type_Start);
-		m_pStartUI->SetCol({ 1.0,1.0,1.0,0.0f });
+		CMove_UI::Create(StartPos, StartSize, StartTime, StartFadeTime, "Start000.png", CMove_UI::UI_Type::Type_Start, { 1.0,1.0,1.0,0.0f });
 	}
 	if (m_pGameTimer)
 	{
@@ -435,10 +419,8 @@ void COnlineGame::Update(void)
 		if (m_pGameTimer->GetCounter() <= 0)
 		{
 			//フィニッシュUIを生成
-			if (!m_pFinishUI)
-			{
-				m_pFinishUI = CMove_UI::Create(FinishPos, FinishSize, StartTime, StartFadeTime, "Finish000.png", CMove_UI::UI_Type::Type_Start);
-			}
+			CMove_UI::Create(FinishPos, FinishSize, StartTime, StartFadeTime, "Finish000.png", CMove_UI::UI_Type::Type_Start);
+
 			CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT, CSceneManager::FADE_MODE::NORMAL, 1.0f);
 		}
 
