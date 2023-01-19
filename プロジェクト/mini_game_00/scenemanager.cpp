@@ -189,6 +189,7 @@ void CSceneManager::SetMode(MODE mode)
 			// I—¹ˆ—
 			m_game->Uninit();
 			m_game = nullptr;
+
 		}
 		break;
 	case MODE::ONLINE_GAME:
@@ -198,6 +199,7 @@ void CSceneManager::SetMode(MODE mode)
 			// I—¹ˆ—
 			m_online_game->Uninit();
 			m_online_game = nullptr;
+			CManager::GetInstance()->DeletePlayerData();
 		}
 		break;
 	case MODE::RESULT:
@@ -242,7 +244,7 @@ void CSceneManager::SetMode(MODE mode)
 		{
 			// ‰Šú‰»
 			m_network_mode = NETWORK_MODE::OFF_LINE;
-
+			CManager::GetInstance()->CreatePlayerData();
 			m_game->Init();
 		}
 		break;

@@ -45,6 +45,8 @@
 //=============================================================================
 CManager *CManager::m_single_manager;
 
+
+
 //=============================================================================
 // デフォルトコンストラクタ
 //=============================================================================
@@ -136,11 +138,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 		m_net_work_manager->Init();
 	}
 
-	// プレイヤー分のループ
-	for (int count_player = 0; count_player < MAX_PLAYER; count_player++)
-	{
-		m_player_ingredient_data[count_player] = CPlayer_ingredient_data::Create();
-	}
+	CreatePlayerData();
 
 	// シーンマネージャークラスの生成
 	m_scene_manager = new CSceneManager;
@@ -323,7 +321,8 @@ void CManager::Update(void)
 	{
 		m_scene_manager->Update();
 	}
-
+	//プレイヤー具材情報クラス
+	DeletePlayerData();
 	// レンダラークラス
 	if (m_renderer != nullptr)
 	{
@@ -390,4 +389,32 @@ CManager *CManager::GetInstance(void)
 		m_single_manager = new CManager;
 	}
 	return m_single_manager;
+}
+//================================================
+//プレイヤー具材情報の生成
+//================================================
+void CManager::CreatePlayerData(void)
+{
+	// プレイヤー分のループ
+	for (int count_player = 0; count_player < MAX_PLAYER; count_player++)
+	{
+		if (!m_player_ingredient_data[count_player])
+		{
+			m_player_ingredient_data[count_player] = CPlayer_ingredient_data::Create();
+		}
+	}
+}
+//================================================
+//プレイヤー具材情報の破棄
+//================================================
+void CManager::DeletePlayerData(void)
+{
+	for (int nCnt = 0; nCnt < MAX_PLAYER; nCnt++)
+	{
+		if (m_player_ingredient_data[nCnt])
+		{
+			m_player_ingredient_data[nCnt]->Uninit();
+			m_player_ingredient_data[nCnt] = nullptr;
+		}
+	}
 }

@@ -55,7 +55,8 @@ public:
 	CPlayer_ingredient_data *GetPlayerIngredientData(int num_player) { return m_player_ingredient_data[num_player]; }	// プレイヤーの具材情報
 	HWND GetWindowHandle() { return m_hwnd; }	// ウィンドウハンドル取得処理
 	void SetWindowHandle(HWND hWind) { m_hwnd = hWind; }	// ウィンドウハンドル設定処理
-
+	void CreatePlayerData(void);
+	void DeletePlayerData(void);
 private:
 	CManager();	// コンストラクタ
 	~CManager();	// デストラクタ
