@@ -180,6 +180,8 @@ void CManager::Uninit(void)
 {
 	// サウンドの停止
 	m_sound->Stop();
+	//プレイヤー具材情報クラス
+	DeletePlayerData();
 
 	// テクスチャの破棄
 	if (m_texture != nullptr)
@@ -321,8 +323,6 @@ void CManager::Update(void)
 	{
 		m_scene_manager->Update();
 	}
-	//プレイヤー具材情報クラス
-	DeletePlayerData();
 	// レンダラークラス
 	if (m_renderer != nullptr)
 	{
