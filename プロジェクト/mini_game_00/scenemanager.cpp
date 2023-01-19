@@ -199,7 +199,6 @@ void CSceneManager::SetMode(MODE mode)
 			// I—¹ˆ—
 			m_online_game->Uninit();
 			m_online_game = nullptr;
-			CManager::GetInstance()->DeletePlayerData();
 		}
 		break;
 	case MODE::RESULT:
@@ -209,6 +208,8 @@ void CSceneManager::SetMode(MODE mode)
 			// I—¹ˆ—
 			m_result->Uninit();
 			m_result = nullptr;
+			CManager::GetInstance()->DeletePlayerData();
+
 		}
 		break;
 	default:
