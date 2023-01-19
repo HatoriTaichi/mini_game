@@ -134,7 +134,7 @@ HRESULT COnlineGame::Init(void)
 
 	while (true)
 	{
-		if (!CNetWorkManager::GetAllConnect())
+		if (CNetWorkManager::GetAllConnect())
 		{
 			if (m_is_onece)
 			{
@@ -312,10 +312,11 @@ HRESULT COnlineGame::Init(void)
 				m_bLastBGMSoundToggle = false;
 
 			}
-		}
-		else if (CNetWorkManager::GetAllConnect())
-		{
-			break;
+			else
+			{
+				break;
+
+			}
 		}
 	}
 	return S_OK;

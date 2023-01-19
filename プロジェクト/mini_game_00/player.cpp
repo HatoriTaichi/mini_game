@@ -112,7 +112,7 @@ HRESULT CPlayer::Init(void)
 void CPlayer::Uninit(void)
 {
 	//‹ïŞ‚Ìî•ñ‚ğ•Û‘¶
-	CManager::GetInstance()->GetPlayerIngredientData(m_nNumPlayer)->SetIngredientsType(m_PlayerData.m_nGetIngredientsType);
+	CManager::GetInstance()->GetPlayerIngredientData(m_nNumPlayer -1)->SetIngredientsType(m_PlayerData.m_nGetIngredientsType);
 	// ƒTƒCƒY‚Ìæ“¾
 	int size = m_model.size();
 	for (int count_model = 0; count_model < size; count_model++)

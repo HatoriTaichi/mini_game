@@ -62,7 +62,7 @@ HRESULT CEnemyPlayer::Init(void)
 //=============================================================================
 void CEnemyPlayer::Uninit(void)
 {
-	CManager::GetInstance()->GetPlayerIngredientData(m_number)->SetIngredientsType(m_enemy_player_data.get_ingredients_type);
+	CManager::GetInstance()->GetPlayerIngredientData(m_number -1)->SetIngredientsType(m_enemy_player_data.get_ingredients_type);
 	// ƒTƒCƒY‚Ìæ“¾
 	int size = m_model.size();
 	for (int count_model = 0; count_model < size; count_model++)
