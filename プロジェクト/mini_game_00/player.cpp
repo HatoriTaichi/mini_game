@@ -315,8 +315,8 @@ void CPlayer::Update(void)
 
 	}
 	m_PlayerData.m_posold = m_PlayerData.m_pos;
-
-	if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NETWORK_MODE::ON_LINE)
+	CSceneManager::NETWORK_MODE nNetWorkMode = CManager::GetInstance()->GetSceneManager()->GetNetWorkMode();
+	if (nNetWorkMode == CSceneManager::NETWORK_MODE::ON_LINE)
 	{
 		//プレイヤー情報をサーバーに送信
 		CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
