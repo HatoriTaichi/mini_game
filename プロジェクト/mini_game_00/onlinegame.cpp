@@ -32,8 +32,6 @@
 // Ã“Iƒƒ“ƒo•Ï”éŒ¾
 //=============================================================================
 bool COnlineGame::m_is_onece = true;
-vector<int> COnlineGame::m_IngredientsSpawnNum[OnlineGame_OffSetArrayMax];
-vector<int> COnlineGame::m_ItemSpawnNum[OnlineGame_OffSetArrayMax];
 
 //=============================================================================
 // 
@@ -51,7 +49,7 @@ static const int ClimaxItemSpawnMin = 2;
 static const int ClimaxItemSpawnMax = 2;
 static const int EnemySpawnMax = 2;
 static const int LastSpartTime = 30;
-static const int GameMaxTime = 90;//§ŒÀŠÔ
+static const int GameMaxTime = 10;//§ŒÀŠÔ
 static const int StartTime = 90;
 static const int StartFadeTime = 10;
 static const int TargetFadeTime = 50;
@@ -113,6 +111,7 @@ COnlineGame::COnlineGame()
 	m_MaxEnemySpawn = 0;
 	m_bIsStartUiSet = false;
 	m_bIsFinishUiSet = false;
+	m_is_onece = true;
 }
 
 //=============================================================================

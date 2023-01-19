@@ -54,8 +54,8 @@ private:
 	CEnemyPlayer *m_enemy_player;	// 敵
 	vector<D3DXVECTOR3> m_IngredientsSpawnPoint;//具材のスポーンポイント
 	vector<D3DXVECTOR3> m_ItemSpawnPoint;//アイテムのスポーンポイント
-	static vector<int> m_IngredientsSpawnNum[OnlineGame_OffSetArrayMax];//具材の事前出現番号
-	static vector<int> m_ItemSpawnNum[OnlineGame_OffSetArrayMax];//具材の事前出現番号
+	vector<int> m_IngredientsSpawnNum[OnlineGame_OffSetArrayMax];//具材の事前出現番号
+	vector<int> m_ItemSpawnNum[OnlineGame_OffSetArrayMax];//具材の事前出現番号
 	GameMode m_Mode;//ゲーム中のモード
 	CPlayer *m_pPlayer;
 	CObject2D *m_pBandUI;
