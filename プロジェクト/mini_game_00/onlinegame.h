@@ -86,7 +86,8 @@ private:
 	bool m_bLastBGMSoundToggle;	// ラストスパートBGMが鳴ったか
 	int m_UITimer;//UI表示用タイマー
 	bool m_bIsGameStart;
-
+	bool m_bIsStartUiSet;
+	bool m_bIsFinishUiSet;
 
 };
 

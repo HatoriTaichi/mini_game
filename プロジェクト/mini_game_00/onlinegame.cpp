@@ -111,6 +111,8 @@ COnlineGame::COnlineGame()
 	m_MaxIngredientsSpawn = 0;
 	m_MaxItemSpawn = 0;
 	m_MaxEnemySpawn = 0;
+	m_bIsStartUiSet = false;
+	m_bIsFinishUiSet = false;
 }
 
 //=============================================================================
@@ -407,20 +409,21 @@ void COnlineGame::Update(void)
 	}
 
 	//スタートUIを生成
-	if (m_UITimer >= StartSpawnTime)
+	if (!m_bIsStartUiSet && m_UITimer >= StartSpawnTime)
 	{
 		CMove_UI::Create(StartPos, StartSize, StartTime, StartFadeTime, "Start000.png", CMove_UI::UI_Type::Type_Start, { 1.0,1.0,1.0,0.0f });
+		m_bIsStartUiSet = true;
 	}
 	if (m_pGameTimer)
 	{
 		//サーバーから取得したタイマーを設定
 		m_pGameTimer->SetCounterNum(data->game_timer);
 		//時間切れになったらゲーム終了
-		if (m_pGameTimer->GetCounter() <= 0)
+		if (!m_bIsFinishUiSet && m_pGameTimer->GetCounter() <= 0)
 		{
 			//フィニッシュUIを生成
 			CMove_UI::Create(FinishPos, FinishSize, StartTime, StartFadeTime, "Finish000.png", CMove_UI::UI_Type::Type_Start);
-
+			m_bIsFinishUiSet = true;
 			CManager::GetInstance()->GetSceneManager()->ChangeScene(CSceneManager::MODE::RESULT, CSceneManager::FADE_MODE::NORMAL, 1.0f);
 		}
 
