@@ -253,6 +253,7 @@ void AllAcceptInit(CTcpListener *listener, int room_num)
 	vector<CCommunication*> communication;	// 通信クラス
 	CCommunicationData::COMMUNICATION_DATA data = {};	// 割り振るためのデータ
 	int count_player = 0;	// カウント
+	int my_num = room_num;	// 自分の部屋番号
 	char recv_data[MAX_COMMU_DATA];	// レシーブ用
 
 	while (true)
@@ -295,7 +296,7 @@ void AllAcceptInit(CTcpListener *listener, int room_num)
 	}
 
 	// 部屋毎のスレッド
-	thread room_communication_th(CreateRoom, communication, room_num);
+	thread room_communication_th(CreateRoom, communication, my_num);
 
 	// 切り離す
 	room_communication_th.detach();
