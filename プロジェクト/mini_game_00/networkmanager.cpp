@@ -56,6 +56,10 @@ void CNetWorkManager::Init(void)
 		// ê∂ê¨
 		m_communication = new CTcpClient;
 	}
+	m_player_data.Init();
+	m_enemy_data.Init();
+	m_is_recv = false;
+	m_is_recv_success = false;
 }
 
 //=============================================================================
@@ -70,6 +74,10 @@ void CNetWorkManager::Uninit(void)
 		delete m_communication;
 		m_communication = nullptr;
 	}
+	m_player_data.Init();
+	m_enemy_data.Init();
+	m_is_recv = false;
+	m_is_recv_success = false;
 }
 
 //=============================================================================
