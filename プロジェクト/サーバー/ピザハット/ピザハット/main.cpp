@@ -176,6 +176,8 @@ void CreateRoom(vector<CCommunication*> communication, int room_num)
 				// タイマー減算
 				data[0]->game_timer--;
 				data[1]->game_timer--;
+				commu_data[0].SetCmmuData(*data[0]);
+				commu_data[2].SetCmmuData(*data[1]);
 			}
 
 			// 現在の時間を保存
