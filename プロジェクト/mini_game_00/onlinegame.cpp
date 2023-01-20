@@ -112,6 +112,7 @@ COnlineGame::COnlineGame()
 	m_bIsStartUiSet = false;
 	m_bIsFinishUiSet = false;
 	m_is_onece = true;
+	m_bLastSoundToggle = false;
 }
 
 //=============================================================================
@@ -138,12 +139,6 @@ HRESULT COnlineGame::Init(void)
 		{
 			if (m_is_onece)
 			{
-				//if (!m_pPlayer[1])
-				//{
-				//	m_pPlayer[1] = CPlayer::Create(D3DXVECTOR3(100.0f, 0.0f, -200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-				//		D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/player_motion_1.txt", 1);
-				//}
-				//CEnemy::Create(D3DXVECTOR3(0.0f, 0.0f, 200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data/Txt/motion.txt");
 				if (!m_pBandUI)
 				{
 					m_pBandUI = CObject2D::Create(BandUIPos, BandUISize, "national_flag.png");
@@ -203,18 +198,7 @@ HRESULT COnlineGame::Init(void)
 					m_pLastSpurtUI = CMove_UI::Create(LastSpurtPos, LastSpurtSize, 0, 0, "lastspurt000.png", CMove_UI::UI_Type::Type_LastSpurt);
 					m_pLastSpurtUI->SetState(CMove_UI::State::Normal);
 				}
-				////フィニッシュUIを生成
-				//if (!m_pFinishUI)
-				//{
-				//	m_pFinishUI = CObject2D::Create(FinishPos, FinishSize, "Finish000.png");
-				//	m_pFinishUI->SetCol({ 1.0,1.0,1.0,0.0 });
-				//}
-				//ラストスパートUIUIを生成
-				if (!m_pLastSpurtUI)
-				{
-					//m_pLastSpurtUI = CObject2D::Create(LastSpurtPos, LastSpurtSize, "lastspurt000.png");
-					//m_pLastSpurtUI
-				}
+
 				vector<string> TextElement;	// フォルダの保存バッファ
 				CFileLoad::STAGE_INFO Stage;
 				CFileLoad::STAGE_SPAWN_INFO Spawn;
