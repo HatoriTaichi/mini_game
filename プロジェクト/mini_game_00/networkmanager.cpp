@@ -93,6 +93,11 @@ void CNetWorkManager::Recv(void)
 
 				CCommunicationData::COMMUNICATION_DATA *data_buf = new CCommunicationData::COMMUNICATION_DATA;	// データのバッファ
 
+				if (m_communication == nullptr)
+				{
+					break;
+				}
+
 				// 受信
 				recv_size = m_communication->Recv(&recv_data[0], sizeof(CCommunicationData::COMMUNICATION_DATA));
 				m_is_recv = true;
