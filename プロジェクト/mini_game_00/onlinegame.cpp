@@ -379,7 +379,7 @@ void COnlineGame::Uninit(void)
 		m_pLastSpurtUI = nullptr;
 	}
 
-
+	CManager::GetInstance()->GetNetWorkManager()->Init();
 }
 
 //=============================================================================
