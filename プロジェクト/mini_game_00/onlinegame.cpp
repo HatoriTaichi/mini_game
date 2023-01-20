@@ -375,7 +375,6 @@ void COnlineGame::Update(void)
 	CCommunicationData::COMMUNICATION_DATA *player_data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
 	CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetEnemyData()->GetCmmuData();
 	char aSendData[MAX_COMMU_DATA];
-	player_data->game_timer = data->game_timer;
 	CKey *key = CManager::GetInstance()->GetKey();
 	if (m_bIsGameStart)
 	{

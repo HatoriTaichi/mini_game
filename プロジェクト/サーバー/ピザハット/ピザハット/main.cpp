@@ -177,7 +177,7 @@ void CreateRoom(vector<CCommunication*> communication, int room_num)
 				data[0]->game_timer--;
 				data[1]->game_timer--;
 				commu_data[0].SetCmmuData(*data[0]);
-				commu_data[2].SetCmmuData(*data[1]);
+				commu_data[1].SetCmmuData(*data[1]);
 			}
 
 			// 現在の時間を保存
@@ -224,6 +224,7 @@ void CreateRoom(vector<CCommunication*> communication, int room_num)
 				cout << "Player : " << count_player << "->プレイヤーの位置" << data[count_player]->player.pos.x << " : " << data[count_player]->player.pos.y << " : " << data[count_player]->player.pos.z << endl;
 				cout << "Player : " << count_player << "->プレイヤーの回転" << data[count_player]->player.rot.x << " : " << data[count_player]->player.rot.y << " : " << data[count_player]->player.rot.z << endl;
 				cout << "Player : " << count_player << "->プレイヤーのモーション" << data[count_player]->player.motion << endl;
+				cout << "Player : " << count_player << "->プレイヤーのタイマー" << data[count_player]->game_timer << endl;
 				cout << "Player : " << count_player << "->プレイヤーの接続状況" << data[count_player]->connect << endl;
 			}
 			cout << "=======================================================" << endl;
