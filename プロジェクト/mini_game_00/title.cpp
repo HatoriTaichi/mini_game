@@ -22,7 +22,7 @@
 #include "select_botton.h"
 #include "object2D.h"
 #include "sound.h"
-
+#include "networkmanager.h"
 #define CAMERA_ROT (D3DXVECTOR3(D3DXToRadian(0.0f), D3DXToRadian(30.0f),D3DXToRadian(0.0f)))	// カメラの向き
 #define TITLELOGO_POS (D3DXVECTOR3(640.0f, 200.0f,0.0f))	// タイトルロゴの位置
 #define TITLELOGO_SIZE (D3DXVECTOR3(200.0f, 200.0f,0.0f))	// タイトルロゴの位置
@@ -68,6 +68,8 @@ CTitle::~CTitle()
 //=============================================================================
 HRESULT CTitle::Init(void)
 {
+	CManager::GetInstance()->GetNetWorkManager()->Init();
+
 	CManager::GetInstance()->GetCamera()->SetRot(CAMERA_ROT);
 
 	CManager::GetInstance()->GetSound()->Play(CSound::SOUND_LABEL_BGM_TITLE);
