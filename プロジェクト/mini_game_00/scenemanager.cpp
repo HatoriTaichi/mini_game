@@ -235,6 +235,8 @@ void CSceneManager::SetMode(MODE mode)
 		{
 			// ‰Šú‰»
 			m_title->Init();
+			CManager::GetInstance()->CreatePlayerData();
+
 		}
 		break;
 	case MODE::GAME:
@@ -256,7 +258,6 @@ void CSceneManager::SetMode(MODE mode)
 		{
 			// ‰Šú‰»
 			m_network_mode = NETWORK_MODE::ON_LINE;
-			CManager::GetInstance()->CreatePlayerData();
 
 			m_online_game->Init();
 
