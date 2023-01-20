@@ -374,6 +374,7 @@ void COnlineGame::Update(void)
 	//プレイヤー情報をサーバーに送信
 	CCommunicationData::COMMUNICATION_DATA *player_data = CManager::GetInstance()->GetNetWorkManager()->GetPlayerData()->GetCmmuData();
 	CCommunicationData::COMMUNICATION_DATA *data = CManager::GetInstance()->GetNetWorkManager()->GetEnemyData()->GetCmmuData();
+	player_data->game_timer = data->game_timer;
 	char aSendData[MAX_COMMU_DATA];
 	CKey *key = CManager::GetInstance()->GetKey();
 	if (m_bIsGameStart)

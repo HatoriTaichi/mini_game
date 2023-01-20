@@ -99,9 +99,7 @@ void CNetWorkManager::Recv(void)
 			{
 				char recv_data[MAX_COMMU_DATA];	// 受信データ
 
-				CCommunicationData::COMMUNICATION_DATA *data = m_player_data.GetCmmuData();	// 自分の情報を取得
 				CCommunicationData::COMMUNICATION_DATA *data_buf = new CCommunicationData::COMMUNICATION_DATA;	// データのバッファ
-				data->game_timer = data_buf->game_timer;
 
 				if (m_communication == nullptr)
 				{
