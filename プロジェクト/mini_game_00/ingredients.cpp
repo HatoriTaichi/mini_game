@@ -413,12 +413,12 @@ void CIngredients::ColisionPlayer(void)
 					pPlayer->SetIngredients(m_Type);
 					if (CManager::GetInstance()->GetSceneManager()->GetNetWorkMode() == CSceneManager::NETWORK_MODE::ON_LINE)
 					{
-						CManager::GetInstance()->GetSceneManager()->GetOnloineGame()->AddIngredientsCnt(1, m_Type, nCnt);
+						CManager::GetInstance()->GetSceneManager()->GetOnloineGame()->AddIngredientsCnt(1, m_Type, pPlayer->GetPlayerNum());
 
 					}
 					else
 					{
-						CManager::GetInstance()->GetSceneManager()->GetGame()->AddIngredientsCnt(1, m_Type, nCnt);
+						CManager::GetInstance()->GetSceneManager()->GetGame()->AddIngredientsCnt(1, m_Type, pPlayer->GetPlayerNum());
 
 					}
 					if (!m_bDoDrop)

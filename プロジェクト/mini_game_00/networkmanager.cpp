@@ -56,6 +56,10 @@ void CNetWorkManager::Init(void)
 		// 生成
 		m_communication = new CTcpClient;
 	}
+	m_player_data.Init();
+	m_enemy_data.Init();
+	m_is_recv = false;
+	m_is_recv_success = false;
 }
 
 //=============================================================================
@@ -70,6 +74,10 @@ void CNetWorkManager::Uninit(void)
 		delete m_communication;
 		m_communication = nullptr;
 	}
+	m_player_data.Init();
+	m_enemy_data.Init();
+	m_is_recv = false;
+	m_is_recv_success = false;
 }
 
 //=============================================================================
@@ -92,6 +100,11 @@ void CNetWorkManager::Recv(void)
 				char recv_data[MAX_COMMU_DATA];	// 受信データ
 
 				CCommunicationData::COMMUNICATION_DATA *data_buf = new CCommunicationData::COMMUNICATION_DATA;	// データのバッファ
+
+				if (m_communication == nullptr)
+				{
+					break;
+				}
 
 				// 受信
 				recv_size = m_communication->Recv(&recv_data[0], sizeof(CCommunicationData::COMMUNICATION_DATA));

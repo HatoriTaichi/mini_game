@@ -300,6 +300,15 @@ void CResult::ComboCalculate(void)
 			}
 
 		}
+		//‹ïŞ‚ğæ‚Á‚½ŒÂ”•ª‚¾‚¯ƒXƒRƒA‚ğ‚¿‚å‚Á‚Æ·‚é
+		for (int nCnt = 0; nCnt < C2d_ingredients::IngredientsType::Max; nCnt++)
+		{
+			for (int ning = 0; ning < m_nIngredientTypeCntMax[nCnt][nPlayer]; ning++)
+			{
+				m_nComboMaxScore[nPlayer] += 100;
+			}
+
+		}
 	}
 	int n = 0;
 }
@@ -489,6 +498,7 @@ void CResult::ComboScoreCnt(void)
 			m_pComboScoreCounter[nCntPlayer]->SetCounterNum(m_nComboMaxScore[nCntPlayer]);
 			m_bComboScoreMaxCnt[nCntPlayer] = true;
 		}
+		
 	}
 	if (m_bComboScoreMaxCnt[0] && m_bComboScoreMaxCnt[1])
 	{
