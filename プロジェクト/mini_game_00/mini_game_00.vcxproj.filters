@@ -276,11 +276,11 @@
     <ClInclude Include="BulletHoll.h">
       <Filter>ソース ファイル\エフェクト</Filter>
     </ClInclude>
-    <ClInclude Include="fade.h">
-      <Filter>ソース ファイル\マネージャー系</Filter>
-    </ClInclude>
     <ClInclude Include="enemyplayer.h">
       <Filter>ソース ファイル\キャラクター\敵</Filter>
+    </ClInclude>
+    <ClInclude Include="fade.h">
+      <Filter>ソース ファイル\フェード</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
